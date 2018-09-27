@@ -14,6 +14,15 @@
   /* CSS */
   #app {
     background: #FFFFFF;
+    user-select: none;
+    -webkit-user-drag: none;
+  }
+  #app::-webkit-scrollbar {
+    width: 0px;
+    background: transparent
+  }
+  #app::-webkit-scrollbar-thumb {
+    background: transparent;
   }
   #id-top-bar {
     position: fixed;
