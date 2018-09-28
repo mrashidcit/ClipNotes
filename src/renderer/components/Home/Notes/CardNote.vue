@@ -7,7 +7,7 @@
     <v-img
       v-if="briefnotes.type === 'image'"
       height="250px"
-      :src="briefnotes.filePath">
+      :src="briefnotes.path">
       <v-container fill-height fluid>
         <v-layout fill-height>
           <v-flex xs12 align-end flexbox>

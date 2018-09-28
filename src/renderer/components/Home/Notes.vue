@@ -12,6 +12,13 @@
         </v-layout>
       </v-container>
     </div>
+    <div class="hero">
+      <p style="text-align: center; cursor: default;">
+        No notes available!<br/>
+        To get started, click <v-icon class="grey--text">add_circle</v-icon> to add new note
+        or <b>copy and paste any item</b>.
+      </p>
+    </div>
   </div>
 </template>
 

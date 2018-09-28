@@ -5,8 +5,52 @@
 </template>
 
 <script>
+  const { ipcRenderer } = require('electron')
+
   export default {
-    name: 'briefnotes'
+    name: 'briefnotes',
+    methods: {
+      // Generic SQL update
+      // _sql: SQL command as string
+      // _data: SQL data as array
+      updateSqlEntry (_sql, _data) {
+        // SEND 'onUPdateSqlEntry' to main process
+        ipcRenderer.send('onUpdateSqlEntry', {
+          sql: _sql,
+          data: _data
+        })
+      },
+      readSql (_obj) {
+        ipcRenderer.send('onReadSql', _obj)
+      },
+      // Register Root events
+      registerEvents () {
+        const _context = this
+        ipcRenderer.on('onSqlDataReady', (event, _obj) => {
+          _context.$root.$emit('onSqlDataReady', _obj)
+        })
+        this.$root.$on('updateSqlEntry', (_obj) => {
+          // Check _obj is valid
+          if (_obj && _obj.constructor === {}.constructor) {
+            if ('sql' in _obj && 'data' in _obj &&
+              _obj.sql && _obj.data) {
+              _context.updateSqlEntry(_obj.sql, _obj.data)
+            }
+          }
+        })
+        this.$root.$on('readSql', (_obj) => {
+          if (_obj && _obj.constructor === {}.constructor) {
+            if ('sql' in _obj && 'id' in _obj &&
+              _obj.sql && _obj.id) {
+              _context.readSql(_obj)
+            }
+          }
+        })
+      }
+    },
+    mounted () {
+      this.registerEvents()
+    }
   }
 </script>
 
@@ -40,6 +84,12 @@
     right: 0;
     background: #E8ECF2;
     overflow: auto;
+  }
+  .hero {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
   }
   .wrapper {
     padding: 10px;
