@@ -88,6 +88,7 @@ export default {
           'briefnote',
           _path
         )
+        // Check if path exists
         if (fops.existsSync(srcPath)) {
           fops.readFile(srcPath, 'utf8', (err, data) => {
             if (err) {
