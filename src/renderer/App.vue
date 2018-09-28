@@ -7,6 +7,30 @@
 <script>
   const { ipcRenderer } = require('electron')
 
+  const os = require('os')
+  const path = require('path')
+  const fops = require('fs-extra')
+
+  const appConfig = {
+    dbPath: path.join(
+      os.homedir(),
+      '.xplorebits',
+      'briefnote',
+      'briefnote.db'
+    ),
+    appPath: path.join(
+      os.homedir(),
+      '.xplorebits',
+      'briefnote'
+    ),
+    resourcePath: path.join(
+      os.homedir(),
+      '.xplorebits',
+      'briefnote',
+      'resource'
+    )
+  }
+
   export default {
     name: 'briefnotes',
     methods: {
@@ -43,6 +67,51 @@
             if ('sql' in _obj && 'id' in _obj &&
               _obj.sql && _obj.id) {
               _context.readSql(_obj)
+            }
+          }
+        })
+        this.$root.$on('saveHtmlFile', (_obj) => {
+          if (_obj && _obj.constructor === {}.constructor &&
+            'html' in _obj && 'name' in _obj &&
+            _obj.html && _obj.name) {
+            if (!fops.existsSync(appConfig.resourcePath)) {
+              fops.ensureDirSync(appConfig.resourcePath)
+            }
+            fops.writeFile(
+              path.join(
+                appConfig.resourcePath,
+                _obj.name.split('.').length > 1
+                  ? _obj.name.split('.')[1] !== 'html'
+                    ? `${_obj.name.split('.')[0]}.html`
+                    : _obj.name
+                  : `${_obj.name}.html`
+              ),
+              _obj.html
+            )
+          }
+        })
+        this.$root.$on('saveImageFile', (_obj) => {
+          if (_obj && _obj.constructor === {}.constructor &&
+            'src' in _obj && 'name' in _obj &&
+            _obj.src && _obj.name) {
+            if (!fops.existsSync(appConfig.resourcePath)) {
+              fops.ensureDirSync(appConfig.resourcePath)
+            }
+            if (fops.existsSync(_obj.src)) {
+              fops.copyFile(
+                _obj.src,
+                path.join(
+                  appConfig.resourcePath,
+                  _obj.name
+                ),
+                (err) => {
+                  if (err) {
+                    console.error(err)
+                  }
+                }
+              )
+            } else {
+              console.error('File does not exists: ', _obj.src)
             }
           }
         })

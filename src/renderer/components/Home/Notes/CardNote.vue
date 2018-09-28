@@ -1,28 +1,25 @@
 <template>
   <v-card flat tile height="250px" color="white"
     :class="`elevation-${elevation.value}`"
-    @mouseover="onMouseOver(briefnotes)"
-    @mouseout="onMouseOut(briefnotes)"
+    @mouseover="onMouseOver(briefnote)"
+    @mouseout="onMouseOut(briefnote)"
     style="cursor: pointer;">
     <v-img
-      v-if="briefnotes.type === 'image'"
+      v-if="briefnote.type === 'image'"
       height="250px"
-      :src="briefnotes.path">
+      :src="value" :load-data="getAbsolutePath(briefnote.path)">
       <v-container fill-height fluid>
         <v-layout fill-height>
           <v-flex xs12 align-end flexbox>
-            <p class="headline card-image-info">{{briefnotes.title}}</p>
+            <p class="headline card-image-info">{{briefnote.title}}</p>
           </v-flex>
         </v-layout>
       </v-container>
     </v-img>
-    <v-card-title v-else-if="briefnotes.type === 'text' || briefnotes.type === 'html'">
-      <div class="headline">{{briefnotes.title}}</div>
+    <v-card-title v-else-if="(briefnote.type === 'text' || briefnote.type === 'html')">
+      <div class="headline">{{briefnote.title}}</div>
     </v-card-title>
-    <v-card-text v-if="briefnotes.type === 'text'">
-      <span class="text-threedots">{{dummyDescription}}</span>
-    </v-card-text>
-    <v-card-text class="htmlContent" v-if="briefnotes.type === 'html'" v-html="dummyHtml"></v-card-text>
+    <v-card-text class="htmlContent" v-if="briefnote.type === 'html'" v-html="value" :load-data="getHtmlStr(briefnote.path)"></v-card-text>
     <div class="options" v-if="onHover">
       <v-layout row>
         <v-btn icon raised color="white">
@@ -39,14 +36,26 @@
         </v-btn>
       </v-layout>
     </div>
+    <v-card-text class="hero" v-if="!ready">
+      Loading {{briefnote}}
+      <v-progress-linear
+        indeterminate
+        color="black"
+        class="mb-0"
+      ></v-progress-linear>
+    </v-card-text>
   </v-card>
 </template>
 
 <script>
+const os = require('os')
+const path = require('path')
+const fops = require('fs-extra')
+
 export default {
   name: 'card-note',
   props: [
-    'briefnotes'
+    'briefnote'
   ],
   data () {
     return {
@@ -56,7 +65,9 @@ export default {
       dummyHtml: `<h1>hello</h1> <h1>hello</h1> <h1>hello</h1><h1>hello</h1><h1>hello</h1>`,
       elevation: {
         value: 0
-      }
+      },
+      ready: false,
+      value: ''
     }
   },
   methods: {
@@ -67,6 +78,46 @@ export default {
     onMouseOut (_item) {
       this.onHover = false
       this.elevation.value = 0
+    },
+    getHtmlStr (_path) {
+      const context = this
+      if (_path) {
+        const srcPath = path.join(
+          os.homedir(),
+          '.xplorebits',
+          'briefnote',
+          _path
+        )
+        if (fops.existsSync(srcPath)) {
+          fops.readFile(srcPath, 'utf8', (err, data) => {
+            if (err) {
+              console.error(err)
+            } else {
+              setTimeout(() => {
+                context.value = data
+                context.ready = true
+              }, 500)
+            }
+          })
+        }
+      }
+    },
+    getAbsolutePath (_path) {
+      const context = this
+      if (_path) {
+        const srcPath = path.join(
+          os.homedir(),
+          '.xplorebits',
+          'briefnote',
+          _path
+        )
+        if (fops.existsSync(srcPath)) {
+          setTimeout(() => {
+            context.ready = true
+            context.value = `file://${srcPath}`
+          }, 500)
+        }
+      }
     }
   }
 }
@@ -80,7 +131,7 @@ export default {
     padding: 5px;
   }
   .card-image-info {
-    background-color: rgba(255, 255, 255, 0.5);
+    background-color: rgba(255, 255, 255, 0.7);
     color: black;
     padding: 5px;
   }

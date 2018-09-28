@@ -1,18 +1,19 @@
 <template>
   <div id="id-notes">
-    <div class="wrapper">
+    <div class="wrapper"
+      v-if="briefnote.length > 0">
       <v-container v-bind="{ [`grid-list-${size}`]: true }" fluid>
         <v-layout row wrap>
           <v-flex
-            v-for="(item, index) in briefnotes"
+            v-for="(item, index) in briefnote"
             :key="index"
             sm6 md4>
-            <card-note :briefnotes="item" />
+            <card-note :briefnote="item" />
           </v-flex>
         </v-layout>
       </v-container>
     </div>
-    <div class="hero">
+    <div class="hero" v-else>
       <p style="text-align: center; cursor: default;">
         No notes available!<br/>
         To get started, click <v-icon class="grey--text">add_circle</v-icon> to add new note
@@ -27,7 +28,7 @@ import CardNote from './Notes/CardNote'
 export default {
   name: 'notes',
   props: [
-    'briefnotes'
+    'briefnote'
   ],
   components: {
     CardNote

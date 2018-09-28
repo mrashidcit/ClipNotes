@@ -128,7 +128,6 @@ DbHelper.prototype.read = function (_obj, _callback) {
   if (_obj && _obj.constructor === {}.constructor &&
     'sql' in _obj && 'id' in _obj &&
     _obj.sql && _obj.id) {
-    console.log(config.db)
     if (config.db) {
       config.db.serialize(() => {
         config.db.all(`${_obj.sql}`, (error, _rows) => {
