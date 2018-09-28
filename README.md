@@ -21,9 +21,9 @@
 - [ ] Able to access application from **Command-line** or **Sockets**.
 
 ## Development Instructions
-This project is created using [electron-vue](https://github.com/SimulatedGREG/electron-vue) template. Apart from this template dependencies, you need to have following setup to start developing/debugging *briefnote* application.
-* Windows, OSX/Darwin, Linux OS platform
-* NodeJs standard version
+This project is created using [electron-vue](https://github.com/SimulatedGREG/electron-vue) template. Apart from this template and application dependencies, you need to have following setup to start developing/debugging *briefnote* application.
+* *Windows* or *OSX* or *Linux* OS platform
+* *NodeJs* standard version
 
 ## Build Instructions
 
