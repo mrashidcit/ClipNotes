@@ -20,11 +20,19 @@
 - [ ] Able to integrate **Dropbox** or **Google Drive**.
 - [ ] Able to access application from **Command-line** or **Sockets**.
 
-#### Build Setup
+## Development Instructions
+This project is created using [electron-vue](https://github.com/SimulatedGREG/electron-vue) template. Apart from this template dependencies, you need to have following setup to start developing/debugging *brifnote* application.
+* Windows, OSX/Darwin, Linux OS platform
+* NodeJs standard version
+
+## Build Instructions
 
 ``` bash
 # install dependencies
 npm install
+
+# rebuild dependencies for ElectronJs
+npm run rebuild-for-electron
 
 # serve with hot reload at localhost:9080
 npm run dev
@@ -41,3 +49,9 @@ npm run lint
 
 ```
 ---
+
+## License
+[MIT](https://opensource.org/licenses/MIT)
+
+## Contact
+[hello@xplorebits.com](mailto:hello@xplorebits.com)
