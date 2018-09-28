@@ -15,6 +15,9 @@
           <v-btn icon depressed>
             <v-icon>search</v-icon>
           </v-btn>
+          <v-btn icon color="white">
+            <v-icon class="black--text">add</v-icon>
+          </v-btn>
         </v-layout>
       </div>
       <div class="options">

@@ -1,12 +1,28 @@
 <template>
   <v-card flat tile height="250px" color="white"
     :class="`elevation-${elevation.value}`"
-    @mouseover="onMouseOver(item)"
-    @mouseout="onMouseOut(item)">
-    <v-card-title>
-      <div class="headline">{{dummyTitle}}</div>
-      <div class="text-threedots">{{dummyDescription}}</div>
+    @mouseover="onMouseOver(briefnotes)"
+    @mouseout="onMouseOut(briefnotes)"
+    style="cursor: pointer;">
+    <v-img
+      v-if="briefnotes.type === 'image'"
+      height="250px"
+      :src="briefnotes.filePath">
+      <v-container fill-height fluid>
+        <v-layout fill-height>
+          <v-flex xs12 align-end flexbox>
+            <p class="headline card-image-info">{{briefnotes.title}}</p>
+          </v-flex>
+        </v-layout>
+      </v-container>
+    </v-img>
+    <v-card-title v-else-if="briefnotes.type === 'text' || briefnotes.type === 'html'">
+      <div class="headline">{{briefnotes.title}}</div>
     </v-card-title>
+    <v-card-text v-if="briefnotes.type === 'text'">
+      <span class="text-threedots">{{dummyDescription}}</span>
+    </v-card-text>
+    <v-card-text class="htmlContent" v-if="briefnotes.type === 'html'" v-html="dummyHtml"></v-card-text>
     <div class="options" v-if="onHover">
       <v-layout row>
         <v-btn icon raised color="white">
@@ -30,13 +46,14 @@
 export default {
   name: 'card-note',
   props: [
-    'item'
+    'briefnotes'
   ],
   data () {
     return {
       onHover: false,
       dummyDescription: `Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.`,
       dummyTitle: `What is Lorem Ipsum?`,
+      dummyHtml: `<h1>hello</h1> <h1>hello</h1> <h1>hello</h1><h1>hello</h1><h1>hello</h1>`,
       elevation: {
         value: 0
       }
@@ -62,10 +79,13 @@ export default {
     right: 0;
     padding: 5px;
   }
-  .text-threedots {
+  .card-image-info {
+    background-color: rgba(255, 255, 255, 0.5);
+    color: black;
+    padding: 5px;
+  }
+  .htmlContent {
     overflow: hidden;
-    display: -webkit-box;
-    -webkit-line-clamp: 6;
-    -webkit-box-orient: vertical; 
+    height: 140px;
   }
 </style>

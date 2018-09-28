@@ -4,10 +4,10 @@
       <v-container v-bind="{ [`grid-list-${size}`]: true }" fluid>
         <v-layout row wrap>
           <v-flex
-            v-for="n in 9"
-            :key="n"
+            v-for="(item, index) in briefnotes"
+            :key="index"
             sm6 md4>
-            <card-note :item="n" />
+            <card-note :briefnotes="item" />
           </v-flex>
         </v-layout>
       </v-container>
@@ -19,6 +19,9 @@
 import CardNote from './Notes/CardNote'
 export default {
   name: 'notes',
+  props: [
+    'briefnotes'
+  ],
   components: {
     CardNote
   },
