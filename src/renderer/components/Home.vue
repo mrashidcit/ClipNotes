@@ -11,7 +11,6 @@
   import TopBar from './Home/TopBar'
   import Notes from './Home/Notes'
   
-  const os = require('os')
   const {
     ipcRenderer,
     clipboard
@@ -40,13 +39,12 @@
         if (arg && arg.constructor === {}.constructor && 'label' in arg) {
           switch (arg.label) {
             case 'paste':
-              if (os.platform() === 'darwin') {
-                if (isImageFormat(clipboard.availableFormats())) {
-                  console.log('found image')
-                  console.log(clipboard.read('public.file-url'))
-                } else {
-                  console.log('found text/html')
-                }
+              if (isImageFormat(clipboard.availableFormats())) {
+                console.log('found image')
+                const filePath = clipboard.read('public.file-url').replace('file://', '')
+                console.log(filePath)
+              } else {
+                console.log('found text/html')
               }
               break
             default: break
