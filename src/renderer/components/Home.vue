@@ -11,12 +11,29 @@
   import TopBar from './Home/TopBar'
   import Notes from './Home/Notes'
   
+  const os = require('os')
   const path = require('path')
   const {
     ipcRenderer,
     clipboard
   } = require('electron')
   const uniqid = require('uniqid')
+
+  /**
+   * Add platform specific dependencies
+   */
+  switch (os.platform()) {
+    case 'win32':
+      // Add if any windows specifc dependencies
+      // Windows specifc packages can be listed in package.json -> "win32Dependencies" key
+      window.winClipboard = require('win-clipboard')
+      break
+    case 'linux':
+      break
+    case 'darwin':
+      break
+    default: break
+  }
 
   export default {
     name: 'landing-page',
@@ -132,6 +149,35 @@
             }
           }
         })
+      },
+      onPaste () {
+        const formats = clipboard.availableFormats()
+        console.log(formats)
+        if (isImageFormat(formats)) {
+          const filePath = clipboard.read('public.file-url').replace('file://', '')
+          this.addNote({
+            type: 'image',
+            obj: {
+              path: filePath,
+              format: getImageFormat(formats)
+            }
+          })
+        } else {
+          console.log('found text/html')
+          const htmlData = (clipboard.readHTML() || clipboard.readText())
+          if (htmlData) {
+            this.addNote({
+              type: 'html',
+              obj: {
+                html: htmlData
+              }
+            })
+          } else {
+            if (os.platform() === 'win32') {
+              console.log(window.winClipboard)
+            }
+          }
+        }
       }
     },
     mounted () {
@@ -139,30 +185,16 @@
       this.$nextTick(function () {
         context.registerEvents()
         context.init()
+        if (os.platform() === 'win32') {
+          document.onpaste = function () {
+            context.onPaste()
+          }
+        }
         ipcRenderer.on('onMenuItemClick', (event, arg) => {
           if (arg && arg.constructor === {}.constructor && 'label' in arg) {
             switch (arg.label) {
               case 'paste':
-                const formats = clipboard.availableFormats()
-                if (isImageFormat(formats)) {
-                  const filePath = clipboard.read('public.file-url').replace('file://', '')
-                  context.addNote({
-                    type: 'image',
-                    obj: {
-                      path: filePath,
-                      format: getImageFormat(formats)
-                    }
-                  })
-                } else {
-                  console.log('found text/html')
-                  const htmlData = clipboard.readHTML()
-                  context.addNote({
-                    type: 'html',
-                    obj: {
-                      html: htmlData
-                    }
-                  })
-                }
+                context.onPaste()
                 break
               default: break
             }
