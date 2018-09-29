@@ -19,7 +19,8 @@
     "pack:renderer": "cross-env NODE_ENV=production webpack --progress --colors --config .electron-vue/webpack.renderer.config.js",
     "test": "npm run unit && npm run e2e",
     "unit": "karma start test/unit/karma.conf.js",
-    "postinstall": "npm run lint:fix;npmpd;./node_modules/.bin/electron-rebuild .",
+    "install": "./node_modules/.bin/npmpd .",
+    "postinstall": "npm run lint:fix",
     "rebuild-for-electron": "./node_modules/.bin/electron-rebuild ."
   },
   "build": {
@@ -117,6 +118,7 @@
     "multispinner": "^0.2.1",
     "node-loader": "^0.6.0",
     "node-sass": "^4.9.2",
+    "npm-platform-dependencies": "^0.1.0",
     "require-dir": "^1.0.0",
     "sass-loader": "^7.0.3",
     "spectron": "^3.8.0",
