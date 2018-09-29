@@ -32,7 +32,7 @@ This project is created using [electron-vue](https://github.com/SimulatedGREG/el
 npm install
 
 # install Platform specific dependencies
-npm run platformSpecific
+npm run platformInstall
 
 # rebuild dependencies for ElectronJs
 npm run rebuild-for-electron
