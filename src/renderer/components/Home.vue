@@ -191,8 +191,9 @@
               }
             })
           } else {
+            // Using win-clipboard to fetch Image or Text data
             if (os.platform() === 'win32') {
-              console.log(window.winClipboard)
+              // Generate file path
               const clipboardData = window.winClipboard.getFormats()
               if (clipboardData.indexOf('FileNameW') > -1) {
                 const rawPath = new TextDecoder('utf-8').decode(window.winClipboard.getData('FileNameW'))
@@ -203,6 +204,7 @@
                   }
                 })
                 if (filePath) {
+                  // Add Image Note
                   this.addNote({
                     type: 'image',
                     obj: {
