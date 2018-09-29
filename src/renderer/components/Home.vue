@@ -26,7 +26,11 @@
     case 'win32':
       // Add if any windows specifc dependencies
       // Windows specifc packages can be listed in package.json -> "win32Dependencies" key
-      window.winClipboard = require('win-clipboard')
+      try {
+        window.winClipboard = require('win-clipboard')
+      } catch (e) {
+        console.error('win-clipboard not loaded')
+      }
       break
     case 'linux':
       break
@@ -81,7 +85,8 @@
                 // Save file into app's resource folder
                 this.$root.$emit('saveHtmlFile', {
                   html: _config.obj.html,
-                  name: `${fileName}`
+                  name: `${fileName}`,
+                  obj: resultObj
                 })
               }
               break
@@ -104,12 +109,14 @@
                     'resource',
                     `${fileName}`
                   ),
-                  id: uniqid()
+                  id: uniqid(),
+                  visible: false
                 }
                 // Save file into app's resource folder
                 this.$root.$emit('saveImageFile', {
                   src: _config.obj.path,
-                  name: `${fileName}`
+                  name: `${fileName}`,
+                  obj: resultObj
                 })
               }
               break
@@ -143,9 +150,19 @@
             if (_obj.obj.id === context.uid) {
               if (_obj.rows && _obj.rows.constructor === [].constructor) {
                 _obj.rows.forEach((item) => {
+                  item['visible'] = true
                   context.briefnote.push(item)
                 })
               }
+            }
+          }
+        })
+        this.$root.$on('onSaveImage', (_obj) => {
+          if (_obj && _obj.constructor === {}.constructor &&
+            'type' in _obj && 'title' in _obj && 'path' in _obj && 'id' in _obj) {
+            const targetIndex = this.briefnote.findIndex(item => item.id === _obj.id)
+            if (targetIndex > -1) {
+              this.briefnote[targetIndex].visible = true
             }
           }
         })

@@ -72,7 +72,7 @@
         })
         this.$root.$on('saveHtmlFile', (_obj) => {
           if (_obj && _obj.constructor === {}.constructor &&
-            'html' in _obj && 'name' in _obj &&
+            'html' in _obj && 'name' in _obj && 'obj' in _obj &&
             _obj.html && _obj.name) {
             if (!fops.existsSync(appConfig.resourcePath)) {
               fops.ensureDirSync(appConfig.resourcePath)
@@ -86,13 +86,20 @@
                     : _obj.name
                   : `${_obj.name}.html`
               ),
-              _obj.html
+              _obj.html,
+              (err) => {
+                if (err) {
+                  console.error(err)
+                } else {
+                  _context.$root.$emit('onSaveImage', _obj.obj)
+                }
+              }
             )
           }
         })
         this.$root.$on('saveImageFile', (_obj) => {
           if (_obj && _obj.constructor === {}.constructor &&
-            'src' in _obj && 'name' in _obj &&
+            'src' in _obj && 'name' in _obj && 'obj' in _obj &&
             _obj.src && _obj.name) {
             if (!fops.existsSync(appConfig.resourcePath)) {
               fops.ensureDirSync(appConfig.resourcePath)
@@ -107,6 +114,8 @@
                 (err) => {
                   if (err) {
                     console.error(err)
+                  } else {
+                    _context.$root.$emit('onSaveImage', _obj.obj)
                   }
                 }
               )

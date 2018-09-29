@@ -5,7 +5,7 @@
     @mouseout="onMouseOut(briefnote)"
     style="cursor: pointer;">
     <v-img
-      v-if="briefnote.type === 'image'"
+      v-if="briefnote.type === 'image' && 'visible' in briefnote && briefnote.visible === true"
       height="250px"
       :src="value" :load-data="getAbsolutePath(briefnote.path)">
       <v-container fill-height fluid>
@@ -16,10 +16,10 @@
         </v-layout>
       </v-container>
     </v-img>
-    <v-card-title v-else-if="(briefnote.type === 'text' || briefnote.type === 'html')">
+    <v-card-title v-else-if="(briefnote.type === 'text' || briefnote.type === 'html') && 'visible' in briefnote && briefnote.visible === true">
       <div class="headline">{{briefnote.title}}</div>
     </v-card-title>
-    <v-card-text class="htmlContent" v-if="briefnote.type === 'html'" v-html="value" :load-data="getHtmlStr(briefnote.path)"></v-card-text>
+    <v-card-text class="htmlContent" v-if="briefnote.type === 'html' && 'visible' in briefnote && briefnote.visible === true" v-html="value" :load-data="getHtmlStr(briefnote.path)"></v-card-text>
     <div class="options" v-if="onHover">
       <v-layout row>
         <v-btn icon raised color="white">
