@@ -80,7 +80,8 @@
                     'resource',
                     `${fileName}`
                   ),
-                  id: uid
+                  id: uid,
+                  visible: false
                 }
                 // Save file into app's resource folder
                 this.$root.$emit('saveHtmlFile', {
@@ -192,6 +193,25 @@
           } else {
             if (os.platform() === 'win32') {
               console.log(window.winClipboard)
+              const clipboardData = window.winClipboard.getFormats()
+              if (clipboardData.indexOf('FileNameW') > -1) {
+                const rawPath = new TextDecoder('utf-8').decode(window.winClipboard.getData('FileNameW'))
+                let filePath = ''
+                rawPath.split('').forEach((letter) => {
+                  if (!(letter.charCodeAt(0) === 0)) {
+                    filePath += letter
+                  }
+                })
+                if (filePath) {
+                  this.addNote({
+                    type: 'image',
+                    obj: {
+                      path: filePath,
+                      format: getImageFormat(formats)
+                    }
+                  })
+                }
+              }
             }
           }
         }

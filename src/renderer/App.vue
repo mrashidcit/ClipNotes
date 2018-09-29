@@ -139,11 +139,11 @@
     user-select: none;
     -webkit-user-drag: none;
   }
-  #app::-webkit-scrollbar {
-    width: 0px;
+  ::-webkit-scrollbar {
+    width: 0;
     background: transparent
   }
-  #app::-webkit-scrollbar-thumb {
+  ::-webkit-scrollbar-thumb {
     background: transparent;
   }
   #id-top-bar {
@@ -162,6 +162,13 @@
     right: 0;
     background: #E8ECF2;
     overflow: auto;
+  }
+  #id-notes::-webkit-scrollbar {
+    width: 10px;
+    background: transparent
+  }
+  #id-notes::-webkit-scrollbar-thumb {
+    background: gray;
   }
   .hero {
     position: absolute;
