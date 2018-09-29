@@ -67,8 +67,7 @@
     "vue-electron": "^1.0.6",
     "vue-router": "^3.0.1",
     "vuetify": "^1.2.5",
-    "vuex": "^3.0.1",
-    "win-clipboard": "0.0.6"
+    "vuex": "^3.0.1"
   },
   "devDependencies": {
     "ajv": "^6.5.0",
