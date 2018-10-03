@@ -124,6 +124,7 @@ DbHelper.prototype.update = (_obj) => {
  * Read SQL database
  */
 DbHelper.prototype.read = function (_obj, _callback) {
+  console.log(config.db)
   // Validate data object
   if (_obj && _obj.constructor === {}.constructor &&
     'sql' in _obj && 'id' in _obj &&

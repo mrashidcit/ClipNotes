@@ -10,6 +10,7 @@
   const os = require('os')
   const path = require('path')
   const fops = require('fs-extra')
+  const base64Img = require('base64-img')
 
   const appConfig = {
     dbPath: path.join(
@@ -122,6 +123,28 @@
             } else {
               console.error('File does not exists: ', _obj.src)
             }
+          }
+        })
+        this.$root.$on('saveScreenshot', (_obj) => {
+          if (_obj && _obj.constructor === {}.constructor &&
+            'data' in _obj && 'name' in _obj && 'obj' in _obj &&
+            _obj.data && _obj.name) {
+            if (!fops.existsSync(appConfig.resourcePath)) {
+              fops.ensureDirSync(appConfig.resourcePath)
+            }
+            // Save image in file system
+            base64Img.img(
+              _obj.data,
+              appConfig.resourcePath,
+              `${_obj.name}`,
+              (err) => {
+                if (err) {
+                  console.error(err)
+                } else {
+                  _context.$root.$emit('onSaveImage', _obj.obj)
+                }
+              }
+            )
           }
         })
       }

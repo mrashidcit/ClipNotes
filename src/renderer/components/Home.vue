@@ -3,13 +3,19 @@
     <!-- Top application bar -->
     <top-bar />
     <!-- Notes -->
-    <notes :briefnote="briefnote" />
+    <notes v-if="!onLoading" :briefnote="briefnote" />
+
+    <!-- Dialogs -->
+    <!-- Generic Loader -->
+    <generic-loader :config="dialogs.genericLoader" />
   </div>
 </template>
 
 <script>
   import TopBar from './Home/TopBar'
   import Notes from './Home/Notes'
+  import GenericLoader from './Dialogs/GenericLoader'
+  import { nativeImage } from 'electron'
   
   const os = require('os')
   const path = require('path')
@@ -43,16 +49,24 @@
     name: 'landing-page',
     components: {
       TopBar,
-      Notes
+      Notes,
+      GenericLoader
     },
     data () {
       return {
+        onLoading: true,
         briefnote: [
           /* { title: 'A brief html note', type: 'html', path: '', id: '' },
           { title: 'A brief text note', type: 'text', path: '', id: '' },
           { title: 'A brief image note', type: 'image', path: 'https://images.pexels.com/photos/997719/pexels-photo-997719.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260', id: '' } */
         ],
-        uid: uniqid()
+        uid: uniqid(),
+        dialogs: {
+          genericLoader: {
+            text: '',
+            state: false
+          }
+        }
       }
     },
     methods: {
@@ -80,7 +94,8 @@
                     'resource',
                     `${fileName}`
                   ),
-                  id: uid
+                  id: uid,
+                  visible: false
                 }
                 // Save file into app's resource folder
                 this.$root.$emit('saveHtmlFile', {
@@ -120,6 +135,31 @@
                 })
               }
               break
+            case 'screenshot':
+              if (_config.obj && _config.obj.constructor === {}.constructor &&
+                'data' in _config.obj) {
+                const timestamp = new Date().getTime()
+                const uid = uniqid()
+                const fileName = `${uid}-${timestamp}`
+                resultObj = {
+                  title: 'Untitled Screenshot',
+                  type: 'image',
+                  path: path.join(
+                    'resource',
+                    `${fileName}.png`
+                  ),
+                  id: uid,
+                  visible: false
+                }
+                // Save file into app's resource folder
+                this.$root.$emit('saveScreenshot', {
+                  data: _config.obj.data,
+                  name: `${fileName}`,
+                  obj: resultObj
+                })
+              }
+              break
+            default: break
           }
           if (resultObj) {
             // Update object both local and SQL
@@ -145,6 +185,7 @@
       registerEvents () {
         const context = this
         this.$root.$on('onSqlDataReady', (_obj) => {
+          console.log(_obj)
           if (_obj && _obj.constructor === {}.constructor &&
             'obj' in _obj && 'id' in _obj.obj) {
             if (_obj.obj.id === context.uid) {
@@ -172,13 +213,23 @@
         console.log(formats)
         if (isImageFormat(formats)) {
           const filePath = clipboard.read('public.file-url').replace('file://', '')
-          this.addNote({
-            type: 'image',
-            obj: {
-              path: filePath,
-              format: getImageFormat(formats)
-            }
-          })
+          if (filePath) {
+            this.addNote({
+              type: 'image',
+              obj: {
+                path: filePath,
+                format: getImageFormat(formats)
+              }
+            })
+          } else { // A screenshot
+            const nativeImageObj = nativeImage.createFromBuffer(clipboard.readImage().toPNG())
+            this.addNote({
+              type: 'screenshot',
+              obj: {
+                data: nativeImageObj.toDataURL()
+              }
+            })
+          }
         } else {
           console.log('found text/html')
           const htmlData = (clipboard.readHTML() || clipboard.readText())
@@ -199,9 +250,15 @@
     },
     mounted () {
       const context = this
+      this.onLoading = true
+      this.dialogs.genericLoader.state = true
       this.$nextTick(function () {
         context.registerEvents()
         context.init()
+        setTimeout(() => {
+          context.dialogs.genericLoader.state = false
+          context.onLoading = false
+        }, 1000)
         if (os.platform() === 'win32') {
           document.onpaste = function () {
             context.onPaste()

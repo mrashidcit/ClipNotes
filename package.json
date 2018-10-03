@@ -60,6 +60,7 @@
   },
   "dependencies": {
     "axios": "^0.18.0",
+    "base64-img": "^1.0.4",
     "fs-extra": "^7.0.0",
     "material-design-icons-iconfont": "^3.0.3",
     "sqlite3": "^4.0.2",
