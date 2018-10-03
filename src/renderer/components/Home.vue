@@ -1,10 +1,11 @@
 <template>
   <div>
     <!-- Top application bar -->
-    <top-bar />
+    <top-bar :onViewSearch="onViewSearch" />
+    <!-- Search View -->
+    <search :onViewSearch="onViewSearch" />
     <!-- Notes -->
     <notes v-if="!onLoading" :briefnote="briefnote" />
-
     <!-- Dialogs -->
     <!-- Generic Loader -->
     <generic-loader :config="dialogs.genericLoader" />
@@ -14,6 +15,7 @@
 <script>
   import TopBar from './Home/TopBar'
   import Notes from './Home/Notes'
+  import Search from './Home/Search'
   import GenericLoader from './Dialogs/GenericLoader'
   import { nativeImage } from 'electron'
   
@@ -50,7 +52,8 @@
     components: {
       TopBar,
       Notes,
-      GenericLoader
+      GenericLoader,
+      Search
     },
     data () {
       return {
@@ -66,7 +69,8 @@
             text: '',
             state: false
           }
-        }
+        },
+        onViewSearch: false
       }
     },
     methods: {
@@ -207,6 +211,19 @@
             }
           }
         })
+        this.$root.$on('viewSearch', (_obj) => {
+          if (_obj && _obj.constructor === {}.constructor &&
+            'state' in _obj) {
+            if (_obj.state) {
+              this.onViewSearch = true
+            } else {
+              this.onViewSearch = false
+            }
+          }
+        })
+        this.$root.$on('resetTopbar', () => {
+          this.onViewSearch = false
+        })
       },
       onPaste () {
         const formats = clipboard.availableFormats()
@@ -231,7 +248,6 @@
             })
           }
         } else {
-          console.log('found text/html')
           const htmlData = (clipboard.readHTML() || clipboard.readText())
           if (htmlData) {
             this.addNote({

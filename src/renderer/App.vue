@@ -169,6 +169,14 @@
   ::-webkit-scrollbar-thumb {
     background: transparent;
   }
+  #search-view {
+    position: fixed;
+    top: 50px;
+    left: 50%;
+    width: 500px;
+    transform: translateX(-50%);
+    z-index: 400;
+  }
   #id-top-bar {
     position: fixed;
     top: 0;
@@ -176,6 +184,7 @@
     right: 0;
     line-height: 50px;
     background-color: #F3F6F9;
+    z-index: 1;
   }
   #id-notes {
     position: fixed;
@@ -185,6 +194,7 @@
     right: 0;
     background: #E8ECF2;
     overflow: auto;
+    z-index: 1;
   }
   #id-notes::-webkit-scrollbar {
     width: 10px;

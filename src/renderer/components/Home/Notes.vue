@@ -2,16 +2,18 @@
   <div id="id-notes">
     <div class="wrapper"
       v-if="briefnote.length > 0">
-      <v-container v-bind="{ [`grid-list-${size}`]: true }" fluid>
-        <v-layout row wrap>
-          <v-flex
-            v-for="(item, index) in briefnote"
-            :key="index"
-            sm6 md4>
-            <card-note :briefnote="item" />
-          </v-flex>
-        </v-layout>
-      </v-container>
+      <v-layout>
+        <v-container v-bind="{ [`grid-list-${size}`]: true }" fluid>
+          <v-layout row wrap>
+            <v-flex
+              v-for="(item, index) in briefnote"
+              :key="index"
+              sm6 md4>
+              <card-note :briefnote="item" />
+            </v-flex>
+          </v-layout>
+        </v-container>
+      </v-layout>
     </div>
     <div class="hero" v-else>
       <p style="text-align: center; cursor: default;">
@@ -36,7 +38,8 @@ export default {
   data () {
     return {
       size: 'md',
-      onViewOptions: false
+      onViewOptions: false,
+      onSearchView: true
     }
   }
 }
