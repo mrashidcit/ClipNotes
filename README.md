@@ -6,7 +6,7 @@
 ### v0.1.0
 #### Create new note
 - [x] Able to create new note by *pasting TEXT or HTML* from **clipboard**.
-- [ ] Able to create new note by *pasting a screenshot* from **clipboard**.
+- [x] Able to create new note by *pasting a screenshot* from **clipboard**.
 - [x] Able to create new note by *pasting an Image* (any format) from **file system**.
 #### Tag management
 - [ ] Able to **create new tag**.
