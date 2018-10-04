@@ -3,7 +3,7 @@
     <!-- Top application bar -->
     <top-bar :onViewSearch="onViewSearch" />
     <!-- Search View -->
-    <search :onViewSearch="onViewSearch" />
+    <search :onViewSearch="onViewSearch" :tags="tags" />
     <!-- Notes -->
     <notes v-if="!onLoading" :briefnote="briefnote" />
     <!-- Dialogs -->
@@ -63,6 +63,7 @@
           { title: 'A brief text note', type: 'text', path: '', id: '' },
           { title: 'A brief image note', type: 'image', path: 'https://images.pexels.com/photos/997719/pexels-photo-997719.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260', id: '' } */
         ],
+        tags: [],
         uid: uniqid(),
         dialogs: {
           genericLoader: {
@@ -177,27 +178,51 @@
                 resultObj.id
               ]
             })
+            this.$root.$emit('updateSqlEntry', {
+              sql: `INSERT INTO filter(note, tag) VALUES(?,?)`,
+              data: [
+                resultObj.id,
+                'tag_unlisted'
+              ]
+            })
           }
         }
       },
       init () {
+        // Update runtime data from SQL database
+        // Update notes
         this.$root.$emit('readSql', {
           sql: `SELECT * FROM notes`,
-          id: this.uid
+          id: this.uid,
+          selector: 'notes'
+        })
+        // Update tags
+        this.$root.$emit('readSql', {
+          sql: `SELECT * FROM tags`,
+          id: this.uid,
+          selector: 'tags'
         })
       },
       registerEvents () {
         const context = this
         this.$root.$on('onSqlDataReady', (_obj) => {
-          console.log(_obj)
           if (_obj && _obj.constructor === {}.constructor &&
-            'obj' in _obj && 'id' in _obj.obj) {
-            if (_obj.obj.id === context.uid) {
-              if (_obj.rows && _obj.rows.constructor === [].constructor) {
-                _obj.rows.forEach((item) => {
-                  item['visible'] = true
-                  context.briefnote.push(item)
-                })
+            'rows' in _obj && 'obj' in _obj && 'id' in _obj.obj &&
+            'selector' in _obj.obj) {
+            if (_obj.obj.id === context.uid && _obj.rows && _obj.rows.constructor === [].constructor) {
+              switch (_obj.obj.selector) {
+                case 'notes':
+                  _obj.rows.forEach((item) => {
+                    item['visible'] = true
+                    context.briefnote.push(item)
+                  })
+                  break
+                case 'tags':
+                  _obj.rows.forEach((item) => {
+                    context.tags.push(item)
+                  })
+                  break
+                default: break
               }
             }
           }

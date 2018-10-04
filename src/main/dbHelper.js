@@ -76,7 +76,36 @@ DbHelper.prototype.init = () => {
               id TEXT,
               value TEXT,
               title TEXT
-            )`
+            )`,
+            (err) => {
+              if (err) {
+                console.error(err)
+              } else {
+                config.db.all(
+                  `SELECT * FROM tags`,
+                  (err, rows) => {
+                    if (err) {
+                      console.error(err)
+                    } else {
+                      console.log('rows', rows)
+                      if (rows.length < 1) {
+                        console.log('rows are empty')
+                        config.db.run(
+                          `INSERT INTO
+                          tags(id,value,title)
+                          VALUES(?,?,?)`,
+                          [
+                            'tag_unlisted',
+                            'unlisted',
+                            'Unlisted'
+                          ]
+                        )
+                      }
+                    }
+                  }
+                )
+              }
+            }
           )
           // filter
           config.db.run(

@@ -9,17 +9,14 @@
           <v-btn id="topbar-searchview"
             icon depressed :color="onViewSearch ? 'primary' : 'none'"
             @click="onClickViewSearch">
-            <v-icon :class="`${onViewSearch ? 'white--text' : 'black--text'}`"> arrow_drop_down </v-icon>
-          </v-btn>
-          <v-btn icon flat>
-            <v-icon> more_horiz </v-icon>
+            <v-icon :class="`${onViewSearch ? 'white--text' : 'black--text'}`"> search </v-icon>
           </v-btn>
         </v-layout>
       </div>
       <div class="options">
         <v-layout row>
           <v-btn icon depressed>
-            <v-icon>settings</v-icon>
+            <v-icon>more_vert</v-icon>
           </v-btn>
         </v-layout>
       </div>

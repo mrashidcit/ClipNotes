@@ -23,9 +23,6 @@
     <div class="options" v-if="onHover">
       <v-layout row>
         <v-btn icon raised color="white">
-          <v-icon class="grey--text">star</v-icon>
-        </v-btn>
-        <v-btn icon raised color="white">
           <v-icon class="black--text">zoom_out_map</v-icon>
         </v-btn>
         <v-btn icon raised color="white">
@@ -37,7 +34,7 @@
       </v-layout>
     </div>
     <v-card-text class="hero" v-if="!ready">
-      Loading {{briefnote}}
+      Loading
       <v-progress-linear
         indeterminate
         color="black"
