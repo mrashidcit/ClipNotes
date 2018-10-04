@@ -1,6 +1,6 @@
 <template>
   <v-app id="app">
-    <router-view></router-view>
+    <router-view :config="appConfig"></router-view>
   </v-app>
 </template>
 
@@ -12,28 +12,31 @@
   const fops = require('fs-extra')
   const base64Img = require('base64-img')
 
-  const appConfig = {
-    dbPath: path.join(
-      os.homedir(),
-      '.xplorebits',
-      'briefnote',
-      'briefnote.db'
-    ),
-    appPath: path.join(
-      os.homedir(),
-      '.xplorebits',
-      'briefnote'
-    ),
-    resourcePath: path.join(
-      os.homedir(),
-      '.xplorebits',
-      'briefnote',
-      'resource'
-    )
-  }
-
   export default {
     name: 'briefnotes',
+    data () {
+      return {
+        appConfig: {
+          dbPath: path.join(
+            os.homedir(),
+            '.xplorebits',
+            'briefnote',
+            'briefnote.db'
+          ),
+          appPath: path.join(
+            os.homedir(),
+            '.xplorebits',
+            'briefnote'
+          ),
+          resourcePath: path.join(
+            os.homedir(),
+            '.xplorebits',
+            'briefnote',
+            'resource'
+          )
+        }
+      }
+    },
     methods: {
       // Generic SQL update
       // _sql: SQL command as string
@@ -75,12 +78,12 @@
           if (_obj && _obj.constructor === {}.constructor &&
             'html' in _obj && 'name' in _obj && 'obj' in _obj &&
             _obj.html && _obj.name) {
-            if (!fops.existsSync(appConfig.resourcePath)) {
-              fops.ensureDirSync(appConfig.resourcePath)
+            if (!fops.existsSync(_context.appConfig.resourcePath)) {
+              fops.ensureDirSync(_context.appConfig.resourcePath)
             }
             fops.writeFile(
               path.join(
-                appConfig.resourcePath,
+                _context.appConfig.resourcePath,
                 _obj.name.split('.').length > 1
                   ? _obj.name.split('.')[1] !== 'html'
                     ? `${_obj.name.split('.')[0]}.html`
@@ -102,14 +105,14 @@
           if (_obj && _obj.constructor === {}.constructor &&
             'src' in _obj && 'name' in _obj && 'obj' in _obj &&
             _obj.src && _obj.name) {
-            if (!fops.existsSync(appConfig.resourcePath)) {
-              fops.ensureDirSync(appConfig.resourcePath)
+            if (!fops.existsSync(_context.appConfig.resourcePath)) {
+              fops.ensureDirSync(_context.appConfig.resourcePath)
             }
             if (fops.existsSync(_obj.src)) {
               fops.copyFile(
                 _obj.src,
                 path.join(
-                  appConfig.resourcePath,
+                  _context.appConfig.resourcePath,
                   _obj.name
                 ),
                 (err) => {
@@ -129,13 +132,13 @@
           if (_obj && _obj.constructor === {}.constructor &&
             'data' in _obj && 'name' in _obj && 'obj' in _obj &&
             _obj.data && _obj.name) {
-            if (!fops.existsSync(appConfig.resourcePath)) {
-              fops.ensureDirSync(appConfig.resourcePath)
+            if (!fops.existsSync(_context.appConfig.resourcePath)) {
+              fops.ensureDirSync(_context.appConfig.resourcePath)
             }
             // Save image in file system
             base64Img.img(
               _obj.data,
-              appConfig.resourcePath,
+              _context.appConfig.resourcePath,
               `${_obj.name}`,
               (err) => {
                 if (err) {

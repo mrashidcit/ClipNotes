@@ -1,12 +1,12 @@
 <template>
-  <div id="id-top-bar" @click="onResetTopBar">
+  <div id="id-top-bar">
     <div class="wrapper" clear-top-bottom>
       <div class="logo">
         briefnote
       </div>
       <div class="menu">
-        <v-layout row>
-          <v-btn id="topbar-searchview"
+        <v-layout row id="topbar-searchview">
+          <v-btn
             icon depressed :color="onViewSearch ? 'primary' : 'none'"
             @click="onClickViewSearch">
             <v-icon :class="`${onViewSearch ? 'white--text' : 'black--text'}`"> search </v-icon>
@@ -38,11 +38,6 @@ export default {
       this.$root.$emit('viewSearch', {
         state: this.onViewSearch ? 0 : 1
       })
-    },
-    onResetTopBar (e) {
-      if (e.target.id === 'id-top-bar') {
-        this.$root.$emit('resetTopbar')
-      }
     }
   }
 }

@@ -22,7 +22,8 @@
     <v-card-text class="htmlContent" v-if="briefnote.type === 'html' && 'visible' in briefnote && briefnote.visible === true" v-html="value" :load-data="getHtmlStr(briefnote.path)"></v-card-text>
     <div class="options" v-if="onHover">
       <v-layout row>
-        <v-btn icon raised color="white">
+        <v-btn icon raised color="white"
+          @click="openNote">
           <v-icon class="black--text">zoom_out_map</v-icon>
         </v-btn>
         <v-btn icon raised color="white">
@@ -115,6 +116,13 @@ export default {
             context.value = `file://${srcPath}`
           }, 500)
         }
+      }
+    },
+    openNote () {
+      const note = this.briefnote
+      if (note && 'id' in note && 'path' in note &&
+        'title' in note && 'type' in note) {
+        this.$root.$emit('viewNote', note)
       }
     }
   }

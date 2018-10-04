@@ -1,11 +1,15 @@
 <template>
-  <div>
+  <div id="id-home" @click="resetTopbar">
     <!-- Top application bar -->
-    <top-bar :onViewSearch="onViewSearch" />
+    <top-bar :onViewSearch="onViewSearch"
+      :style="onViewNote ? `filter: blur(8px);-webkit-filter: blur(8px);` : null"/>
     <!-- Search View -->
     <search :onViewSearch="onViewSearch" :tags="tags" />
     <!-- Notes -->
-    <notes v-if="!onLoading" :briefnote="briefnote" />
+    <notes v-if="!onLoading" :briefnote="briefnote"
+      :style="onViewNote ? `filter: blur(8px);-webkit-filter: blur(8px);`: null"/>
+    <!-- View Note -->
+    <view-note :state="onViewNote" :data="noteViewData" :config="config" />
     <!-- Dialogs -->
     <!-- Generic Loader -->
     <generic-loader :config="dialogs.genericLoader" />
@@ -16,6 +20,7 @@
   import TopBar from './Home/TopBar'
   import Notes from './Home/Notes'
   import Search from './Home/Search'
+  import ViewNote from './Home/ViewNote'
   import GenericLoader from './Dialogs/GenericLoader'
   import { nativeImage } from 'electron'
   
@@ -52,9 +57,11 @@
     components: {
       TopBar,
       Notes,
+      ViewNote,
       GenericLoader,
       Search
     },
+    props: ['config'],
     data () {
       return {
         onLoading: true,
@@ -71,7 +78,9 @@
             state: false
           }
         },
-        onViewSearch: false
+        onViewSearch: false,
+        onViewNote: false,
+        noteViewData: null
       }
     },
     methods: {
@@ -249,6 +258,14 @@
         this.$root.$on('resetTopbar', () => {
           this.onViewSearch = false
         })
+        this.$root.$on('closeNoteView', () => {
+          this.onViewNote = false
+          this.noteViewData = null
+        })
+        this.$root.$on('viewNote', (_obj) => {
+          this.noteViewData = _obj
+          this.onViewNote = true
+        })
       },
       onPaste () {
         const formats = clipboard.availableFormats()
@@ -307,6 +324,12 @@
               }
             }
           }
+        }
+      },
+      resetTopbar (e) {
+        if (window.jQuery(e.target).closest('#search-view').length < 1 &&
+          window.jQuery(e.target).closest('#topbar-searchview').length < 1) {
+          this.$root.$emit('resetTopbar')
         }
       }
     },
