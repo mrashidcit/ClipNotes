@@ -103,6 +103,7 @@
                 const fileName = `${uid}-${new Date().getTime()}.html`
                 resultObj = {
                   title: 'Untitled Note',
+                  description: '',
                   type: 'html',
                   path: path.join(
                     'resource',
@@ -133,6 +134,7 @@
                   title: path.basename(_config.obj.path).split('.').length > 1
                     ? path.basename(_config.obj.path).split('.')[0]
                     : path.basename(_config.obj.path),
+                  description: '',
                   type: 'image',
                   path: path.join(
                     'resource',
@@ -157,6 +159,7 @@
                 const fileName = `${uid}-${timestamp}`
                 resultObj = {
                   title: 'Untitled Screenshot',
+                  description: '',
                   type: 'image',
                   path: path.join(
                     'resource',

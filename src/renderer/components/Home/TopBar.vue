@@ -11,6 +11,10 @@
             @click="onClickViewSearch">
             <v-icon :class="`${onViewSearch ? 'white--text' : 'black--text'}`"> search </v-icon>
           </v-btn>
+          <v-btn
+            icon depressed>
+            <v-icon>add_circle</v-icon>
+          </v-btn>
         </v-layout>
       </div>
       <div class="options">

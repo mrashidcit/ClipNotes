@@ -4,6 +4,7 @@
     @mouseover="onMouseOver(briefnote)"
     @mouseout="onMouseOut(briefnote)"
     style="cursor: pointer;">
+    <!-- Note Type: Image -->
     <v-img
       v-if="briefnote.type === 'image' && 'visible' in briefnote && briefnote.visible === true"
       height="250px"
@@ -16,10 +17,17 @@
         </v-layout>
       </v-container>
     </v-img>
-    <v-card-title v-else-if="(briefnote.type === 'text' || briefnote.type === 'html') && 'visible' in briefnote && briefnote.visible === true">
+    <!-- Note Type: TEXT or HTML -->
+    <!-- Title -->
+    <v-card-title
+      v-else-if="
+        (briefnote.type === 'text' || briefnote.type === 'html') &&
+        'visible' in briefnote && briefnote.visible === true">
       <div class="headline">{{briefnote.title}}</div>
     </v-card-title>
+    <!-- Text/HTML -->
     <v-card-text class="htmlContent" v-if="briefnote.type === 'html' && 'visible' in briefnote && briefnote.visible === true" v-html="value" :load-data="getHtmlStr(briefnote.path)"></v-card-text>
+    <!-- Note options -->
     <div class="options" v-if="onHover">
       <v-layout row>
         <v-btn icon raised color="white"
@@ -27,13 +35,11 @@
           <v-icon class="black--text">zoom_out_map</v-icon>
         </v-btn>
         <v-btn icon raised color="white">
-          <v-icon class="black--text">edit</v-icon>
-        </v-btn>
-        <v-btn icon raised color="white">
           <v-icon class="black--text">more_horiz</v-icon>
         </v-btn>
       </v-layout>
     </div>
+    <!-- Loader view -->
     <v-card-text class="hero" v-if="!ready">
       Loading
       <v-progress-linear

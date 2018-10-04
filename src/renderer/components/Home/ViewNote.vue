@@ -5,8 +5,16 @@
     <v-card class="view-card">
       <div class="menu wrapper">
         <v-layout row color="transparent">
-          <h4 class="note-title">{{ title ? title : 'Untitled Note' }}</h4>
+          <h4 class="note-title">{{ data && data.title ? data.title : 'Untitled Note' }}</h4>
           <v-spacer></v-spacer>
+          <v-btn @click="onInfo"
+            icon color="white" :class="info ? 'primary': null">
+            <v-icon>subject</v-icon>
+          </v-btn>
+          <v-btn
+            icon color="white">
+            <v-icon>edit</v-icon>
+          </v-btn>
           <v-btn @click="onCloseNoteView"
             icon color="white">
             <v-icon>close</v-icon>
@@ -16,6 +24,13 @@
       <div class="note" :small-image="data && data.type === 'image' ? isSmallImage() : null">
         <img v-if="data && data.type === 'image' && source"
           :src="source" />
+      </div>
+      <div class="note-info"
+        v-if="data && data.type === 'image' && info">
+        <div class="wrapper">
+          <h1>{{ data && data.title ? data.title : 'Untitled Note' }}</h1>
+          <p>{{ data && data.description ? data.description : 'No Description provided' }}</p>
+        </div>
       </div>
     </v-card>
   </v-dialog>
@@ -32,12 +47,16 @@ export default {
     return {
       title: '',
       object: '',
-      source: null
+      source: null,
+      info: 1
     }
   },
   methods: {
     onCloseNoteView () {
       this.$root.$emit('closeNoteView')
+    },
+    onInfo () {
+      this.info = this.info ? 0 : 1
     },
     prep (_data) {
       if ('type' in _data && this.config && 'appPath' in this.config) {
@@ -102,5 +121,13 @@ export default {
   .note > img {
     width: 100%;
     height: auto;
+  }
+  .note-info {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 250px;
+    background: rgba(255, 255, 255, 0.8)
   }
 </style>

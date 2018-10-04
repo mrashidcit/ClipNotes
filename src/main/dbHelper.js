@@ -64,6 +64,7 @@ DbHelper.prototype.init = () => {
             `CREATE TABLE if not exists
             notes(
               title TEXT,
+              description TEXT,
               type TEXT,
               path TEXT,
               id TEXT
