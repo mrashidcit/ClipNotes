@@ -42,6 +42,7 @@
     clipboard
   } = require('electron')
   const uniqid = require('uniqid')
+  const uri2path = require('file-uri-to-path')
 
   /**
    * Add platform specific dependencies.
@@ -398,14 +399,14 @@
         if (isImageFormat(formats)) {
           // Image format detected
           // Create absolute path of image
-          const filePath = clipboard.read('public.file-url').replace('file://', '')
+          const filePath = clipboard.read('public.file-url')
           if (filePath) {
             // Image path is valid
             // Add image type note
             this.addNote({
               type: 'image',
               obj: {
-                path: filePath,
+                path: uri2path(filePath),
                 format: getImageFormat(formats)
               }
             })
