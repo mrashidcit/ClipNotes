@@ -1,5 +1,6 @@
 <template>
   <div id="id-notes">
+    <!-- Notes as flex view -->
     <div class="wrapper"
       v-if="briefnote.length > 0">
       <v-layout>
@@ -9,12 +10,13 @@
               v-for="(item, index) in briefnote"
               :key="index"
               sm6 md4>
-              <card-note :briefnote="item" />
+              <card-note :briefnote="item" :config="config" />
             </v-flex>
           </v-layout>
         </v-container>
       </v-layout>
     </div>
+    <!-- Instructions when notes are empty -->
     <div class="hero" v-else>
       <p style="text-align: center; cursor: default;">
         No notes available!<br/>
@@ -30,16 +32,15 @@ import CardNote from './Notes/CardNote'
 export default {
   name: 'notes',
   props: [
-    'briefnote'
+    'briefnote',
+    'config'
   ],
   components: {
     CardNote
   },
   data () {
     return {
-      size: 'md',
-      onViewOptions: false,
-      onSearchView: true
+      size: 'md' // Editable grid list size
     }
   }
 }

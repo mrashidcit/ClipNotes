@@ -1,29 +1,36 @@
 <template>
   <div id="id-home" @click="resetTopbar">
-    <!-- Top application bar -->
-    <top-bar :onViewSearch="onViewSearch"
-      :style="onViewNote ? `filter: blur(8px);-webkit-filter: blur(8px);` : null"/>
-    <!-- Search View -->
-    <search :onViewSearch="onViewSearch" :tags="tags" />
-    <!-- Notes -->
-    <notes v-if="!onLoading" :briefnote="briefnote"
-      :style="onViewNote ? `filter: blur(8px);-webkit-filter: blur(8px);`: null"/>
-    <!-- View Note -->
-    <view-note :state="onViewNote" :data="noteViewData" :config="config" />
-    <!-- Dialogs -->
-    <!-- Generic Loader -->
-    <generic-loader :config="dialogs.genericLoader" />
+    <!-- + Views -->
+      <!-- Top application bar -->
+      <top-bar :onViewSearch="views.onViewSearch"
+        :style="dialogs.noteView.state ? `filter: blur(8px);-webkit-filter: blur(8px);` : null"/>
+      <!-- Search View -->
+      <search :onViewSearch="views.onViewSearch" :tags="tags" />
+      <!-- Notes -->
+      <notes v-if="!onLoading" :briefnote="briefnote" :config="config"
+        :style="dialogs.noteView.state ? `filter: blur(8px);-webkit-filter: blur(8px);`: null"/>
+    <!-- - Views -->
+    <!-- + Dialogs -->
+      <!-- Generic Loader -->
+      <generic-loader :config="dialogs.genericLoader" />
+      <!-- View Note -->
+      <view-note :state="dialogs.noteView.state" :data="dialogs.noteView.data" :config="config" />
+    <!-- - Dialogs -->
   </div>
 </template>
 
 <script>
+  // Import Vue Components for views
   import TopBar from './Home/TopBar'
   import Notes from './Home/Notes'
   import Search from './Home/Search'
-  import ViewNote from './Home/ViewNote'
+
+  // Import Vue Components for dialogs
+  import ViewNote from './Dialogs/ViewNote'
   import GenericLoader from './Dialogs/GenericLoader'
   import { nativeImage } from 'electron'
   
+  // Import dependency modules
   const os = require('os')
   const path = require('path')
   const {
@@ -33,13 +40,14 @@
   const uniqid = require('uniqid')
 
   /**
-   * Add platform specific dependencies
+   * Add platform specific dependencies.
    */
   switch (os.platform()) {
     case 'win32':
-      // Add if any windows specifc dependencies
+      // Add win32/windows specific dependencies
       // Windows specifc packages can be listed in package.json -> "win32Dependencies" key
       try {
+        // Windows clipboard dependency.
         window.winClipboard = require('win-clipboard')
       } catch (e) {
         console.error('win-clipboard not loaded')
@@ -51,7 +59,7 @@
       break
     default: break
   }
-
+  // Vue template instance
   export default {
     name: 'landing-page',
     components: {
@@ -64,38 +72,70 @@
     props: ['config'],
     data () {
       return {
+        // Show loader until application UI rendered
         onLoading: true,
         briefnote: [
-          /* { title: 'A brief html note', type: 'html', path: '', id: '' },
-          { title: 'A brief text note', type: 'text', path: '', id: '' },
-          { title: 'A brief image note', type: 'image', path: 'https://images.pexels.com/photos/997719/pexels-photo-997719.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260', id: '' } */
+          /**
+           * Notes updated at runtime from SQL database.
+           * briefnote objects: title, description, type, path, id
+           */
         ],
-        tags: [],
+        tags: [
+          /**
+           * List of all tags used by application
+           * tags objects: title, value, id
+           */
+        ],
+        filter: [
+          /**
+           * List of all filter data used by application
+           * tags objects: note, tag
+           */
+        ],
+        // An unique id for Home template.
+        // Used for reading data broadcasted through root events.
         uid: uniqid(),
+        // Manage dialogs at runtime
         dialogs: {
+          // Generic loader with text message
           genericLoader: {
-            text: '',
-            state: false
+            text: '', // Loader message string
+            state: false // Loader active state
+          },
+          // Note view dialog for briefnote
+          noteView: {
+            data: null, // Note view data object: briefnote selected object
+            state: false // Note view active state
           }
         },
-        onViewSearch: false,
-        onViewNote: false,
-        noteViewData: null
+        // Runtime control data for component views
+        views: {
+          onViewSearch: false
+        }
       }
     },
     methods: {
+      /**
+       * Add a briefnote for both runtime + database
+       * @param {Object} _config - A new Note data.
+       */
       addNote (_config) {
+        // Validate _config object
         if (_config && _config.constructor === {}.constructor &&
           'type' in _config && 'obj' in _config) {
+          // Final briefnote instance.
           let resultObj = null
+          // Create and update briefnote instance.
           switch (_config.type) {
             case 'text':
+              // Note type is TEXT
               if (_config.obj && _config.obj.constructor === {}.constructor &&
                 'text' in _config.obj) {
                 console.log(_config.obj.text)
               }
               break
             case 'html':
+              // Note type is HTML
               if (_config.obj && _config.obj.constructor === {}.constructor &&
                 'html' in _config.obj) {
                 // Create result object
@@ -112,7 +152,7 @@
                   id: uid,
                   visible: false
                 }
-                // Save file into app's resource folder
+                // Save Html note into app's resource folder
                 this.$root.$emit('saveHtmlFile', {
                   html: _config.obj.html,
                   name: `${fileName}`,
@@ -121,6 +161,7 @@
               }
               break
             case 'image':
+              // Note type is IMAGE from file system
               if (_config.obj && _config.obj.constructor === {}.constructor &&
                 'path' in _config.obj && 'format' in _config.obj) {
                 // Create image file name
@@ -143,7 +184,7 @@
                   id: uniqid(),
                   visible: false
                 }
-                // Save file into app's resource folder
+                // Save Image note into app's resource folder
                 this.$root.$emit('saveImageFile', {
                   src: _config.obj.path,
                   name: `${fileName}`,
@@ -152,6 +193,7 @@
               }
               break
             case 'screenshot':
+              // Note type is a SCREENSHOT from clipboard
               if (_config.obj && _config.obj.constructor === {}.constructor &&
                 'data' in _config.obj) {
                 const timestamp = new Date().getTime()
@@ -168,7 +210,7 @@
                   id: uid,
                   visible: false
                 }
-                // Save file into app's resource folder
+                // Save Screenshot note into app's resource folder
                 this.$root.$emit('saveScreenshot', {
                   data: _config.obj.data,
                   name: `${fileName}`,
@@ -176,11 +218,14 @@
                 })
               }
               break
-            default: break
+            default:
+              // Note type is invlaid.
+              break
           }
           if (resultObj) {
-            // Update object both local and SQL
+            // Update briefnote in runtime data
             this.briefnote.push(resultObj)
+            // Update briefnote in database
             this.$root.$emit('updateSqlEntry', {
               sql: `INSERT INTO notes(title, type, path, id) VALUES(?,?,?,?)`,
               data: [
@@ -190,6 +235,12 @@
                 resultObj.id
               ]
             })
+            // Update runtime filter list for this new note entry, as 'Unlisted'.
+            this.filter.push({
+              note: resultObj.id,
+              tag: 'tag_unlisted'
+            })
+            // Update database filter list for this new note entry, as 'Unlisted'.
             this.$root.$emit('updateSqlEntry', {
               sql: `INSERT INTO filter(note, tag) VALUES(?,?)`,
               data: [
@@ -200,23 +251,40 @@
           }
         }
       },
+      /**
+       * Initialize application data
+       */
       init () {
         // Update runtime data from SQL database
-        // Update notes
+        // Request read briefnotes data
         this.$root.$emit('readSql', {
-          sql: `SELECT * FROM notes`,
-          id: this.uid,
-          selector: 'notes'
+          sql: `SELECT * FROM notes`, // SQL command
+          id: this.uid, // Current home component id
+          selector: 'notes' // set selector for 'notes' data
         })
-        // Update tags
+        // Request read tags data
         this.$root.$emit('readSql', {
-          sql: `SELECT * FROM tags`,
-          id: this.uid,
-          selector: 'tags'
+          sql: `SELECT * FROM tags`, // SQL command
+          id: this.uid, // Current home component id
+          selector: 'tags' // set selector for 'tags' data
+        })
+        // Request read filter data
+        this.$root.$emit('readSql', {
+          sql: `SELECT * FROM filter`, // SQL command
+          id: this.uid, // Current home component id
+          selector: 'filter' // set selector for 'filter' data
         })
       },
+      /**
+       * Register application root events
+       */
       registerEvents () {
         const context = this
+        /**
+         * When SQL data is ready to read
+         * @name onSqlDataReady
+         * @param {Object} - Sql data
+         */
         this.$root.$on('onSqlDataReady', (_obj) => {
           if (_obj && _obj.constructor === {}.constructor &&
             'rows' in _obj && 'obj' in _obj && 'id' in _obj.obj &&
@@ -239,6 +307,11 @@
             }
           }
         })
+        /**
+         * When image is saved into file system
+         * @name onSaveImage
+         * @param {Object} - Briefnote instance used for save image
+         */
         this.$root.$on('onSaveImage', (_obj) => {
           if (_obj && _obj.constructor === {}.constructor &&
             'type' in _obj && 'title' in _obj && 'path' in _obj && 'id' in _obj) {
@@ -248,34 +321,60 @@
             }
           }
         })
+        /**
+         * Request to show tag search view
+         * @name viewSearch
+         * @param {Object} - Object to state tag search view
+         */
         this.$root.$on('viewSearch', (_obj) => {
           if (_obj && _obj.constructor === {}.constructor &&
             'state' in _obj) {
             if (_obj.state) {
-              this.onViewSearch = true
+              this.views.onViewSearch = true
             } else {
-              this.onViewSearch = false
+              this.views.onViewSearch = false
             }
           }
         })
+        /**
+         * Request to reset application top bar to defaults.
+         * @name resetTopbar
+         */
         this.$root.$on('resetTopbar', () => {
-          this.onViewSearch = false
+          this.views.onViewSearch = false
         })
+        /**
+         * Request to close note viewer
+         * @name closeNoteView
+         */
         this.$root.$on('closeNoteView', () => {
-          this.onViewNote = false
-          this.noteViewData = null
+          this.dialogs.noteView.state = false
+          this.dialogs.noteView.data = null
         })
+        /**
+         * Request to open 'note viewer'
+         * @name closeNoteView
+         * @param {Object} - briefnote instance
+         */
         this.$root.$on('viewNote', (_obj) => {
-          this.noteViewData = _obj
-          this.onViewNote = true
+          this.dialogs.noteView.data = _obj
+          this.dialogs.noteView.state = true
         })
       },
+      /**
+       * On paste action
+       */
       onPaste () {
+        // Get available formats from electron clipboard
         const formats = clipboard.availableFormats()
         console.log(formats)
         if (isImageFormat(formats)) {
+          // Image format detected
+          // Create absolute path of image
           const filePath = clipboard.read('public.file-url').replace('file://', '')
           if (filePath) {
+            // Image path is valid
+            // Add image type note
             this.addNote({
               type: 'image',
               obj: {
@@ -283,18 +382,26 @@
                 format: getImageFormat(formats)
               }
             })
-          } else { // A screenshot
+          } else {
+            // A screenshot doesn't have absolute path
+            // Create nativeImage instance as PNG from clipboard data
             const nativeImageObj = nativeImage.createFromBuffer(clipboard.readImage().toPNG())
+            // Add screenshot type note
             this.addNote({
               type: 'screenshot',
               obj: {
-                data: nativeImageObj.toDataURL()
+                data: nativeImageObj.toDataURL() // Convert to data url
               }
             })
           }
         } else {
+          // Clipboard doesn't have image data
+          // Get HTML or TEXT data from clipboard
           const htmlData = (clipboard.readHTML() || clipboard.readText())
           if (htmlData) {
+            // HTML data detected
+            // Add HTML type data.
+            // Curretn implementation uses html for both TEXT and HTML data.
             this.addNote({
               type: 'html',
               obj: {
@@ -302,11 +409,15 @@
               }
             })
           } else {
-            // Using win-clipboard to fetch Image or Text data
+            // HTML/TEXT data is not detected
+            // This is a special scenarion for windows OS.
+            // Electron's clipboard doesn't detect Image type.
             if (os.platform() === 'win32') {
-              // Generate file path
+              // Get formats from win-clipboard
               const clipboardData = window.winClipboard.getFormats()
               if (clipboardData.indexOf('FileNameW') > -1) {
+                // File name is detected.
+                // Create absolute path
                 const rawPath = new TextDecoder('utf-8').decode(window.winClipboard.getData('FileNameW'))
                 let filePath = ''
                 rawPath.split('').forEach((letter) => {
@@ -315,7 +426,9 @@
                   }
                 })
                 if (filePath) {
-                  // Add Image Note
+                  // Path is valid
+                  // TODO: check if file is image
+                  // Add Image type note
                   this.addNote({
                     type: 'image',
                     obj: {
@@ -329,33 +442,50 @@
           }
         }
       },
+      /**
+       * Rest application topbar
+       */
       resetTopbar (e) {
+        // Reset application topbar ONLY if user click outside search button or serach view.
         if (window.jQuery(e.target).closest('#search-view').length < 1 &&
           window.jQuery(e.target).closest('#topbar-searchview').length < 1) {
           this.$root.$emit('resetTopbar')
         }
       }
     },
+    /**
+     * When application is mounted.
+     */
     mounted () {
+      // Copy application context
       const context = this
+      // Set application to loading until it initializes
       this.onLoading = true
       this.dialogs.genericLoader.state = true
       this.$nextTick(function () {
+        // UI is rendered
+        // Register events for Home vue component.
         context.registerEvents()
+        // Initialize application data
         context.init()
         setTimeout(() => {
+          // Set application to ready
           context.dialogs.genericLoader.state = false
           context.onLoading = false
+          // TODO: reduce delay
         }, 1000)
+        // Windows based initalizations
         if (os.platform() === 'win32') {
           document.onpaste = function () {
             context.onPaste()
           }
         }
+        // Register events Electron's menu button clicks.
         ipcRenderer.on('onMenuItemClick', (event, arg) => {
           if (arg && arg.constructor === {}.constructor && 'label' in arg) {
             switch (arg.label) {
               case 'paste':
+                // When user click "Paste" menu button
                 context.onPaste()
                 break
               default: break
@@ -366,6 +496,11 @@
     }
   }
 
+  /**
+   * Check if electron's clipboard format data contains image type.
+   * @param {String} - Electron's clipboard raw format string
+   * @return {Boolean} - Result
+   */
   function isImageFormat (_formats) {
     if (_formats.constructor === [].constructor) {
       for (let index = 0; index < _formats.length; index++) {
@@ -380,6 +515,11 @@
     return false
   }
 
+  /**
+   * Return format type from electron's clipboard format data
+   * @param {String} - Electron's clipboard raw format string
+   * @return {String} - Parsed format as string
+   */
   function getImageFormat (_formats) {
     if (_formats.constructor === [].constructor) {
       for (let index = 0; index < _formats.length; index++) {

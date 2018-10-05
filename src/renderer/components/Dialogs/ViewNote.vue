@@ -21,9 +21,12 @@
           </v-btn>
         </v-layout>
       </div>
-      <div class="note" :small-image="data && data.type === 'image' ? isSmallImage() : null">
-        <img v-if="data && data.type === 'image' && source"
-          :src="source" />
+      <div class="image-note" v-if="data && data.type === 'image' && source"
+        :small-image="data && data.type === 'image' ? isSmallImage() : null">
+        <img :src="source" />
+      </div>
+      <div class="text-note" v-if="data && (data.type === 'html' || data.type === 'text') && source">
+        <div class="note" v-html="source" style="overflow: auto;"></div>
       </div>
       <div class="note-info"
         v-if="data && data.type === 'image' && info">
@@ -37,6 +40,7 @@
 </template>
 
 <script>
+const fops = require('fs-extra')
 const path = require('path')
 const imageSize = require('image-size')
 
@@ -53,6 +57,7 @@ export default {
   },
   methods: {
     onCloseNoteView () {
+      this.source = null
       this.$root.$emit('closeNoteView')
     },
     onInfo () {
@@ -71,6 +76,22 @@ export default {
               }`
             }, 100)
             break
+          case 'text':
+            this.loadFile(
+              path.join(
+                this.config.appPath,
+                _data.path
+              )
+            )
+            break
+          case 'html':
+            this.loadFile(
+              path.join(
+                this.config.appPath,
+                _data.path
+              )
+            )
+            break
           default: break
         }
       }
@@ -84,6 +105,18 @@ export default {
           return false
         }
       }
+    },
+    loadFile (_path) {
+      if (_path && fops.existsSync(_path) && this.source == null) {
+        console.log('readHtml')
+        fops.readFile(_path, 'utf8', (err, data) => {
+          if (err) {
+            console.error(err)
+          } else {
+            this.source = data
+          }
+        })
+      }
     }
   }
 }
@@ -95,7 +128,7 @@ export default {
     height: 100vh;
   }
   .menu {
-    position: absolute;
+    position: fixed;
     top: 0;
     left: 0;
     right: 0;
@@ -107,18 +140,27 @@ export default {
     margin: 5px 0;
     background: white;
   }
-  .note {
+  .text-note {
+    padding-top: 100px;
+    background: transparent;
+    width: 100%;
+  }
+  .text-note > .note {
+    background: white;
+    padding: 10px;
+  }
+  .image-note {
     position: fixed;
     top: 50%;
     transform: translateY(-50%);
   }
-  .note[small-image] {
+  .image-note[small-image] {
     position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
   }
-  .note > img {
+  .image-note > img {
     width: 100%;
     height: auto;
   }

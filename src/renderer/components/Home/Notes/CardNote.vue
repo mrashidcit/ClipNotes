@@ -8,7 +8,7 @@
     <v-img
       v-if="briefnote.type === 'image' && 'visible' in briefnote && briefnote.visible === true"
       height="250px"
-      :src="value" :load-data="getAbsolutePath(briefnote.path)">
+      :src="value" :load-data="!value && getAbsolutePath(briefnote.path)">
       <v-container fill-height fluid>
         <v-layout fill-height>
           <v-flex xs12 align-end flexbox>
@@ -52,6 +52,8 @@
 </template>
 
 <script>
+// import { nativeImage } from 'electron'
+
 const os = require('os')
 const path = require('path')
 const fops = require('fs-extra')
@@ -59,7 +61,8 @@ const fops = require('fs-extra')
 export default {
   name: 'card-note',
   props: [
-    'briefnote'
+    'briefnote',
+    'config'
   ],
   data () {
     return {
@@ -121,6 +124,18 @@ export default {
             context.ready = true
             context.value = `file://${srcPath}`
           }, 500)
+        }
+      }
+    },
+    loadImage (_path) {
+      if (_path && this.config &&
+        'appPath' in this.config && this.config.appPath) {
+        const srcPath = path.join(
+          this.config.appPath,
+          _path
+        )
+        if (fops.existsSync(srcPath)) {
+          console.log(srcPath)
         }
       }
     },
