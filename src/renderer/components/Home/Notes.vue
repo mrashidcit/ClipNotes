@@ -3,7 +3,7 @@
     <!-- Notes as flex view -->
     <div class="wrapper"
       v-if="briefnoteLength > 0">
-      <v-layout>
+      <v-layout :style="onViewSearch ? `pointer-events: none` : null">
         <v-container v-bind="{ [`grid-list-${size}`]: true }" fluid>
           <v-layout row wrap>
             <v-flex
@@ -38,7 +38,8 @@ export default {
     'notes',
     'briefnoteLength',
     'config',
-    'tags'
+    'tags',
+    'onViewSearch'
   ],
   components: {
     CardNote

@@ -35,11 +35,15 @@
           <v-icon class="black--text">zoom_out_map</v-icon>
         </v-btn>
         <v-btn icon raised color="white"
+          @click="onEditInfo">
+          <v-icon class="orange--text">edit</v-icon>
+        </v-btn>
+        <v-btn icon raised color="white"
           @click="onEditTags">
-          <v-icon class="black--text">local_offer</v-icon>
+          <v-icon class="primary--text">local_offer</v-icon>
         </v-btn>
         <v-btn icon raised color="white">
-          <v-icon class="black--text">more_horiz</v-icon>
+          <v-icon class="red--text">delete</v-icon>
         </v-btn>
       </v-layout>
     </div>
@@ -53,8 +57,9 @@
       ></v-progress-linear>
     </v-card-text>
     <!-- Edit tags -->
-    <div class="edit-tags" v-if="edit.tags">
-      <div class="wrapper">
+    <div class="edit"
+      v-if="edit.tags || edit.info">
+      <div class="wrapper" v-if="edit.tags">
         <h3 class="grey--text">Select Tags</h3>
         <v-combobox
           v-model="select"
@@ -77,6 +82,28 @@
           <v-spacer></v-spacer>
           <v-btn depressed color="grey"
             @click="closeEditTags"
+            class="white--text">
+            Cancel
+          </v-btn>
+          <v-btn depressed color="primary">
+            Save
+          </v-btn>
+        </v-layout>
+      </div>
+      <div class="wrapper" v-if="edit.info">
+        <v-text-field solo flat
+          placeholder="Note Title"
+          :value="briefnote.title">
+        </v-text-field>
+        <v-textarea solo flat small
+          height="80px" min-height="80px"
+          :value="briefnote.description"
+          placeholder="Note Description">
+        </v-textarea>
+        <v-layout row>
+          <v-spacer></v-spacer>
+          <v-btn depressed color="grey"
+            @click="closeEditInfo"
             class="white--text">
             Cancel
           </v-btn>
@@ -116,7 +143,8 @@ export default {
       value: '',
       select: [],
       edit: {
-        tags: false
+        tags: false,
+        info: false
       }
     }
   },
@@ -194,9 +222,19 @@ export default {
         this.edit.tags = true
       }
     },
+    onEditInfo () {
+      if (!this.edit.info) {
+        this.edit.info = true
+      }
+    },
     closeEditTags () {
       if (this.edit.tags) {
         this.edit.tags = false
+      }
+    },
+    closeEditInfo () {
+      if (this.edit.info) {
+        this.edit.info = false
       }
     }
   }
@@ -219,7 +257,7 @@ export default {
     overflow: hidden;
     height: 140px;
   }
-  .edit-tags {
+  .edit {
     position: absolute;
     top: 0;
     left: 0;
