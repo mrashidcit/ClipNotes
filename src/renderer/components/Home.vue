@@ -12,6 +12,7 @@
         :notes="list"
         :briefnoteLength="briefnote.length"
         :config="config"
+        :tags="tags"
         :style="dialogs.noteView.state ? `filter: blur(8px);-webkit-filter: blur(8px);`: null"/>
     <!-- - Views -->
     <!-- + Dialogs -->

@@ -10,7 +10,10 @@
               v-for="(item, index) in notes"
               :key="index"
               sm6 md4>
-              <card-note :briefnote="item" :config="config" />
+              <card-note
+                :briefnote="item"
+                :config="config"
+                :tags="tags" />
             </v-flex>
           </v-layout>
         </v-container>
@@ -34,7 +37,8 @@ export default {
   props: [
     'notes',
     'briefnoteLength',
-    'config'
+    'config',
+    'tags'
   ],
   components: {
     CardNote

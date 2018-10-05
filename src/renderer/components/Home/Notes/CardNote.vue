@@ -34,6 +34,10 @@
           @click="openNote">
           <v-icon class="black--text">zoom_out_map</v-icon>
         </v-btn>
+        <v-btn icon raised color="white"
+          @click="onEditTags">
+          <v-icon class="black--text">local_offer</v-icon>
+        </v-btn>
         <v-btn icon raised color="white">
           <v-icon class="black--text">more_horiz</v-icon>
         </v-btn>
@@ -48,6 +52,40 @@
         class="mb-0"
       ></v-progress-linear>
     </v-card-text>
+    <!-- Edit tags -->
+    <div class="edit-tags" v-if="edit.tags">
+      <div class="wrapper">
+        <h3 class="grey--text">Select Tags</h3>
+        <v-combobox
+          v-model="select"
+          :items="tags"
+          label="Select Tags"
+          item-text="title"
+          multiple
+          chips solo>
+          <template
+            slot="selection"
+            slot-scope="data">
+            <v-chip
+              :key="`${data.item.id}`"
+              class="v-chip--select-multi">
+              {{ data.item.title }}
+            </v-chip>
+          </template>
+        </v-combobox>
+        <v-layout row>
+          <v-spacer></v-spacer>
+          <v-btn depressed color="grey"
+            @click="closeEditTags"
+            class="white--text">
+            Cancel
+          </v-btn>
+          <v-btn depressed color="primary">
+            Save
+          </v-btn>
+        </v-layout>
+      </div>
+    </div>
   </v-card>
 </template>
 
@@ -62,7 +100,8 @@ export default {
   name: 'card-note',
   props: [
     'briefnote',
-    'config'
+    'config',
+    'tags'
   ],
   data () {
     return {
@@ -74,7 +113,11 @@ export default {
         value: 0
       },
       ready: false,
-      value: ''
+      value: '',
+      select: [],
+      edit: {
+        tags: false
+      }
     }
   },
   methods: {
@@ -145,6 +188,16 @@ export default {
         'title' in note && 'type' in note) {
         this.$root.$emit('viewNote', note)
       }
+    },
+    onEditTags () {
+      if (!this.edit.tags) {
+        this.edit.tags = true
+      }
+    },
+    closeEditTags () {
+      if (this.edit.tags) {
+        this.edit.tags = false
+      }
     }
   }
 }
@@ -165,5 +218,15 @@ export default {
   .htmlContent {
     overflow: hidden;
     height: 140px;
+  }
+  .edit-tags {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+    overflow-y: auto;
+    background: white;
   }
 </style>
