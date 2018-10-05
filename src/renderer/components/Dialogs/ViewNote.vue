@@ -170,6 +170,6 @@ export default {
     left: 0;
     right: 0;
     height: 250px;
-    background: rgba(255, 255, 255, 0.8)
+    background: rgba(255, 255, 255, 1)
   }
 </style>

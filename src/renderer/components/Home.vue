@@ -5,9 +5,13 @@
       <top-bar :onViewSearch="views.onViewSearch"
         :style="dialogs.noteView.state ? `filter: blur(8px);-webkit-filter: blur(8px);` : null"/>
       <!-- Search View -->
-      <search :onViewSearch="views.onViewSearch" :tags="tags" />
+      <search :onViewSearch="views.onViewSearch"
+        :tags="tags" />
       <!-- Notes -->
-      <notes v-if="!onLoading" :briefnote="briefnote" :config="config"
+      <notes v-if="!onLoading"
+        :notes="list"
+        :briefnoteLength="briefnote.length"
+        :config="config"
         :style="dialogs.noteView.state ? `filter: blur(8px);-webkit-filter: blur(8px);`: null"/>
     <!-- - Views -->
     <!-- + Dialogs -->
@@ -74,6 +78,12 @@
       return {
         // Show loader until application UI rendered
         onLoading: true,
+        list: [
+          /**
+           * List of filtered notes
+           * to display in the application
+           */
+        ],
         briefnote: [
           /**
            * Notes updated at runtime from SQL database.
@@ -302,22 +312,39 @@
                     context.tags.push(item)
                   })
                   break
+                case 'filter':
+                  _obj.rows.forEach((item) => {
+                    context.filter.push(item)
+                  })
+                  context.filterList([
+                    'tag_unlisted'
+                  ])
+                  break
                 default: break
               }
+              setTimeout(() => {
+                // Set application to ready
+                context.dialogs.genericLoader.state = false
+                context.onLoading = false
+                // TODO: reduce delay
+              }, 1000)
             }
           }
         })
         /**
-         * When image is saved into file system
-         * @name onSaveImage
+         * When note is saved into file system
+         * @name onSaveNote
          * @param {Object} - Briefnote instance used for save image
          */
-        this.$root.$on('onSaveImage', (_obj) => {
+        this.$root.$on('onSaveNote', (_obj) => {
           if (_obj && _obj.constructor === {}.constructor &&
             'type' in _obj && 'title' in _obj && 'path' in _obj && 'id' in _obj) {
             const targetIndex = this.briefnote.findIndex(item => item.id === _obj.id)
             if (targetIndex > -1) {
               this.briefnote[targetIndex].visible = true
+              // TODO: Get current tag selection from 'tag serach view'
+              const tagSelection = ['tag_unlisted']
+              this.filterList(tagSelection)
             }
           }
         })
@@ -451,6 +478,26 @@
           window.jQuery(e.target).closest('#topbar-searchview').length < 1) {
           this.$root.$emit('resetTopbar')
         }
+      },
+      /**
+       * Filter notes based on tags selected
+       * @param {Array} _obj - Array of tag IDs
+       */
+      filterList (_obj) {
+        if (_obj && _obj.constructor === [].constructor &&
+          this.filter && this.filter.constructor === [].constructor &&
+          this.briefnote && this.briefnote.constructor === [].constructor &&
+          _obj.length > 0 && this.filter.length > 0 && this.briefnote.length > 0) {
+          this.list = []
+          _obj.forEach((tag) => {
+            this.filter.forEach((filterItem) => {
+              if (filterItem.tag === tag) {
+                const index = this.briefnote.findIndex(x => x.id === filterItem.note)
+                this.list.push(this.briefnote[index])
+              }
+            })
+          })
+        }
       }
     },
     /**
@@ -468,12 +515,6 @@
         context.registerEvents()
         // Initialize application data
         context.init()
-        setTimeout(() => {
-          // Set application to ready
-          context.dialogs.genericLoader.state = false
-          context.onLoading = false
-          // TODO: reduce delay
-        }, 1000)
         // Windows based initalizations
         if (os.platform() === 'win32') {
           document.onpaste = function () {

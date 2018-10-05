@@ -2,12 +2,12 @@
   <div id="id-notes">
     <!-- Notes as flex view -->
     <div class="wrapper"
-      v-if="briefnote.length > 0">
+      v-if="briefnoteLength > 0">
       <v-layout>
         <v-container v-bind="{ [`grid-list-${size}`]: true }" fluid>
           <v-layout row wrap>
             <v-flex
-              v-for="(item, index) in briefnote"
+              v-for="(item, index) in notes"
               :key="index"
               sm6 md4>
               <card-note :briefnote="item" :config="config" />
@@ -32,7 +32,8 @@ import CardNote from './Notes/CardNote'
 export default {
   name: 'notes',
   props: [
-    'briefnote',
+    'notes',
+    'briefnoteLength',
     'config'
   ],
   components: {

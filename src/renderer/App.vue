@@ -95,7 +95,7 @@
                 if (err) {
                   console.error(err)
                 } else {
-                  _context.$root.$emit('onSaveImage', _obj.obj)
+                  _context.$root.$emit('onSaveNote', _obj.obj)
                 }
               }
             )
@@ -119,7 +119,7 @@
                   if (err) {
                     console.error(err)
                   } else {
-                    _context.$root.$emit('onSaveImage', _obj.obj)
+                    _context.$root.$emit('onSaveNote', _obj.obj)
                   }
                 }
               )
@@ -144,7 +144,7 @@
                 if (err) {
                   console.error(err)
                 } else {
-                  _context.$root.$emit('onSaveImage', _obj.obj)
+                  _context.$root.$emit('onSaveNote', _obj.obj)
                 }
               }
             )
