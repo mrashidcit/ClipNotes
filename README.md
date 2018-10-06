@@ -5,7 +5,9 @@
     height="90px" width="auto"/>
 </p>
 
-> Rapid tags, note taking application for Mac, Windows and Linux
+<p align="center">
+Rapid tags, note taking application for Mac, Windows and Linux
+</p>
 
 <p align="center">
   <img src="screenshots/Screen Shot 2018-10-07 at 12.27.44 AM.png"
