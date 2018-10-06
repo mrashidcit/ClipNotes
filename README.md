@@ -1,5 +1,6 @@
 <p align="center">
   <img src="screenshots/briefnote-hero.png"
+    min-height="auto" min-width="auto"
     height="90px" width="auto"/>
 </p>
 
