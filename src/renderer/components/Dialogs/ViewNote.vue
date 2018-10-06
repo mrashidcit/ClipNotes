@@ -148,6 +148,7 @@ export default {
   .text-note > .note {
     background: white;
     padding: 10px;
+    box-shadow: 0px 5px 18px #888888;
   }
   .image-note {
     position: fixed;
@@ -163,6 +164,7 @@ export default {
   .image-note > img {
     width: 100%;
     height: auto;
+    box-shadow: 0px 5px 18px #888888;
   }
   .note-info {
     position: fixed;

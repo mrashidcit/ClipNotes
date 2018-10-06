@@ -84,6 +84,15 @@ ipcMain.on('onUpdateSqlEntry', (event, _obj) => {
   }
 })
 
+ipcMain.on('onDeleteSqlEntryId', (event, _obj) => {
+  // Validate incoming data object to update SQL
+  if (_obj && _obj.constructor === {}.constructor) {
+    if ('sql' in _obj && _obj.sql) {
+      db.deleteWithId(_obj)
+    }
+  }
+})
+
 ipcMain.on('onReadSql', (event, _obj) => {
   if (_obj && _obj.constructor === {}.constructor) {
     if ('sql' in _obj && 'id' in _obj && _obj.sql && _obj.id) {

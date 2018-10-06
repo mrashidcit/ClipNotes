@@ -391,6 +391,89 @@
           this.dialogs.noteView.data = _obj
           this.dialogs.noteView.state = true
         })
+        /**
+         * Save tags on selected note
+         * @name saveEditTags
+         * @param {Object} - Tags & Note seelction object
+         */
+        this.$root.$on('saveEditTags', (_obj) => {
+          // Validate Data
+          if (_obj && _obj.constructor === {}.constructor &&
+            'selection' in _obj && 'note' in _obj &&
+            _obj.selection && _obj.selection.constructor === [].constructor &&
+            _obj.note && _obj.note.constructor === {}.constructor) {
+            if (_obj.selection.length > 0) {
+              _obj.selection.forEach((selectionTag) => {
+                // Update if any NEW tags
+                const tagIndex = context.tags.findIndex(x => x.value === selectionTag.value)
+                if (tagIndex < 0) {
+                  // A new tag found.
+                  context.$root.$emit('updateSqlEntry', {
+                    sql: `INSERT INTO tags(id, title, value) VALUES(?,?,?)`,
+                    data: [
+                      selectionTag.id,
+                      selectionTag.title,
+                      selectionTag.value
+                    ]
+                  })
+                  // Update tags runtime
+                  context.tags.push(selectionTag)
+                }
+                // Update if any new filter item fot the Tag selection
+                const filterIndex = context.filter.findIndex(x => (x.note === _obj.note.id && x.tag === selectionTag.id))
+                if (filterIndex < 0) {
+                  // Add filter entry
+                  context.$root.$emit('updateSqlEntry', {
+                    sql: `INSERT INTO filter(note, tag) VALUES(?,?)`,
+                    data: [
+                      _obj.note.id,
+                      selectionTag.id
+                    ]
+                  })
+                  // Update filter runtime
+                  context.filter.push({
+                    note: _obj.note.id,
+                    tag: selectionTag.id
+                  })
+                }
+              })
+              // Delete invalid filter entires based on tag selection
+              this.deleteInvalidFilters(_obj)
+            } else {
+              // Selection is emtpy.
+              // A note with no tags should be filtered with 'unlisted' tag automatically.
+              // Add 'unlisted' filter entry for the selected note.
+              const unlistedTagIndex = this.tags.findIndex(x => x.id === 'tag_unlisted')
+              if (unlistedTagIndex > -1) {
+                this.deleteInvalidFilters({
+                  selection: [this.tags[unlistedTagIndex]],
+                  note: _obj.note
+                })
+              }
+            }
+          }
+        })
+      },
+      deleteInvalidFilters (_obj) {
+        const context = this
+        const _filter = Object.assign([], context.filter)
+        _filter.forEach((filterItem, index) => {
+          if (_obj.note.id === filterItem.note) {
+            let _delete = true
+            _obj.selection.forEach((selectionItem) => {
+              if (selectionItem.id === filterItem.tag) {
+                _delete = false
+              }
+            })
+            if (_delete) {
+              console.log('deleting ...')
+              context.$root.$emit('deleteSqlEntryId', {
+                sql: `DELETE FROM filter WHERE note='${filterItem.note}' AND tag='${filterItem.tag}'`
+              })
+              context.filter.splice(index, 1)
+            }
+          }
+        })
       },
       /**
        * On paste action

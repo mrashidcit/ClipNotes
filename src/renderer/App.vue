@@ -51,6 +51,9 @@
       readSql (_obj) {
         ipcRenderer.send('onReadSql', _obj)
       },
+      deleteSqlEntryId (_obj) {
+        ipcRenderer.send('onDeleteSqlEntryId', _obj)
+      },
       // Register Root events
       registerEvents () {
         const _context = this
@@ -63,6 +66,13 @@
             if ('sql' in _obj && 'data' in _obj &&
               _obj.sql && _obj.data) {
               _context.updateSqlEntry(_obj.sql, _obj.data)
+            }
+          }
+        })
+        this.$root.$on('deleteSqlEntryId', (_obj) => {
+          if (_obj && _obj.constructor === {}.constructor) {
+            if ('sql' in _obj && _obj.sql) {
+              _context.deleteSqlEntryId(_obj)
             }
           }
         })

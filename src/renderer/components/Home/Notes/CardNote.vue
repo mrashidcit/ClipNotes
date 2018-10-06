@@ -67,12 +67,14 @@
           label="Select Tags"
           item-text="title"
           multiple
+          @keyup.enter="addTag"
           chips solo>
           <template
             slot="selection"
             slot-scope="data">
             <v-chip
               :key="`${data.item.id}`"
+              v-if="data.item.title"
               class="v-chip--select-multi">
               {{ data.item.title }}
             </v-chip>
@@ -85,7 +87,8 @@
             class="white--text">
             Cancel
           </v-btn>
-          <v-btn depressed color="primary">
+          <v-btn depressed color="primary"
+            @click="onSaveEditTags">
             Save
           </v-btn>
         </v-layout>
@@ -122,6 +125,7 @@
 const os = require('os')
 const path = require('path')
 const fops = require('fs-extra')
+const uniqid = require('uniqid')
 
 export default {
   name: 'card-note',
@@ -143,6 +147,7 @@ export default {
       ready: false,
       value: '',
       select: [],
+      selectPrev: [],
       edit: {
         tags: false,
         info: false
@@ -235,6 +240,43 @@ export default {
           })
         }
         this.edit.tags = true
+        this.selectPrev = Object.assign([], this.select)
+      }
+    },
+    addTag () {
+      if (this.select && this.select.constructor === [].constructor &&
+        this.tags && this.tags.constructor === [].constructor &&
+        this.select.length > 0) {
+        const eIndex = this.select.length - 1
+        const newTagName = (`${this.select[eIndex]}`).toLowerCase()
+        const tagIndex = this.tags.length > 0
+          ? this.tags.findIndex(x => x.title === newTagName)
+          : -1
+        this.select.splice(eIndex, 1)
+        if (newTagName && tagIndex < 0) {
+          this.select.push({
+            id: uniqid(),
+            title: newTagName,
+            value: `tag_${newTagName}`
+          })
+        } else {
+          this.select.push(this.tags[tagIndex])
+        }
+      }
+    },
+    onSaveEditTags () {
+      if (this.select && this.select.constructor === [].constructor &&
+        this.tags && this.tags.constructor === [].constructor &&
+        this.briefnote && this.briefnote.constructor === {}.constructor) {
+        if (!arraysEqual(this.select, this.selectPrev)) {
+          this.$root.$emit('saveEditTags', {
+            selection: this.select,
+            note: this.briefnote
+          })
+        }
+        this.select = []
+        this.selectPrev = []
+        this.edit.tags = false
       }
     },
     onEditInfo () {
@@ -254,6 +296,28 @@ export default {
       }
     }
   }
+}
+
+/**
+ * Check if arrays are equal
+ * @param {Array} _a1 - Array One
+ * @param {Array} _a2 - Array Two
+ * @return {Boolean}
+ */
+function arraysEqual (_a1, _a2) {
+  if (_a1 === _a2) return true
+  if (_a1 === null || _a2 === null) return false
+  if (_a1.length !== _a2.length) return false
+
+  // If you don't care about the order of the elements inside
+  // the array, you should sort both arrays here.
+  // Please note that calling sort on an array will modify that array.
+  // you might want to clone your array first.
+
+  for (var i = 0; i < _a1.length; ++i) {
+    if (_a1[i] !== _a2[i]) return false
+  }
+  return true
 }
 </script>
 

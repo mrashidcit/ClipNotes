@@ -98,7 +98,7 @@ DbHelper.prototype.init = () => {
                           [
                             'tag_unlisted',
                             'unlisted',
-                            'Unlisted'
+                            'unlisted'
                           ]
                         )
                       }
@@ -123,12 +123,35 @@ DbHelper.prototype.init = () => {
 }
 
 /**
+ * Delete SQL entry with id
+ */
+DbHelper.prototype.deleteWithId = (_obj) => {
+  // Validate data object
+  if (_obj && _obj.constructor === {}.constructor) {
+    if ('sql' in _obj && _obj.sql) {
+      if (config.db) {
+        config.db.serialize(() => {
+          config.db.run(`${_obj.sql}`, (error) => {
+            if (error) {
+              console.error(error)
+            } else {
+              console.log('Deleted an entry in SQL database. SQL', _obj.sql)
+            }
+          })
+        })
+      }
+    }
+  }
+}
+
+/**
  * Update SQL database with new entry
  */
 DbHelper.prototype.update = (_obj) => {
   // Validate data object
   if (_obj && _obj.constructor === {}.constructor) {
-    if ('sql' in _obj && 'data' in _obj && _obj.sql && _obj.data) {
+    if ('sql' in _obj && 'data' in _obj &&
+      _obj.sql && _obj.data) {
       if (config.db) {
         // Serial SQL database operations
         config.db.serialize(() => {
