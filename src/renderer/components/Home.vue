@@ -6,7 +6,9 @@
         :style="dialogs.noteView.state ? `filter: blur(8px);-webkit-filter: blur(8px);` : null"/>
       <!-- Search View -->
       <search :onViewSearch="views.onViewSearch"
-        :tags="tags" />
+        :tags="tags"
+        :list="list"
+        />
       <!-- Notes -->
       <notes v-if="!onLoading"
         :notes="list"
@@ -297,7 +299,7 @@
         /**
          * When SQL data is ready to read
          * @name onSqlDataReady
-         * @param {Object} - Sql data
+         * @param {Object} _obj - Sql data
          */
         this.$root.$on('onSqlDataReady', (_obj) => {
           if (_obj && _obj.constructor === {}.constructor &&
@@ -320,9 +322,8 @@
                   _obj.rows.forEach((item) => {
                     context.filter.push(item)
                   })
-                  context.filterList([
-                    'tag_unlisted'
-                  ])
+                  const tagIndex = this.tags.findIndex(x => x.id === 'tag_unlisted')
+                  this.filterList([this.tags[tagIndex]])
                   break
                 default: break
               }
@@ -338,7 +339,7 @@
         /**
          * When note is saved into file system
          * @name onSaveNote
-         * @param {Object} - Briefnote instance used for save image
+         * @param {Object} _obj - Briefnote instance used for save image
          */
         this.$root.$on('onSaveNote', (_obj) => {
           if (_obj && _obj.constructor === {}.constructor &&
@@ -347,24 +348,20 @@
             if (targetIndex > -1) {
               this.briefnote[targetIndex].visible = true
               // TODO: Get current tag selection from 'tag serach view'
-              const tagSelection = ['tag_unlisted']
-              this.filterList(tagSelection)
+              const tagIndex = this.tags.findIndex(x => x.id === 'tag_unlisted')
+              this.filterList([this.tags[tagIndex]])
             }
           }
         })
         /**
          * Request to show tag search view
          * @name viewSearch
-         * @param {Object} - Object to state tag search view
          */
-        this.$root.$on('viewSearch', (_obj) => {
-          if (_obj && _obj.constructor === {}.constructor &&
-            'state' in _obj) {
-            if (_obj.state) {
-              this.views.onViewSearch = true
-            } else {
-              this.views.onViewSearch = false
-            }
+        this.$root.$on('viewSearch', () => {
+          if (!this.views.onViewSearch) {
+            this.views.onViewSearch = true
+          } else {
+            this.views.onViewSearch = false
           }
         })
         /**
@@ -385,7 +382,7 @@
         /**
          * Request to open 'note viewer'
          * @name closeNoteView
-         * @param {Object} - briefnote instance
+         * @param {Object} _obj - briefnote instance object
          */
         this.$root.$on('viewNote', (_obj) => {
           this.dialogs.noteView.data = _obj
@@ -394,7 +391,7 @@
         /**
          * Save tags on selected note
          * @name saveEditTags
-         * @param {Object} - Tags & Note seelction object
+         * @param {Object} _obj - Tags & Note seelction object
          */
         this.$root.$on('saveEditTags', (_obj) => {
           // Validate Data
@@ -453,7 +450,26 @@
             }
           }
         })
+        /**
+         * Filter notes based on tag selection
+         * @name filterNotes
+         * @param {Array} _obj - Array of tag selection objects
+         */
+        this.$root.$on('filterNotes', (_obj) => {
+          if (_obj && _obj.constructor === [].constructor) {
+            if (_obj.length > 0) {
+              this.filterList(_obj)
+            } else {
+              const tagIndex = this.tags.findIndex(x => x.id === 'tag_unlisted')
+              this.filterList([this.tags[tagIndex]])
+            }
+          }
+        })
       },
+      /**
+       * Delete any invalid filter entries based on input tag objects
+       * @param {Array} - An object of tag selection and selected note
+       */
       deleteInvalidFilters (_obj) {
         const context = this
         const _filter = Object.assign([], context.filter)
@@ -578,9 +594,11 @@
           this.list = []
           _obj.forEach((tag) => {
             this.filter.forEach((filterItem) => {
-              if (filterItem.tag === tag) {
+              if (filterItem.tag === tag.id) {
                 const index = this.briefnote.findIndex(x => x.id === filterItem.note)
-                this.list.push(this.briefnote[index])
+                if (index > -1) {
+                  this.list.push(this.briefnote[index])
+                }
               }
             })
           })
@@ -615,6 +633,10 @@
               case 'paste':
                 // When user click "Paste" menu button
                 context.onPaste()
+                break
+              case 'find':
+                // When user click "Find" menu button
+                context.$root.$emit('viewSearch')
                 break
               default: break
             }

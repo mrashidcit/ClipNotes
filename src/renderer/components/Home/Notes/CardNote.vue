@@ -138,9 +138,6 @@ export default {
   data () {
     return {
       onHover: false,
-      dummyDescription: `Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.`,
-      dummyTitle: `What is Lorem Ipsum?`,
-      dummyHtml: `<h1>hello</h1> <h1>hello</h1> <h1>hello</h1><h1>hello</h1><h1>hello</h1>`,
       elevation: {
         value: 0
       },
@@ -188,6 +185,7 @@ export default {
       }
     },
     getAbsolutePath (_path) {
+      console.log(this.briefnote)
       const context = this
       if (_path) {
         const srcPath = path.join(
@@ -200,19 +198,8 @@ export default {
           setTimeout(() => {
             context.ready = true
             context.value = `file://${srcPath}`
+            console.log(context.briefnote)
           }, 500)
-        }
-      }
-    },
-    loadImage (_path) {
-      if (_path && this.config &&
-        'appPath' in this.config && this.config.appPath) {
-        const srcPath = path.join(
-          this.config.appPath,
-          _path
-        )
-        if (fops.existsSync(srcPath)) {
-          console.log(srcPath)
         }
       }
     },

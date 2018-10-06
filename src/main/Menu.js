@@ -16,6 +16,15 @@ function MenuTemplate (_config) {
           {role: 'cut'},
           {role: 'copy'},
           {
+            label: 'Find',
+            accelerator: 'CmdOrCtrl+F',
+            click () {
+              _config.window.webContents.send('onMenuItemClick', {
+                label: 'find'
+              })
+            }
+          },
+          {
             label: 'Paste',
             accelerator: 'CmdOrCtrl+V',
             click () {

@@ -1,5 +1,7 @@
 <template>
   <div id="search-view" :style="`display: ${onViewSearch ? 'block' : 'none'}`">
+    <h3>Filter nots with tags</h3>
+    <p>Results: <b>{{list.length}}</b></p>
     <v-combobox
       v-model="select"
       :items="tags"
@@ -25,11 +27,22 @@ export default {
   name: 'search',
   props: [
     'onViewSearch',
-    'tags'
+    'tags',
+    'list'
   ],
   data () {
     return {
       select: []
+    }
+  },
+  computed: {
+    onSelectChange () {
+      return this.select
+    }
+  },
+  watch: {
+    onSelectChange () {
+      this.$root.$emit('filterNotes', this.select)
     }
   }
 }

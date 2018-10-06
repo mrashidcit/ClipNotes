@@ -48,9 +48,7 @@ export default {
      * Emits 'ViewSearch' event which is registerd in Home Component.
      */
     onClickViewSearch () {
-      this.$root.$emit('viewSearch', {
-        state: this.onViewSearch ? 0 : 1
-      })
+      this.$root.$emit('viewSearch')
     }
   }
 }
