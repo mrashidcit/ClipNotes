@@ -8,7 +8,7 @@
     <v-img
       v-if="briefnote.type === 'image' && 'visible' in briefnote && briefnote.visible === true"
       height="250px"
-      :src="value" :load-data="!value && getAbsolutePath(briefnote.path)">
+      :src="pathValue" :load-data="!pathValue && getAbsolutePath(briefnote.path)">-->
       <v-container fill-height fluid>
         <v-layout fill-height>
           <v-flex xs12 align-end flexbox>
@@ -20,13 +20,14 @@
     <!-- Note Type: TEXT or HTML -->
     <!-- Title -->
     <v-card-title
-      v-else-if="
+      v-if="
         (briefnote.type === 'text' || briefnote.type === 'html') &&
         'visible' in briefnote && briefnote.visible === true">
       <div class="headline">{{briefnote.title}}</div>
     </v-card-title>
     <!-- Text/HTML -->
-    <v-card-text class="htmlContent" v-if="briefnote.type === 'html' && 'visible' in briefnote && briefnote.visible === true" v-html="value" :load-data="getHtmlStr(briefnote.path)"></v-card-text>
+    <v-card-text class="htmlContent" v-if="briefnote.type === 'html' && 'visible' in briefnote && briefnote.visible === true" v-html="value"
+      :load-data="getHtmlStr(briefnote.path)"></v-card-text>
     <!-- Note options -->
     <div class="options" v-if="onHover">
       <v-layout row>
@@ -143,6 +144,7 @@ export default {
       },
       ready: false,
       value: '',
+      pathValue: '',
       select: [],
       selectPrev: [],
       edit: {
@@ -161,6 +163,7 @@ export default {
       this.elevation.value = 0
     },
     getHtmlStr (_path) {
+      console.log('getting html')
       const context = this
       if (_path) {
         const srcPath = path.join(
@@ -185,7 +188,7 @@ export default {
       }
     },
     getAbsolutePath (_path) {
-      console.log(this.briefnote)
+      console.log('here', this.briefnote)
       const context = this
       if (_path) {
         const srcPath = path.join(
@@ -197,8 +200,7 @@ export default {
         if (fops.existsSync(srcPath)) {
           setTimeout(() => {
             context.ready = true
-            context.value = `file://${srcPath}`
-            console.log(context.briefnote)
+            context.pathValue = `file://${srcPath}`
           }, 500)
         }
       }
