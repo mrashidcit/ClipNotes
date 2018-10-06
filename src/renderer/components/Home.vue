@@ -456,6 +456,7 @@
          * @param {Array} _obj - Array of tag selection objects
          */
         this.$root.$on('filterNotes', (_obj) => {
+          console.log(_obj)
           if (_obj && _obj.constructor === [].constructor) {
             if (_obj.length > 0) {
               this.filterList(_obj)

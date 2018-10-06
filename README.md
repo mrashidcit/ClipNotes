@@ -23,9 +23,11 @@ Rapid tags, note taking application for Mac, Windows and Linux
 - [x] Able to **assing or remove tag** from selected note.
 #### Search by filter
 - [X] Able to search notes by **tag filter**.
-- [ ] Able to serch notes by **name or description filter**.
+- ~~[ ] Able to serch notes by **name or description filter**.~~
 
 ### v0.0.2
+#### Search by filter
+- [ ] Able to serch notes by **name or description filter**.
 #### Integrations
 - [ ] Able to integrate **Dropbox** or **Google Drive**.
 - [ ] Able to access application from **Command-line** or **Sockets**.

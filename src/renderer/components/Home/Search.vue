@@ -8,6 +8,7 @@
       label="Select Tags"
       item-text="title"
       multiple
+      @keyup.enter="onTagSelection"
       chips solo>
       <template
         slot="selection"
@@ -43,6 +44,29 @@ export default {
   watch: {
     onSelectChange () {
       this.$root.$emit('filterNotes', this.select)
+    }
+  },
+  methods: {
+    onTagSelection () {
+      if (this.select && this.select.constructor === [].constructor &&
+        this.tags && this.tags.constructor === [].constructor &&
+        this.select.length > 0) {
+        const eIndex = this.select.length - 1
+        const newTagName = (`${this.select[eIndex]}`).toLowerCase()
+        const tagIndex = this.tags.length > 0
+          ? this.tags.findIndex(x => x.title === newTagName)
+          : -1
+        this.select.splice(eIndex, 1)
+        if (newTagName && tagIndex < 0) {
+          this.select.push({
+            id: null,
+            title: newTagName,
+            value: `tag_${newTagName}`
+          })
+        } else {
+          this.select.push(this.tags[tagIndex])
+        }
+      }
     }
   }
 }
