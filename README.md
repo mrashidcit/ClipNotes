@@ -67,5 +67,5 @@ npm run lint
 [MIT](https://opensource.org/licenses/MIT)
 
 ## Contact
-[hello@xplorebits.com](mailto:hello@xplorebits.com)
-[saikksub@gmail.com](mailto:hello@xplorebits.com)
+* [hello@xplorebits.com](mailto:hello@xplorebits.com)
+* [saikksub@gmail.com](mailto:hello@xplorebits.com)
