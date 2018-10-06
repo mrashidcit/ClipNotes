@@ -68,3 +68,4 @@ npm run lint
 
 ## Contact
 [hello@xplorebits.com](mailto:hello@xplorebits.com)
+[saikksub@gmail.com](mailto:hello@xplorebits.com)
