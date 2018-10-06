@@ -12,7 +12,7 @@
 - [x] Able to **create new tag**.
 - [x] Able to **assing or remove tag** from selected note.
 #### Search by filter
-- [ ] Able to search notes by **tag filter**.
+- [X] Able to search notes by **tag filter**.
 - [ ] Able to serch notes by **name or description filter**.
 
 ### v0.2.0
