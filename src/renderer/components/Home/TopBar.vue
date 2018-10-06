@@ -3,7 +3,8 @@
     <div class="wrapper" clear-top-bottom>
       <!-- Topbar Logo -->
       <div class="logo">
-        briefnote
+        <img src="../../assets/logo.png">
+        <span><b>briefnote</b></span>
       </div>
       <!-- Topbar center menu -->
       <div class="menu">
@@ -57,6 +58,15 @@ export default {
 <style scoped>
   .logo {
     float: left;
+  }
+  .logo > img {
+    height: 30px;
+    width: auto;
+    display: inline-block;
+    vertical-align: middle;
+  }
+  .logo > span {
+    margin: 0 5px;
   }
   .menu {
     position: absolute;
