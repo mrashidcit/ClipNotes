@@ -13,7 +13,8 @@
               <card-note
                 :briefnote="item"
                 :config="config"
-                :tags="tags" />
+                :tags="tags"
+                :filter="filter" />
             </v-flex>
           </v-layout>
         </v-container>
@@ -39,7 +40,8 @@ export default {
     'briefnoteLength',
     'config',
     'tags',
-    'onViewSearch'
+    'onViewSearch',
+    'filter'
   ],
   components: {
     CardNote

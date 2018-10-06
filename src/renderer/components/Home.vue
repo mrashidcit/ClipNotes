@@ -13,6 +13,7 @@
         :briefnoteLength="briefnote.length"
         :config="config"
         :tags="tags"
+        :filter="filter"
         :onViewSearch="views.onViewSearch"
         :style="dialogs.noteView.state || views.onViewSearch ? `filter: blur(8px);-webkit-filter: blur(8px);`: null"/>
     <!-- - Views -->

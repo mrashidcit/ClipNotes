@@ -128,7 +128,8 @@ export default {
   props: [
     'briefnote',
     'config',
-    'tags'
+    'tags',
+    'filter'
   ],
   data () {
     return {
@@ -219,6 +220,20 @@ export default {
     },
     onEditTags () {
       if (!this.edit.tags) {
+        if (this.briefnote && this.briefnote.constructor === {}.constructor &&
+          this.filter && this.filter.constructor === [].constructor &&
+          this.tags && this.tags.constructor === [].constructor &&
+          this.filter.length > 0 && this.tags.length > 0 &&
+          'id' in this.briefnote && this.briefnote.id) {
+          this.filter.forEach((filterItem) => {
+            if (filterItem.note === this.briefnote.id) {
+              const tagIndex = this.tags.findIndex(x => x.id === filterItem.tag)
+              if (tagIndex > -1) {
+                this.select.push(this.tags[tagIndex])
+              }
+            }
+          })
+        }
         this.edit.tags = true
       }
     },
@@ -229,6 +244,7 @@ export default {
     },
     closeEditTags () {
       if (this.edit.tags) {
+        this.select = []
         this.edit.tags = false
       }
     },
