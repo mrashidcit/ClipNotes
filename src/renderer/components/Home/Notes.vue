@@ -2,7 +2,7 @@
   <div id="id-notes">
     <!-- Notes as flex view -->
     <div class="wrapper"
-      v-if="briefnoteLength > 0">
+      v-if="count > 0">
       <v-layout :style="onViewSearch ? `pointer-events: none` : null">
         <v-container v-bind="{ [`grid-list-${size}`]: true }" fluid>
           <v-layout row wrap>
@@ -22,6 +22,12 @@
     </div>
     <!-- Instructions when notes are empty -->
     <div class="hero" v-else>
+      <div>
+        <img src="../../assets/logo.png"
+          height="100px"
+          width="auto"
+          style="display: block; margin: 20px auto 20px auto;">
+      </div>
       <p style="text-align: center; cursor: default;">
         No notes available!<br/>
         To get started, click <v-icon class="grey--text">add_circle</v-icon> to add new note
@@ -37,7 +43,7 @@ export default {
   name: 'notes',
   props: [
     'notes',
-    'briefnoteLength',
+    'count',
     'config',
     'tags',
     'onViewSearch',

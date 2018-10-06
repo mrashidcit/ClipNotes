@@ -43,7 +43,8 @@
           @click="onEditTags">
           <v-icon class="primary--text">local_offer</v-icon>
         </v-btn>
-        <v-btn icon raised color="white">
+        <v-btn icon raised color="white"
+          @click="onDeleteNote">
           <v-icon class="red--text">delete</v-icon>
         </v-btn>
       </v-layout>
@@ -163,7 +164,6 @@ export default {
       this.elevation.value = 0
     },
     getHtmlStr (_path) {
-      console.log('getting html')
       const context = this
       if (_path) {
         const srcPath = path.join(
@@ -188,7 +188,6 @@ export default {
       }
     },
     getAbsolutePath (_path) {
-      console.log('here', this.briefnote)
       const context = this
       if (_path) {
         const srcPath = path.join(
@@ -282,6 +281,11 @@ export default {
     closeEditInfo () {
       if (this.edit.info) {
         this.edit.info = false
+      }
+    },
+    onDeleteNote () {
+      if (this.briefnote && this.briefnote.constructor === {}.constructor) {
+        this.$root.$emit('confirmDeleteNote', this.briefnote)
       }
     }
   }

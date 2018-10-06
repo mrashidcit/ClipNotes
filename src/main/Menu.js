@@ -45,6 +45,15 @@ function MenuTemplate (_config) {
           {role: 'forcereload'},
           {role: 'toggledevtools'},
           {type: 'separator'},
+          {
+            label: 'Close Dialog',
+            accelerator: 'Escape',
+            click () {
+              _config.window.webContents.send('onMenuItemClick', {
+                label: 'close-dialog'
+              })
+            }
+          },
           {role: 'resetzoom'},
           {role: 'zoomin'},
           {role: 'zoomout'},

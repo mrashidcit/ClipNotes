@@ -3,7 +3,11 @@
     <!-- + Views -->
       <!-- Top application bar -->
       <top-bar :onViewSearch="views.onViewSearch"
-        :style="dialogs.noteView.state ? `filter: blur(8px);-webkit-filter: blur(8px);` : null"/>
+        :style=" dialogs.noteView.state ||
+        dialogs.dialogDeleteNote.state
+        ? `filter: blur(8px);-webkit-filter: blur(8px);`
+        : null"
+      />
       <!-- Search View -->
       <search :onViewSearch="views.onViewSearch"
         :tags="tags"
@@ -12,18 +16,26 @@
       <!-- Notes -->
       <notes v-if="!onLoading"
         :notes="list"
-        :briefnoteLength="briefnote.length"
+        :count="list.length"
         :config="config"
         :tags="tags"
         :filter="filter"
         :onViewSearch="views.onViewSearch"
-        :style="dialogs.noteView.state || views.onViewSearch ? `filter: blur(8px);-webkit-filter: blur(8px);`: null"/>
+        :style="dialogs.noteView.state
+          || views.onViewSearch
+          || dialogs.dialogDeleteNote.state
+          ? `filter: blur(8px);-webkit-filter: blur(8px);`
+          : null" />
     <!-- - Views -->
     <!-- + Dialogs -->
       <!-- Generic Loader -->
       <generic-loader :config="dialogs.genericLoader" />
       <!-- View Note -->
       <view-note :state="dialogs.noteView.state" :data="dialogs.noteView.data" :config="config" />
+      <dialog-delete-note
+        :state="dialogs.dialogDeleteNote.state"
+        :briefnote="dialogs.dialogDeleteNote.note"
+        :config="config" />
     <!-- - Dialogs -->
   </div>
 </template>
@@ -36,10 +48,12 @@
 
   // Import Vue Components for dialogs
   import ViewNote from './Dialogs/ViewNote'
+  import DialogDeleteNote from './Dialogs/DialogDeleteNote'
   import GenericLoader from './Dialogs/GenericLoader'
   import { nativeImage } from 'electron'
   
   // Import dependency modules
+  const fops = require('fs-extra')
   const os = require('os')
   const path = require('path')
   const {
@@ -76,6 +90,7 @@
       TopBar,
       Notes,
       ViewNote,
+      DialogDeleteNote,
       GenericLoader,
       Search
     },
@@ -122,6 +137,11 @@
           noteView: {
             data: null, // Note view data object: briefnote selected object
             state: false // Note view active state
+          },
+          // Generic Yes No dialog
+          dialogDeleteNote: {
+            state: false,
+            note: null
           }
         },
         // Runtime control data for component views
@@ -139,9 +159,9 @@
         // Validate _config object
         if (_config && _config.constructor === {}.constructor &&
           'type' in _config && 'obj' in _config) {
-          // Final briefnote instance.
+          // Final briefnote object.
           let resultObj = null
-          // Create and update briefnote instance.
+          // Create and update briefnote object.
           switch (_config.type) {
             case 'text':
               // Note type is TEXT
@@ -339,7 +359,7 @@
         /**
          * When note is saved into file system
          * @name onSaveNote
-         * @param {Object} _obj - Briefnote instance used for save image
+         * @param {Object} _obj - Briefnote object used for save image
          */
         this.$root.$on('onSaveNote', (_obj) => {
           if (_obj && _obj.constructor === {}.constructor &&
@@ -382,7 +402,7 @@
         /**
          * Request to open 'note viewer'
          * @name closeNoteView
-         * @param {Object} _obj - briefnote instance object
+         * @param {Object} _obj - briefnote object
          */
         this.$root.$on('viewNote', (_obj) => {
           this.dialogs.noteView.data = _obj
@@ -456,7 +476,6 @@
          * @param {Array} _obj - Array of tag selection objects
          */
         this.$root.$on('filterNotes', (_obj) => {
-          console.log(_obj)
           if (_obj && _obj.constructor === [].constructor) {
             if (_obj.length > 0) {
               this.filterList(_obj)
@@ -465,6 +484,74 @@
               this.filterList([this.tags[tagIndex]])
             }
           }
+        })
+        /**
+         * Confirm deleting selected note
+         * @name confirmDeleteNote
+         * @param {Object} _obj - briefnote object
+         */
+        this.$root.$on('confirmDeleteNote', (_obj) => {
+          if (_obj && _obj.constructor === {}.constructor) {
+            this.dialogs.dialogDeleteNote.note = _obj
+            this.dialogs.dialogDeleteNote.state = true
+          }
+        })
+        /**
+         * Delete selected note
+         * @name deleteNote
+         * @param {Object} _obj - briefnote object
+         */
+        this.$root.$on('deleteNote', (_obj) => {
+          if (_obj && _obj.constructor === {}.constructor) {
+            this.$root.$emit('closeDialogDeleteNote')
+            let _copyObject = Object.assign([], this.filter)
+            // Delete form local filter objects of selected note
+            _copyObject.forEach((filterCopyItem, index) => {
+              if (filterCopyItem.note === _obj.id) {
+                context.filter.splice(index, 1)
+              }
+            })
+            // Delete from database filter objects of selected note
+            this.$root.$emit('deleteSqlEntryId', {
+              sql: `DELETE FROM filter WHERE note='${_obj.id}'`
+            })
+            // Delete filter list objects of selected note
+            _copyObject = Object.assign([], this.list)
+            _copyObject.forEach((listCopyItem, index) => {
+              if (listCopyItem.id === _obj.id) {
+                context.list.splice(index, 1)
+              }
+            })
+            // Delete from local briefnotes on selected note
+            const noteIndex = this.briefnote.findIndex(x => x.id === _obj.id)
+            if (noteIndex > -1) {
+              this.briefnote.splice(noteIndex, 1)
+            }
+            // Delete from database notes on selected notes
+            this.$root.$emit('deleteSqlEntryId', {
+              sql: `DELETE FROM notes WHERE id='${_obj.id}'`
+            })
+            // Delete briefnote file from app resource
+            fops.unlink(
+              path.join(
+                this.config.appPath,
+                _obj.path
+              ),
+              (err) => {
+                if (err) {
+                  console.error('unable to delete', err)
+                }
+              }
+            )
+          }
+        })
+        /**
+         * Close dialog Delete note
+         * @name closeDialogDeleteNote
+         */
+        this.$root.$on('closeDialogDeleteNote', () => {
+          this.dialogs.dialogDeleteNote.note = null
+          this.dialogs.dialogDeleteNote.state = false
         })
       },
       /**
@@ -483,7 +570,6 @@
               }
             })
             if (_delete) {
-              console.log('deleting ...')
               context.$root.$emit('deleteSqlEntryId', {
                 sql: `DELETE FROM filter WHERE note='${filterItem.note}' AND tag='${filterItem.tag}'`
               })
@@ -515,7 +601,7 @@
             })
           } else {
             // A screenshot doesn't have absolute path
-            // Create nativeImage instance as PNG from clipboard data
+            // Create nativeImage object as PNG from clipboard data
             const nativeImageObj = nativeImage.createFromBuffer(clipboard.readImage().toPNG())
             // Add screenshot type note
             this.addNote({
@@ -638,6 +724,15 @@
               case 'find':
                 // When user click "Find" menu button
                 context.$root.$emit('viewSearch')
+                break
+              case 'close-dialog':
+                if (context.dialogs.noteView.state) {
+                  context.$root.$emit('closeNoteView')
+                } else if (context.dialogs.dialogDeleteNote.state) {
+                  context.dialogs.dialogDeleteNote.state = false
+                } else if (context.views.onViewSearch) {
+                  context.$root.$emit('resetTopbar')
+                }
                 break
               default: break
             }
