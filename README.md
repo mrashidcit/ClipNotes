@@ -1,5 +1,3 @@
-# briefnote
-
 <p align="center">
   <img src="screenshots/briefnote-hero.png"
     height="90px" width="auto"/>
