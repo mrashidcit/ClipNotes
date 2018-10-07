@@ -41,11 +41,17 @@
       // Generic SQL update
       // _sql: SQL command as string
       // _data: SQL data as array
-      updateSqlEntry (_sql, _data) {
-        // SEND 'onUPdateSqlEntry' to main process
-        ipcRenderer.send('onUpdateSqlEntry', {
+      addSqlEntry (_sql, _data) {
+        // SEND 'onAddSqlEntry' to main process
+        ipcRenderer.send('onAddSqlEntry', {
           sql: _sql,
           data: _data
+        })
+      },
+      updateSqlEntry (_sql) {
+        // SEND 'onUpdateSqlEntry' to main process
+        ipcRenderer.send('onUpdateSqlEntry', {
+          sql: _sql
         })
       },
       readSql (_obj) {
@@ -60,12 +66,20 @@
         ipcRenderer.on('onSqlDataReady', (event, _obj) => {
           _context.$root.$emit('onSqlDataReady', _obj)
         })
-        this.$root.$on('updateSqlEntry', (_obj) => {
+        this.$root.$on('addSqlEntry', (_obj) => {
           // Check _obj is valid
           if (_obj && _obj.constructor === {}.constructor) {
             if ('sql' in _obj && 'data' in _obj &&
               _obj.sql && _obj.data) {
-              _context.updateSqlEntry(_obj.sql, _obj.data)
+              _context.addSqlEntry(_obj.sql, _obj.data)
+            }
+          }
+        })
+        this.$root.$on('updateSqlEntry', (_obj) => {
+          // Check _obj is valid
+          if (_obj && _obj.constructor === {}.constructor) {
+            if ('sql' in _obj && _obj.sql) {
+              _context.updateSqlEntry(_obj.sql)
             }
           }
         })
@@ -239,5 +253,8 @@
     display: -webkit-box;
     -webkit-line-clamp: 6;
     -webkit-box-orient: vertical; 
+  }
+  [contenteditable]:focus {
+    outline: 0px solid transparent;
   }
 </style>

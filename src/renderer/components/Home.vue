@@ -3,8 +3,9 @@
     <!-- + Views -->
       <!-- Top application bar -->
       <top-bar :onViewSearch="views.onViewSearch"
-        :style=" dialogs.noteView.state ||
-        dialogs.dialogDeleteNote.state
+        :style=" dialogs.noteView.state
+          || dialogs.dialogDeleteNote.state
+          || dialogs.newNote.state
         ? `filter: blur(8px);-webkit-filter: blur(8px);`
         : null"
       />
@@ -24,6 +25,7 @@
         :style="dialogs.noteView.state
           || views.onViewSearch
           || dialogs.dialogDeleteNote.state
+          || dialogs.newNote.state
           ? `filter: blur(8px);-webkit-filter: blur(8px);`
           : null" />
     <!-- - Views -->
@@ -36,6 +38,9 @@
         :state="dialogs.dialogDeleteNote.state"
         :briefnote="dialogs.dialogDeleteNote.note"
         :config="config" />
+      <new-note
+        :state="dialogs.newNote.state"/>
+      <about :state="dialogs.about.state" />
     <!-- - Dialogs -->
   </div>
 </template>
@@ -47,9 +52,11 @@
   import Search from './Home/Search'
 
   // Import Vue Components for dialogs
+  import About from './Dialogs/About'
   import ViewNote from './Dialogs/ViewNote'
   import DialogDeleteNote from './Dialogs/DialogDeleteNote'
   import GenericLoader from './Dialogs/GenericLoader'
+  import NewNote from './Dialogs/NewNote'
   import { nativeImage } from 'electron'
   
   // Import dependency modules
@@ -89,8 +96,10 @@
     components: {
       TopBar,
       Notes,
+      About,
       ViewNote,
       DialogDeleteNote,
+      NewNote,
       GenericLoader,
       Search
     },
@@ -142,6 +151,12 @@
           dialogDeleteNote: {
             state: false,
             note: null
+          },
+          newNote: {
+            state: false
+          },
+          about: {
+            state: false
           }
         },
         // Runtime control data for component views
@@ -262,7 +277,7 @@
             // Update briefnote in runtime data
             this.briefnote.push(resultObj)
             // Update briefnote in database
-            this.$root.$emit('updateSqlEntry', {
+            this.$root.$emit('addSqlEntry', {
               sql: `INSERT INTO notes(title, type, path, id) VALUES(?,?,?,?)`,
               data: [
                 resultObj.title,
@@ -277,7 +292,7 @@
               tag: 'tag_unlisted'
             })
             // Update database filter list for this new note entry, as 'Unlisted'.
-            this.$root.$emit('updateSqlEntry', {
+            this.$root.$emit('addSqlEntry', {
               sql: `INSERT INTO filter(note, tag) VALUES(?,?)`,
               data: [
                 resultObj.id,
@@ -425,7 +440,7 @@
                 const tagIndex = context.tags.findIndex(x => x.value === selectionTag.value)
                 if (tagIndex < 0) {
                   // A new tag found.
-                  context.$root.$emit('updateSqlEntry', {
+                  context.$root.$emit('addSqlEntry', {
                     sql: `INSERT INTO tags(id, title, value) VALUES(?,?,?)`,
                     data: [
                       selectionTag.id,
@@ -440,7 +455,7 @@
                 const filterIndex = context.filter.findIndex(x => (x.note === _obj.note.id && x.tag === selectionTag.id))
                 if (filterIndex < 0) {
                   // Add filter entry
-                  context.$root.$emit('updateSqlEntry', {
+                  context.$root.$emit('addSqlEntry', {
                     sql: `INSERT INTO filter(note, tag) VALUES(?,?)`,
                     data: [
                       _obj.note.id,
@@ -468,6 +483,41 @@
                 })
               }
             }
+          }
+        })
+        /**
+         * Save title & description on selected note
+         * @name saveEditInfo
+         * @param {Object} _obj - title, description & briefnote objects
+         */
+        this.$root.$on('saveEditInfo', (_obj) => {
+          if (_obj && _obj.constructor === {}.constructor &&
+            'note' in _obj && _obj.note &&
+            _obj.note.constructor === {}.constructor &&
+            'title' in _obj && 'description' in _obj) {
+            let _index = this.briefnote.findIndex(x => x.id === _obj.note.id)
+            if (_index > -1) {
+              // Update local note entry object with changes
+              this.briefnote[_index].title = _obj.title
+              this.briefnote[_index].description = _obj.description
+            }
+            // Update local list entry object with changes.
+            // List entry is filtered entry.
+            _index = this.list.findIndex(x => x.id === _obj.id)
+            if (_index > -1) {
+              this.list[_index].title = _obj.title
+              this.list[_index].description = _obj.description
+            }
+            // Update SQL databse entry with changes
+            this.$root.$emit('updateSqlEntry', {
+              sql: `
+                UPDATE notes
+                SET
+                title='${_obj.title}',
+                description='${_obj.description}'
+                WHERE
+                id='${_obj.note.id}'`
+            })
           }
         })
         /**
@@ -553,6 +603,46 @@
           this.dialogs.dialogDeleteNote.note = null
           this.dialogs.dialogDeleteNote.state = false
         })
+        /**
+         * Open Selected Dialog
+         * @name openDialog
+         */
+        this.$root.$on('openDialog', (_obj) => {
+          if (_obj && _obj.constructor === {}.constructor &&
+            'name' in _obj && _obj.name) {
+            switch (_obj.name) {
+              case 'new-note':
+                this.dialogs.newNote.state = true
+                break
+              default: break
+            }
+          }
+        })
+        /**
+         * Close Selected Dialog
+         * @name closeDialog
+         */
+        this.$root.$on('closeDialog', (_obj) => {
+          if (_obj && _obj.constructor === {}.constructor &&
+            'name' in _obj && _obj.name) {
+            switch (_obj.name) {
+              case 'new-note':
+                this.dialogs.newNote.state = false
+                break
+              case 'about':
+                this.dialogs.about.state = false
+                break
+              default: break
+            }
+          }
+        })
+        /**
+         * About Dialog
+         * @name aboutDialog
+         */
+        this.$root.$on('aboutDialog', () => {
+          this.dialogs.about.state = true
+        })
       },
       /**
        * Delete any invalid filter entries based on input tag objects
@@ -582,6 +672,11 @@
        * On paste action
        */
       onPaste () {
+        if (this.dialogs.noteView.state ||
+          this.dialogs.dialogDeleteNote.state ||
+          this.dialogs.newNote.state) {
+          return
+        }
         // Get available formats from electron clipboard
         const formats = clipboard.availableFormats()
         console.log(formats)
@@ -732,6 +827,10 @@
                   context.dialogs.dialogDeleteNote.state = false
                 } else if (context.views.onViewSearch) {
                   context.$root.$emit('resetTopbar')
+                } else if (context.dialogs.newNote.state) {
+                  context.$root.$emit('closeDialog', {
+                    name: 'new-note'
+                  })
                 }
                 break
               default: break

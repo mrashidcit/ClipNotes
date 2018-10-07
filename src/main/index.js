@@ -74,10 +74,20 @@ app.on('activate', () => {
   }
 })
 
-ipcMain.on('onUpdateSqlEntry', (event, _obj) => {
+ipcMain.on('onAddSqlEntry', (event, _obj) => {
   // Validate incoming data object to update SQL
   if (_obj && _obj.constructor === {}.constructor) {
     if ('sql' in _obj && 'data' in _obj && _obj.sql && _obj.data) {
+      // Call dbHelper update method
+      db.add(_obj)
+    }
+  }
+})
+
+ipcMain.on('onUpdateSqlEntry', (event, _obj) => {
+  // Validate incoming data object to update SQL
+  if (_obj && _obj.constructor === {}.constructor) {
+    if ('sql' in _obj && _obj.sql) {
       // Call dbHelper update method
       db.update(_obj)
     }

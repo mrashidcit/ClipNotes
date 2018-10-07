@@ -145,9 +145,9 @@ DbHelper.prototype.deleteWithId = (_obj) => {
 }
 
 /**
- * Update SQL database with new entry
+ * Add SQL database with new entry
  */
-DbHelper.prototype.update = (_obj) => {
+DbHelper.prototype.add = (_obj) => {
   // Validate data object
   if (_obj && _obj.constructor === {}.constructor) {
     if ('sql' in _obj && 'data' in _obj &&
@@ -156,6 +156,34 @@ DbHelper.prototype.update = (_obj) => {
         // Serial SQL database operations
         config.db.serialize(() => {
           config.db.run(`${_obj.sql}`, _obj.data, (error) => {
+            if (error) {
+              // Something is wrong. TODO: Handle error properly
+              console.log(`Error when updating database: ${error}`)
+            } else {
+              // Update database Successfully
+              console.log(`Database updated!`)
+            }
+          })
+        })
+      } else {
+        // Unable to initialize SQL database. This is due to database descriptor got RESET.
+        console.log(`Database is not initialized`)
+      }
+    }
+  }
+}
+
+/**
+ * Update SQL database with new entry
+ */
+DbHelper.prototype.update = (_obj) => {
+  // Validate data object
+  if (_obj && _obj.constructor === {}.constructor) {
+    if ('sql' in _obj && _obj.sql) {
+      if (config.db) {
+        // Serial SQL database operations
+        config.db.serialize(() => {
+          config.db.run(`${_obj.sql}`, (error) => {
             if (error) {
               // Something is wrong. TODO: Handle error properly
               console.log(`Error when updating database: ${error}`)

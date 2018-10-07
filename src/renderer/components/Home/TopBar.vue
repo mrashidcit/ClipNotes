@@ -15,19 +15,30 @@
             @click="onClickViewSearch">
             <v-icon :class="`${onViewSearch ? 'white--text' : 'black--text'}`"> search </v-icon>
           </v-btn>
-          <!-- Button to add new note -->
-          <v-btn
+          <!-- Button to add new note
+          <v-btn @click="onClickNewNote"
             icon depressed>
             <v-icon>add_circle</v-icon>
-          </v-btn>
+          </v-btn> -->
         </v-layout>
       </div>
       <!-- Topbar options -->
       <div class="options">
         <v-layout row>
-          <v-btn icon depressed>
-            <v-icon>more_vert</v-icon>
-          </v-btn>
+          <v-menu min-width="120"
+            offset-y>
+            <v-btn icon depressed
+              slot="activator">
+              <v-icon>more_vert</v-icon>
+            </v-btn>
+            <v-list>
+              <v-list-tile
+                v-for="(item, index) in options"
+                :key="index" @click="onClickOption(item.title)">
+                <v-list-tile-title>{{ item.title }}</v-list-tile-title>
+              </v-list-tile>
+            </v-list>
+          </v-menu>
         </v-layout>
       </div>
     </div>
@@ -40,7 +51,10 @@ export default {
   props: ['onViewSearch'],
   data () {
     return {
-      menu: false
+      menu: false,
+      options: [
+        { title: 'About' }
+      ]
     }
   },
   methods: {
@@ -50,6 +64,22 @@ export default {
      */
     onClickViewSearch () {
       this.$root.$emit('viewSearch')
+    },
+    onClickNewNote () {
+      this.$root.$emit('openDialog', {
+        name: 'new-note'
+      })
+    },
+    onClickOption (_title) {
+      if (_title) {
+        switch (_title) {
+          case 'About':
+            this.$root.$emit('aboutDialog')
+            break
+          default:
+            break
+        }
+      }
     }
   }
 }

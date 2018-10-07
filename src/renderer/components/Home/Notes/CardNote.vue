@@ -97,10 +97,11 @@
       </div>
       <div class="wrapper" v-if="edit.info">
         <v-text-field solo flat
-          placeholder="Note Title"
-          :value="briefnote.title">
+          v-model="editTitle"
+          placeholder="Note Title">
         </v-text-field>
         <v-textarea solo flat small
+          v-model="editDescription"
           height="80px" min-height="80px"
           :value="briefnote.description"
           placeholder="Note Description">
@@ -112,7 +113,8 @@
             class="white--text">
             Cancel
           </v-btn>
-          <v-btn depressed color="primary">
+          <v-btn depressed color="primary"
+            @click="onSaveEditInfo">
             Save
           </v-btn>
         </v-layout>
@@ -151,7 +153,13 @@ export default {
       edit: {
         tags: false,
         info: false
-      }
+      },
+      editTitle: this.briefnote.title
+        ? this.briefnote.title
+        : '',
+      editDescription: this.briefnote.description
+        ? this.briefnote.description
+        : ''
     }
   },
   methods: {
@@ -265,6 +273,16 @@ export default {
         this.select = []
         this.selectPrev = []
         this.edit.tags = false
+      }
+    },
+    onSaveEditInfo () {
+      if (this.editDescription && this.editTitle) {
+        this.$root.$emit('saveEditInfo', {
+          title: this.editTitle,
+          description: this.editDescription,
+          note: this.briefnote
+        })
+        this.closeEditInfo()
       }
     },
     onEditInfo () {

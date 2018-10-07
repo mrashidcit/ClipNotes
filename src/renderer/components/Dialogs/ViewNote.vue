@@ -29,7 +29,7 @@
         <div class="note" v-html="source" style="overflow: auto;"></div>
       </div>
       <div class="note-info"
-        v-if="data && data.type === 'image' && info">
+        v-if="data && (data.type === 'image' || data.type === 'html' || data.type === 'text') && info">
         <div class="wrapper">
           <h1>{{ data && data.title ? data.title : 'Untitled Note' }}</h1>
           <p>{{ data && data.description ? data.description : 'No Description provided' }}</p>
