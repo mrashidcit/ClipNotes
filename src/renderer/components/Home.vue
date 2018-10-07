@@ -357,8 +357,7 @@
                   _obj.rows.forEach((item) => {
                     context.filter.push(item)
                   })
-                  const tagIndex = this.tags.findIndex(x => x.id === 'tag_unlisted')
-                  this.filterList([this.tags[tagIndex]])
+                  this.filterList(null)
                   break
                 default: break
               }
@@ -530,8 +529,7 @@
             if (_obj.length > 0) {
               this.filterList(_obj)
             } else {
-              const tagIndex = this.tags.findIndex(x => x.id === 'tag_unlisted')
-              this.filterList([this.tags[tagIndex]])
+              this.filterList(null)
             }
           }
         })
@@ -783,6 +781,20 @@
                 }
               }
             })
+          })
+        } else if (_obj === null &&
+          this.filter && this.filter.constructor === [].constructor &&
+          this.briefnote && this.briefnote.constructor === [].constructor &&
+          this.filter.length > 0 && this.briefnote.length > 0) {
+          this.list = []
+          this.filter.forEach((filterItem) => {
+            const index = this.briefnote.findIndex(x => x.id === filterItem.note)
+            if (index > -1) {
+              const duplicateIndex = this.list.findIndex(x => x.id === filterItem.note)
+              if (duplicateIndex < 0) {
+                this.list.push(this.briefnote[index])
+              }
+            }
           })
         }
       }
