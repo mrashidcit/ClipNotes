@@ -689,7 +689,7 @@
             // Check if file extention is image
             const fileBuffer = readChunk.sync(uri2path(filePath), 0, 4100)
             const fileTypeObj = fileType(fileBuffer)
-            if (!fileTypeObj || !isImage(fileTypeObj.ext)) {
+            if (!fileTypeObj || !isImage(`file.${fileTypeObj.ext}`)) {
               return
             }
             // Add image type note
@@ -743,12 +743,12 @@
                     filePath += letter
                   }
                 })
-                if (filePath && fops.existsSync(uri2path(filePath))) {
+                if (filePath && fops.existsSync(filePath)) {
                   // Path is valid
                   // TODO: check if file is image
-                  const fileBuffer = readChunk.sync(uri2path(filePath), 0, 4100)
+                  const fileBuffer = readChunk.sync(filePath, 0, 4100)
                   const fileTypeObj = fileType(fileBuffer)
-                  if (!fileTypeObj || !isImage(fileTypeObj.ext)) {
+                  if (!fileTypeObj || !isImage(`file.${fileTypeObj.ext}`)) {
                     return
                   }
                   // Add Image type note
