@@ -11,10 +11,6 @@
             icon color="white" :class="info ? 'primary': null">
             <v-icon>subject</v-icon>
           </v-btn>
-          <v-btn
-            icon color="white">
-            <v-icon>edit</v-icon>
-          </v-btn>
           <v-btn @click="onCloseNoteView"
             icon color="white">
             <v-icon>close</v-icon>
