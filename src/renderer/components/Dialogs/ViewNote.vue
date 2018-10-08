@@ -140,6 +140,7 @@ export default {
     padding-top: 100px;
     background: transparent;
     width: 100%;
+    pointer-events: none;
   }
   .text-note > .note {
     background: white;

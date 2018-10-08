@@ -26,7 +26,9 @@
       <div class="headline">{{briefnote.title}}</div>
     </v-card-title>
     <!-- Text/HTML -->
-    <v-card-text class="htmlContent" v-if="briefnote.type === 'html' && 'visible' in briefnote && briefnote.visible === true" v-html="value"
+    <v-card-text class="htmlContent"
+      v-if="briefnote.type === 'html' && 'visible' in briefnote && briefnote.visible === true"
+      v-html="value"
       :load-data="getHtmlStr(briefnote.path)"></v-card-text>
     <!-- Note options -->
     <div class="options" v-if="onHover">
@@ -347,6 +349,7 @@ function arraysEqual (_a1, _a2) {
   .htmlContent {
     overflow: hidden;
     height: 140px;
+    pointer-events: none;
   }
   .edit {
     position: absolute;
