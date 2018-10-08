@@ -62,6 +62,9 @@
   // Import dependency modules
   const fops = require('fs-extra')
   const os = require('os')
+  const isImage = require('is-image')
+  const readChunk = require('read-chunk')
+  const fileType = require('file-type')
   const path = require('path')
   const {
     ipcRenderer,
@@ -677,13 +680,18 @@
         }
         // Get available formats from electron clipboard
         const formats = clipboard.availableFormats()
-        console.log(formats)
         if (isImageFormat(formats)) {
           // Image format detected
           // Create absolute path of image
           const filePath = clipboard.read('public.file-url')
-          if (filePath) {
+          if (filePath && fops.existsSync(uri2path(filePath))) {
             // Image path is valid
+            // Check if file extention is image
+            const fileBuffer = readChunk.sync(uri2path(filePath), 0, 4100)
+            const fileTypeObj = fileType(fileBuffer)
+            if (!fileTypeObj || !isImage(fileTypeObj.ext)) {
+              return
+            }
             // Add image type note
             this.addNote({
               type: 'image',
@@ -735,9 +743,14 @@
                     filePath += letter
                   }
                 })
-                if (filePath) {
+                if (filePath && fops.existsSync(uri2path(filePath))) {
                   // Path is valid
                   // TODO: check if file is image
+                  const fileBuffer = readChunk.sync(uri2path(filePath), 0, 4100)
+                  const fileTypeObj = fileType(fileBuffer)
+                  if (!fileTypeObj || !isImage(fileTypeObj.ext)) {
+                    return
+                  }
                   // Add Image type note
                   this.addNote({
                     type: 'image',

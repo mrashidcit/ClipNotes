@@ -15,8 +15,7 @@
           Version 0.0.1 (Beta)
         </p>
         <p style="margin: 10px 0;font-size: 11px;">
-          Copyright &copy; 2018 XploreBits Technologies.
-          <br/>All rights reserved.
+          Copyright &copy; 2018 saikksub
         </p>
       </v-card-text>
       <v-card-actions>
