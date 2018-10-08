@@ -12,6 +12,10 @@ Rapid tags, note taking application for Mac, Windows and Linux
     height="auto" width="auto"/>
 </p>
 
+## [Download Beta-version of briefnote](https://github.com/xplorebits/briefnote/releases/tag/v0.0.1)
+
+<a href="https://www.patreon.com/saikksub"><img height="50px" width="auto" alt= "become a patreon" src="https://c5.patreon.com/external/logo/become_a_patron_button@2x.png"></a>
+
 ## Roadmap
 ### v0.0.1
 #### Create new note
