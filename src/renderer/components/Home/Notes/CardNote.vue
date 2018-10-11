@@ -172,6 +172,7 @@ export default {
   },
   watch: {
     briefnoteDataChange () {
+      // Absolute path for image files
       if (this.briefnote &&
         this.briefnote.type === 'image' &&
         this.briefnote.path
