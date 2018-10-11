@@ -16,25 +16,15 @@ Rapid tags, note taking application for Mac, Windows and Linux
 
 <a href="https://www.patreon.com/saikksub"><img height="50px" width="auto" alt= "become a patreon" src="https://c5.patreon.com/external/logo/become_a_patron_button@2x.png"></a>
 
-## Roadmap
-### v0.0.1
-#### Create new note
-- [x] Able to create new note by *pasting TEXT or HTML* from **clipboard**.
-- [x] Able to create new note by *pasting a screenshot* from **clipboard**.
-- [x] Able to create new note by *pasting an Image* (any format) from **file system**.
-#### Tag management
-- [x] Able to **create new tag**.
-- [x] Able to **assing or remove tag** from selected note.
-#### Search by filter
-- [X] Able to search notes by **tag filter**.
-- ~~[ ] Able to serch notes by **name or description filter**.~~
+## What is briefnote?
+**brief-note** is a *Cross-platform desktop application* to create and manage notes from the system clipboard. User can create notes by simply copy-paste a **TEXT**, **IMAGE**, **SCREENSHOT** from file system, editors and browsers.
 
-### v0.0.2
-#### Search by filter
-- [ ] Able to serch notes by **name or description filter**.
-#### Integrations
-- [ ] Able to integrate **Dropbox** or **Google Drive**.
-- [ ] Able to access application from **Command-line** or **Sockets**.
+## Why?
+When you are doing some work by surfing through Internet, you find so much information. At some point you want to start taking notes. You can open a regular word processor or an editor to start copy-paste things.
+
+This is one way of collecing notes. But, NOT  faster or efficient way to . You need some application which can quickly hold the information that you find and revise them later for offical documentation.
+
+So, **brifnote** is a simple tool which can store random information that you find in Internet and allow you to assign TAGS for them.
 
 ## Development Instructions
 This project is created using [electron-vue](https://github.com/SimulatedGREG/electron-vue) template. Apart from this template and application dependencies, you need to have following setup to start developing/debugging *briefnote* application.
