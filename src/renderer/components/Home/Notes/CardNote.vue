@@ -8,7 +8,8 @@
     <v-img
       v-if="briefnote.type === 'image' && 'visible' in briefnote && briefnote.visible === true"
       height="250px"
-      :src="pathValue" :load-data="!pathValue && getAbsolutePath(briefnote.path)">-->
+      :src="pathValue"
+      :init-data="!pathValue && briefnote && briefnote.type === 'image' && getAbsolutePath(briefnote.path)">
       <v-container fill-height fluid>
         <v-layout fill-height>
           <v-flex xs12 align-end flexbox>
@@ -164,6 +165,21 @@ export default {
         : ''
     }
   },
+  computed: {
+    briefnoteDataChange () {
+      return this.briefnote
+    }
+  },
+  watch: {
+    briefnoteDataChange () {
+      if (this.briefnote &&
+        this.briefnote.type === 'image' &&
+        this.briefnote.path
+      ) {
+        this.getAbsolutePath(this.briefnote.path)
+      }
+    }
+  },
   methods: {
     onMouseOver (_item) {
       this.onHover = true
@@ -278,7 +294,7 @@ export default {
       }
     },
     onSaveEditInfo () {
-      if (this.editDescription && this.editTitle) {
+      if (this.editDescription || this.editTitle) {
         this.$root.$emit('saveEditInfo', {
           title: this.editTitle,
           description: this.editDescription,

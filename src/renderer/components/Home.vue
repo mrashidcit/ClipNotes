@@ -789,7 +789,7 @@
             this.filter.forEach((filterItem) => {
               if (filterItem.tag === tag.id) {
                 const index = this.briefnote.findIndex(x => x.id === filterItem.note)
-                if (index > -1) {
+                if (index > -1 && this.list.findIndex(x => x.id === filterItem.note) < 0) {
                   this.list.push(this.briefnote[index])
                 }
               }
