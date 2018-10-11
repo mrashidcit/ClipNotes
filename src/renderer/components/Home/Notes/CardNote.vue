@@ -8,8 +8,8 @@
     <v-img
       v-if="briefnote.type === 'image' && 'visible' in briefnote && briefnote.visible === true"
       height="250px"
-      :src="pathValue"
-      :init-data="!pathValue && briefnote && briefnote.type === 'image' && getAbsolutePath(briefnote.path)">
+      :src="urlData"
+      :init-data="!urlData && briefnote && briefnote.type === 'image' && getImageUrl(briefnote.path)">
       <v-container fill-height fluid>
         <v-layout fill-height>
           <v-flex xs12 align-end flexbox>
@@ -127,7 +127,7 @@
 </template>
 
 <script>
-// import { nativeImage } from 'electron'
+const spawn = require('threads').spawn
 
 const os = require('os')
 const path = require('path')
@@ -151,6 +151,7 @@ export default {
       ready: false,
       value: '',
       pathValue: '',
+      urlData: '',
       select: [],
       selectPrev: [],
       edit: {
@@ -175,9 +176,10 @@ export default {
       // Absolute path for image files
       if (this.briefnote &&
         this.briefnote.type === 'image' &&
-        this.briefnote.path
+        this.briefnote.path &&
+        !this.urlData
       ) {
-        this.getAbsolutePath(this.briefnote.path)
+        this.getImageUrl(this.briefnote.path)
       }
     }
   },
@@ -211,6 +213,59 @@ export default {
               }, 500)
             }
           })
+        }
+      }
+    },
+    getImageUrl (_path) {
+      const context = this
+      if (_path) {
+        const srcPath = path.join(
+          os.homedir(),
+          '.xplorebits',
+          'briefnote',
+          _path
+        )
+        if (fops.existsSync(srcPath)) {
+          const thread = spawn(function (input, done) {
+            // const base64Img = this.require('base64-img')
+            const Jimp = this.require('jimp')
+            Jimp.read(input._srcPath, (err, lenna) => {
+              if (err) throw err
+              const _obj = lenna
+                .resize(256, 256) // resize
+                .quality(30)
+              _obj.getBase64(Jimp.MIME_PNG, function (err, data) {
+                if (err) {
+                  done({_urlData: null})
+                } else {
+                  done({_urlData: data})
+                }
+              })
+            })
+            /* base64Img.base64(input._srcPath, function (err, data) {
+              if (err) {
+                done({_urlData: null})
+              } else {
+                done({_urlData: data})
+              }
+            }) */
+          })
+          thread
+            .send({ _srcPath: srcPath })
+            // The handlers come here: (none of them is mandatory)
+            .on('message', function (response) {
+              if (response._urlData) {
+                context.urlData = response._urlData
+                context.ready = true
+              }
+              thread.kill()
+            })
+            .on('error', function (error) {
+              console.error('Worker errored:', error)
+            })
+            .on('exit', function () {
+              console.log('Worker has been terminated.')
+            })
         }
       }
     },
