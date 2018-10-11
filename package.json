@@ -21,7 +21,6 @@
     "pack:renderer": "cross-env NODE_ENV=production webpack --progress --colors --config .electron-vue/webpack.renderer.config.js",
     "test": "npm run unit && npm run e2e",
     "unit": "karma start test/unit/karma.conf.js",
-    "install": "./node_modules/.bin/npmpd .",
     "postinstall": "npm run lint:fix",
     "platformInstall": "./node_modules/.bin/npmpd .",
     "rebuild-for-electron": "./node_modules/.bin/electron-rebuild ."
