@@ -6,6 +6,7 @@
         :style=" dialogs.noteView.state
           || dialogs.dialogDeleteNote.state
           || dialogs.newNote.state
+          || dialogs.onPaste.state
         ? `filter: blur(8px);-webkit-filter: blur(8px);`
         : null"
       />
@@ -26,6 +27,7 @@
           || views.onViewSearch
           || dialogs.dialogDeleteNote.state
           || dialogs.newNote.state
+          || dialogs.onPaste.state
           ? `filter: blur(8px);-webkit-filter: blur(8px);`
           : null" />
     <!-- - Views -->
@@ -41,6 +43,9 @@
       <new-note
         :state="dialogs.newNote.state"/>
       <about :state="dialogs.about.state" />
+      <paste-dialog :state="dialogs.onPaste.state"
+        :tags="tags"
+        :list="list" />
     <!-- - Dialogs -->
   </div>
 </template>
@@ -53,6 +58,7 @@
 
   // Import Vue Components for dialogs
   import About from './Dialogs/About'
+  import PasteDialog from './Dialogs/PasteDialog'
   import ViewNote from './Dialogs/ViewNote'
   import DialogDeleteNote from './Dialogs/DialogDeleteNote'
   import GenericLoader from './Dialogs/GenericLoader'
@@ -100,6 +106,7 @@
       TopBar,
       Notes,
       About,
+      PasteDialog,
       ViewNote,
       DialogDeleteNote,
       NewNote,
@@ -156,6 +163,9 @@
             note: null
           },
           newNote: {
+            state: false
+          },
+          onPaste: {
             state: false
           },
           about: {
@@ -830,7 +840,9 @@
         // Windows based initalizations
         if (os.platform() === 'win32') {
           document.onpaste = function () {
-            context.onPaste()
+            if (!this.dialogs.onPaste.state) {
+              context.onPaste()
+            }
           }
         }
         // Register events Electron's menu button clicks.
@@ -839,7 +851,10 @@
             switch (arg.label) {
               case 'paste':
                 // When user click "Paste" menu button
-                context.onPaste()
+                // context.onPaste()
+                if (!this.dialogs.onPaste.state) {
+                  console.log('on Paste')
+                }
                 break
               case 'find':
                 // When user click "Find" menu button

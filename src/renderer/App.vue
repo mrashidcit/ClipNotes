@@ -241,6 +241,10 @@
     left: 50%;
     transform: translateX(-50%);
   }
+  .view-card {
+    background-color: rgba(255, 255, 255, 0.7);
+    height: 100vh;
+  }
   .wrapper {
     padding: 10px;
   }

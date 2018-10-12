@@ -1,7 +1,7 @@
 <template>
   <v-dialog id="id-generic-yes-no" v-model="state"
     fullscreen hide-overlay transition="dialog-bottom-transition">
-    <v-card class="view-card">
+    <v-card>
       <div class="hero">
         <v-card color="transparent" flat
           width="550" height="200"
