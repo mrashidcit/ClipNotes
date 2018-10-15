@@ -67,7 +67,8 @@ DbHelper.prototype.init = () => {
               description TEXT,
               type TEXT,
               path TEXT,
-              id TEXT
+              id TEXT,
+              thumbnail TEXT
             )`
           )
           // tags

@@ -4,11 +4,23 @@
     transition="dialog-bottom-transition"
     persistent max-width="600">
     <div class="view-card">
-      <div class="hero-x" style="padding: 20px;">
+      <div class="hero-x" style="padding: 20px;" v-if="!loader">
         <div style="width: 500px; height: 300px">
-          <h1>
-            {{noteName ? noteName : 'New Note'}}
-          </h1>
+          <v-layout row>
+            <h1>
+              {{noteName ? noteName : 'Untitled Note'}}
+            </h1>
+            <v-spacer></v-spacer>
+            <v-btn depressed color="red"
+              icon @click="closeDialog">
+              <v-icon class="white--text">close</v-icon>
+            </v-btn>
+            <v-btn depressed color="primary"
+              :disabled="!$store.state.PasteImage.source"
+              icon @click="addNote">
+              <v-icon>check</v-icon>
+            </v-btn>
+          </v-layout>
           <v-text-field box
             v-model="noteName"
             label="Note Name">
@@ -35,22 +47,18 @@
             v-model="noteDescription"
             placeholder="Note Description">
           </v-textarea>
-          <v-img
-            src="https://cdn.vuetifyjs.com/images/cards/desert.jpg"
-            aspect-ratio="2.75">
+          <v-img v-if="note && $store.state.PasteImage.source && note.type === 'image'"
+            :src="$store.state.PasteImage.source"
+            aspect-ratio="1.75">
           </v-img>
-          <v-card-actions class="width: 100%;">
-            <v-spacer></v-spacer>
-            <v-btn depressed color="red"
-              icon @click="closeDialog">
-              <v-icon class="white--text">close</v-icon>
-            </v-btn>
-            <v-btn depressed color="primary"
-              icon>
-              <v-icon>check</v-icon>
-            </v-btn>
-          </v-card-actions>
+          <p style="text-align: center;"
+            v-if="!$store.state.PasteImage.source">
+            Loading Image
+          </p>
         </div>
+      </div>
+      <div class="hero" v-else>
+        <h1>Creating Note ...</h1>
       </div>
     </div>
   </v-dialog>
@@ -64,18 +72,36 @@ export default {
   props: [
     'state',
     'tags',
-    'list'
+    'list',
+    'config',
+    'note'
   ],
   data () {
     return {
       noteName: '',
       noteDescription: '',
-      select: []
+      select: [],
+      loader: false
     }
   },
   methods: {
     closeDialog () {
-      // Close the view
+      this.cleanUp()
+      this.$root.$emit('closeDialog', {
+        name: 'paste'
+      })
+    },
+    addNote () {
+      this.loader = true
+      this.$root.$emit('addNote', {
+        type: this.note.type,
+        obj: this.note.obj,
+        _obj: {
+          name: this.noteName,
+          description: this.noteDescription,
+          tags: this.select
+        }
+      })
     },
     addTag () {
       if (this.select && this.select.constructor === [].constructor &&
@@ -97,7 +123,22 @@ export default {
           this.select.push(this.tags[tagIndex])
         }
       }
+    },
+    registerEvents () {
+      this.$root.$on('onSaveNote', () => {
+        this.closeDialog()
+      })
+    },
+    cleanUp () {
+      this.noteName = ''
+      this.noteDescription = ''
+      this.select = []
+      this.loader = false
+      this.$store.dispatch('clearSource')
     }
+  },
+  mounted () {
+    this.registerEvents()
   }
 }
 </script>

@@ -43,9 +43,12 @@
       <new-note
         :state="dialogs.newNote.state"/>
       <about :state="dialogs.about.state" />
-      <paste-dialog :state="dialogs.onPaste.state"
+      <paste-dialog
+        :state="dialogs.onPaste.state"
         :tags="tags"
-        :list="list" />
+        :config="config"
+        :list="list"
+        :note="dialogs.onPaste.note" />
     <!-- - Dialogs -->
   </div>
 </template>
@@ -166,7 +169,8 @@
             state: false
           },
           onPaste: {
-            state: false
+            state: false,
+            note: null
           },
           about: {
             state: false
@@ -286,33 +290,6 @@
               // Note type is invlaid.
               break
           }
-          if (resultObj) {
-            // Update briefnote in runtime data
-            this.briefnote.push(resultObj)
-            // Update briefnote in database
-            this.$root.$emit('addSqlEntry', {
-              sql: `INSERT INTO notes(title, type, path, id) VALUES(?,?,?,?)`,
-              data: [
-                resultObj.title,
-                resultObj.type,
-                resultObj.path,
-                resultObj.id
-              ]
-            })
-            // Update runtime filter list for this new note entry, as 'Unlisted'.
-            this.filter.push({
-              note: resultObj.id,
-              tag: 'tag_unlisted'
-            })
-            // Update database filter list for this new note entry, as 'Unlisted'.
-            this.$root.$emit('addSqlEntry', {
-              sql: `INSERT INTO filter(note, tag) VALUES(?,?)`,
-              data: [
-                resultObj.id,
-                'tag_unlisted'
-              ]
-            })
-          }
         }
       },
       /**
@@ -390,7 +367,37 @@
          */
         this.$root.$on('onSaveNote', (_obj) => {
           if (_obj && _obj.constructor === {}.constructor &&
-            'type' in _obj && 'title' in _obj && 'path' in _obj && 'id' in _obj) {
+            'type' in _obj && 'title' in _obj && 'path' in _obj &&
+            'id' in _obj) {
+            if (_obj && (_obj.type === 'image' || _obj.type === 'screenshot') &&
+              'thumbnail' in _obj) {
+              // Update briefnote in runtime data
+              this.briefnote.push(_obj)
+              // Update briefnote in database
+              this.$root.$emit('addSqlEntry', {
+                sql: `INSERT INTO notes(title, type, path, id, thumbnail) VALUES(?,?,?,?,?)`,
+                data: [
+                  _obj.title,
+                  _obj.type,
+                  _obj.path,
+                  _obj.id,
+                  _obj.thumbnail
+                ]
+              })
+              // Update runtime filter list for this new note entry, as 'Unlisted'.
+              this.filter.push({
+                note: _obj.id,
+                tag: 'tag_unlisted'
+              })
+              // Update database filter list for this new note entry, as 'Unlisted'.
+              this.$root.$emit('addSqlEntry', {
+                sql: `INSERT INTO filter(note, tag) VALUES(?,?)`,
+                data: [
+                  _obj.id,
+                  'tag_unlisted'
+                ]
+              })
+            }
             const targetIndex = this.briefnote.findIndex(item => item.id === _obj.id)
             if (targetIndex > -1) {
               this.briefnote[targetIndex].visible = true
@@ -434,6 +441,14 @@
         this.$root.$on('viewNote', (_obj) => {
           this.dialogs.noteView.data = _obj
           this.dialogs.noteView.state = true
+        })
+        /**
+         * Add note
+         * @name addNote
+         * @param {Object} _obj - briefnote object with user values
+         */
+        this.$root.$on('addNote', (_obj) => {
+          this.addNote(_obj)
         })
         /**
          * Save tags on selected note
@@ -643,6 +658,11 @@
               case 'about':
                 this.dialogs.about.state = false
                 break
+              case 'paste':
+                this.dialogs.onPaste.state = false
+                this.dialogs.onPaste.note = null
+                console.log(this.dialogs.onPaste)
+                break
               default: break
             }
           }
@@ -685,7 +705,8 @@
       onPaste () {
         if (this.dialogs.noteView.state ||
           this.dialogs.dialogDeleteNote.state ||
-          this.dialogs.newNote.state) {
+          this.dialogs.newNote.state ||
+          this.dialogs.onPaste.state) {
           return
         }
         // Get available formats from electron clipboard
@@ -702,25 +723,40 @@
             if (!fileTypeObj || !isImage(`file.${fileTypeObj.ext}`)) {
               return
             }
-            // Add image type note
-            this.addNote({
+            const noteObj = {
               type: 'image',
               obj: {
                 path: uri2path(filePath),
                 format: getImageFormat(formats)
               }
-            })
+            }
+            if (!this.dialogs.onPaste.state) {
+              this.dialogs.onPaste.state = true
+              this.dialogs.onPaste.note = noteObj
+              setTimeout(() => {
+                this.$store.dispatch('setSource', `file://${noteObj.obj.path}`)
+              }, 1500)
+            }
+            // Add image type note
+            /* this.addNote({
+              type: 'image',
+              obj: {
+                path: uri2path(filePath),
+                format: getImageFormat(formats)
+              }
+            }) */
           } else {
             // A screenshot doesn't have absolute path
             // Create nativeImage object as PNG from clipboard data
             const nativeImageObj = nativeImage.createFromBuffer(clipboard.readImage().toPNG())
+            console.log(nativeImageObj)
             // Add screenshot type note
-            this.addNote({
+            /* this.addNote({
               type: 'screenshot',
               obj: {
                 data: nativeImageObj.toDataURL() // Convert to data url
               }
-            })
+            }) */
           }
         } else {
           // Clipboard doesn't have image data
@@ -730,12 +766,15 @@
             // HTML data detected
             // Add HTML type data.
             // Curretn implementation uses html for both TEXT and HTML data.
-            this.addNote({
+            if (!this.dialogs.onPaste.state) {
+              this.dialogs.onPaste.state = true
+            }
+            /* this.addNote({
               type: 'html',
               obj: {
                 html: htmlData
               }
-            })
+            }) */
           } else {
             // HTML/TEXT data is not detected
             // This is a special scenarion for windows OS.
@@ -761,14 +800,17 @@
                   if (!fileTypeObj || !isImage(`file.${fileTypeObj.ext}`)) {
                     return
                   }
+                  if (!this.dialogs.onPaste.state) {
+                    this.dialogs.onPaste.state = true
+                  }
                   // Add Image type note
-                  this.addNote({
+                  /* this.addNote({
                     type: 'image',
                     obj: {
                       path: filePath,
                       format: getImageFormat(formats)
                     }
-                  })
+                  }) */
                 }
               }
             }
@@ -851,10 +893,7 @@
             switch (arg.label) {
               case 'paste':
                 // When user click "Paste" menu button
-                // context.onPaste()
-                if (!this.dialogs.onPaste.state) {
-                  console.log('on Paste')
-                }
+                context.onPaste()
                 break
               case 'find':
                 // When user click "Find" menu button

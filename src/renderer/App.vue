@@ -9,6 +9,7 @@
 
   const os = require('os')
   const path = require('path')
+  const spawn = require('threads').spawn
   const fops = require('fs-extra')
   const base64Img = require('base64-img')
 
@@ -143,7 +144,10 @@
                   if (err) {
                     console.error(err)
                   } else {
-                    _context.$root.$emit('onSaveNote', _obj.obj)
+                    this.createThumbnailAsync(_obj).then((_tPath) => {
+                      _obj.obj['thumbnail'] = `resource/${_tPath}`
+                      _context.$root.$emit('onSaveNote', _obj.obj)
+                    })
                   }
                 }
               )
@@ -174,6 +178,63 @@
             )
           }
         })
+      },
+      // Create and Save Image as thumbnail
+      async createThumbnailAsync (_obj) {
+        const _context = this
+        const promise = new Promise((resolve, reject) => {
+          const thread = spawn(function (input, done) {
+            // const base64Img = this.require('base64-img')
+            const Jimp = this.require('jimp')
+            const nodePath = this.require('path')
+            const fsExtra = this.require('fs-extra')
+            Jimp.read(input._srcPath, (err, lenna) => {
+              if (err) throw err
+              const _obj = lenna
+                .resize(420, 254) // resize
+                .quality(20)
+              _obj.getBase64(Jimp.MIME_PNG, function (err, data) {
+                if (err) {
+                  done({name: null})
+                } else {
+                  const fileName = nodePath.basename(input._srcName.split('.')[0])
+                  const thumbPath = nodePath.join(
+                    input._resPath,
+                    `.t-${fileName}`
+                  )
+                  fsExtra.writeFile(thumbPath, data, (err) => {
+                    if (err) {
+                      done({path: null})
+                    } else {
+                      done({path: `.t-${fileName}`})
+                    }
+                  })
+                }
+              })
+            })
+          })
+          thread
+            .send({
+              _srcPath: _obj.src,
+              _srcName: _obj.name,
+              _resPath: _context.appConfig.resourcePath
+            })
+            // The handlers come here: (none of them is mandatory)
+            .on('message', function (response) {
+              console.log('xplore ->', response.path)
+              resolve(response.path)
+              thread.kill()
+            })
+            .on('error', function (error) {
+              console.error('Worker errored:', error)
+              reject(error)
+            })
+            .on('exit', function () {
+              console.log('Worker has been terminated.')
+            })
+        })
+        await promise
+        return promise
       }
     },
     mounted () {

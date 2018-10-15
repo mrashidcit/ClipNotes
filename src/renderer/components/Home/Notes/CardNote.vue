@@ -8,8 +8,8 @@
     <v-img
       v-if="briefnote.type === 'image' && 'visible' in briefnote && briefnote.visible === true"
       height="250px"
-      :src="urlData"
-      :init-data="!urlData && briefnote && briefnote.type === 'image' && getImageUrl(briefnote.path)">
+      :src="thumbnailUrl"
+      :init-data="!thumbnailUrl && briefnote && briefnote.type === 'image' && getThumbnailUri(briefnote.thumbnail)">
       <v-container fill-height fluid>
         <v-layout fill-height>
           <v-flex xs12 align-end flexbox>
@@ -127,8 +127,6 @@
 </template>
 
 <script>
-const spawn = require('threads').spawn
-
 const os = require('os')
 const path = require('path')
 const fops = require('fs-extra')
@@ -152,6 +150,7 @@ export default {
       value: '',
       pathValue: '',
       urlData: '',
+      thumbnailUrl: '',
       select: [],
       selectPrev: [],
       edit: {
@@ -177,9 +176,9 @@ export default {
       if (this.briefnote &&
         this.briefnote.type === 'image' &&
         this.briefnote.path &&
-        !this.urlData
+        !this.thumbnailUrl
       ) {
-        this.getImageUrl(this.briefnote.path)
+        this.getThumbnailUri(this.briefnote.thumbnail)
       }
     }
   },
@@ -216,73 +215,26 @@ export default {
         }
       }
     },
-    getImageUrl (_path) {
-      const context = this
+    getThumbnailUri (_path) {
       if (_path) {
+        const context = this
         const srcPath = path.join(
-          os.homedir(),
-          '.xplorebits',
-          'briefnote',
+          this.config.appPath,
           _path
         )
         if (fops.existsSync(srcPath)) {
-          const thread = spawn(function (input, done) {
-            // const base64Img = this.require('base64-img')
-            const Jimp = this.require('jimp')
-            Jimp.read(input._srcPath, (err, lenna) => {
-              if (err) throw err
-              const _obj = lenna
-                .resize(256, 256) // resize
-                .quality(30)
-              _obj.getBase64(Jimp.MIME_PNG, function (err, data) {
-                if (err) {
-                  done({_urlData: null})
-                } else {
-                  done({_urlData: data})
-                }
-              })
-            })
-            /* base64Img.base64(input._srcPath, function (err, data) {
+          fops.readFile(
+            srcPath,
+            'utf8',
+            (err, data) => {
               if (err) {
-                done({_urlData: null})
+                console.error(err)
               } else {
-                done({_urlData: data})
-              }
-            }) */
-          })
-          thread
-            .send({ _srcPath: srcPath })
-            // The handlers come here: (none of them is mandatory)
-            .on('message', function (response) {
-              if (response._urlData) {
-                context.urlData = response._urlData
+                context.thumbnailUrl = data
                 context.ready = true
               }
-              thread.kill()
-            })
-            .on('error', function (error) {
-              console.error('Worker errored:', error)
-            })
-            .on('exit', function () {
-              console.log('Worker has been terminated.')
-            })
-        }
-      }
-    },
-    getAbsolutePath (_path) {
-      const context = this
-      if (_path) {
-        const srcPath = path.join(
-          os.homedir(),
-          '.xplorebits',
-          'briefnote',
-          _path
-        )
-        if (fops.existsSync(srcPath)) {
-          setTimeout(() => {
-            context.ready = true
-            context.pathValue = `file://${srcPath}`
-          }, 500)
+            }
+          )
         }
       }
     },
