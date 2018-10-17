@@ -13,7 +13,7 @@ if (process.env.NODE_ENV !== 'development') {
 /**
  * Database helper module
  */
-const DbHelper = require('./dbHelper')
+const DbHelper = require('./dbHelper/dbHelper')
 const db = new DbHelper()
 db.init() // Initialize Database
 
@@ -32,14 +32,11 @@ function createWindow () {
    * Initial window options
    */
   mainWindow = new BrowserWindow({
-    height: 750,
-    width: 900,
+    height: 700,
+    width: 1120,
     useContentSize: true,
     minHeight: 600,
-    minWidth: 800,
-    webPreferences: {
-      webSecurity: false
-    }
+    minWidth: 800
   })
 
   mainWindow.loadURL(winURL)
@@ -74,51 +71,8 @@ app.on('activate', () => {
   }
 })
 
-ipcMain.on('onAddSqlEntry', (event, _obj) => {
-  // Validate incoming data object to update SQL
-  if (_obj && _obj.constructor === {}.constructor) {
-    if ('sql' in _obj && 'data' in _obj && _obj.sql && _obj.data) {
-      // Call dbHelper update method
-      db.add(_obj)
-    }
-  }
-})
-
-ipcMain.on('onUpdateSqlEntry', (event, _obj) => {
-  // Validate incoming data object to update SQL
-  if (_obj && _obj.constructor === {}.constructor) {
-    if ('sql' in _obj && _obj.sql) {
-      // Call dbHelper update method
-      db.update(_obj)
-    }
-  }
-})
-
-ipcMain.on('onDeleteSqlEntryId', (event, _obj) => {
-  // Validate incoming data object to update SQL
-  if (_obj && _obj.constructor === {}.constructor) {
-    if ('sql' in _obj && _obj.sql) {
-      db.deleteWithId(_obj)
-    }
-  }
-})
-
-ipcMain.on('onReadSql', (event, _obj) => {
-  if (_obj && _obj.constructor === {}.constructor) {
-    if ('sql' in _obj && 'id' in _obj && _obj.sql && _obj.id) {
-      // Call dbHelper update method
-      db.read(_obj, (error, _obj) => {
-        if (error) {
-          console.error(error)
-        } else {
-          event.sender.send('onSqlDataReady', {
-            rows: _obj.rows,
-            obj: _obj.obj
-          })
-        }
-      })
-    }
-  }
+ipcMain.on('sql', function (event, config) {
+  console.log(config)
 })
 
 /**

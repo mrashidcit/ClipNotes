@@ -28,14 +28,6 @@ DbHelper.prototype.init = () => {
     nodePath.join(
       config.homedir,
       '.xplorebits',
-      'briefnote'
-    )
-  )
-  // Ensure 'resource' directory
-  fops.ensureDirSync(
-    nodePath.join(
-      config.homedir,
-      '.xplorebits',
       'briefnote',
       'resource'
     )

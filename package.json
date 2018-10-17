@@ -72,7 +72,6 @@
     "markdown": "^0.5.0",
     "material-design-icons-iconfont": "^3.0.3",
     "read-chunk": "^3.0.0",
-    "semantic-ui-css": "^2.4.0",
     "sqlite3": "^4.0.2",
     "threads": "^0.12.0",
     "uniqid": "^5.0.3",
@@ -83,7 +82,7 @@
     "vuex": "^3.0.1"
   },
   "devDependencies": {
-    "ajv": "^6.5.0",
+    "ajv": "^6.5.4",
     "babel-core": "^6.26.3",
     "babel-eslint": "^8.2.3",
     "babel-loader": "^7.1.4",

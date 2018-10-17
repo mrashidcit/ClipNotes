@@ -15,21 +15,13 @@ function MenuTemplate (_config) {
           {type: 'separator'},
           {role: 'cut'},
           {role: 'copy'},
+          {role: 'paste'},
           {
             label: 'Find',
             accelerator: 'CmdOrCtrl+F',
             click () {
               _config.window.webContents.send('onMenuItemClick', {
                 label: 'find'
-              })
-            }
-          },
-          {
-            label: 'Paste',
-            accelerator: 'CmdOrCtrl+V',
-            click () {
-              _config.window.webContents.send('onMenuItemClick', {
-                label: 'paste'
               })
             }
           },
