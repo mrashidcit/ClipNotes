@@ -197,30 +197,26 @@ DbHelper.prototype.update = (_obj) => {
 /**
  * Read SQL database
  */
-DbHelper.prototype.read = function (_obj, _callback) {
-  console.log(config.db)
+DbHelper.prototype.read = function (_sql, _callback) {
   // Validate data object
-  if (_obj && _obj.constructor === {}.constructor &&
-    'sql' in _obj && 'id' in _obj &&
-    _obj.sql && _obj.id) {
+  if (_sql) {
     if (config.db) {
       config.db.serialize(() => {
-        config.db.all(`${_obj.sql}`, (error, _rows) => {
+        config.db.all(`${_sql}`, (error, rows) => {
           if (error) {
             _callback(error)
           } else {
-            _callback(null, {
-              rows: _rows,
-              obj: _obj
-            })
+            _callback(rows)
           }
         })
       })
     } else {
-      _callback(new Error('Database is not initialized'))
+      console.log('DB is not valid')
+      _callback(null)
     }
   } else {
-    _callback(new Error('Invalid data object'))
+    console.log('config is not valid')
+    _callback(null)
   }
 }
 

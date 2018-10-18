@@ -13,6 +13,7 @@ export default {
     const context = this
     this.$nextTick(function () {
       this.registerEvents()
+      this.init()
       document.onpaste = function () {
         if (!context.$store.state.config.add.state) {
           console.log('onPaste')
@@ -27,8 +28,54 @@ export default {
   },
   methods: {
     registerEvents () {
+      const context = this
       this.$root.$on('sql', function (config) {
         ipcRenderer.send('sql', config)
+      })
+      ipcRenderer.on('sql_read', function (event, config) {
+        if (config && config.constructor === {}.constructor &&
+          'for' in config && 'stage' in config && 'data' in config &&
+          config.for && config.stage) {
+          switch (config.stage) {
+            case 'init':
+              // For full initialization
+              context.$store.dispatch('initNotes', {
+                entry: config.for,
+                source: config.data
+              })
+              break
+            case 'singleEntry':
+              // For single entry read
+              break
+            default: break
+          }
+        }
+      })
+    },
+    init () {
+      // Read notes form SQL
+      this.$root.$emit('sql', {
+        command: 'READ',
+        sql: 'SELECT * FROM notes',
+        data: null,
+        for: 'notes',
+        stage: 'init'
+      })
+      // Read filter from SQL
+      this.$root.$emit('sql', {
+        command: 'READ',
+        sql: 'SELECT * FROM filter',
+        data: null,
+        for: 'filter',
+        stage: 'init'
+      })
+      // Read tags from SQL
+      this.$root.$emit('sql', {
+        command: 'READ',
+        sql: 'SELECT * FROM tags',
+        data: null,
+        for: 'tags',
+        stage: 'init'
       })
     },
     onPaste () {

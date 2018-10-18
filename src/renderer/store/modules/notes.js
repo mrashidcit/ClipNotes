@@ -10,12 +10,28 @@ const mutations = {
     if (validate(config)) {
       switch (config.entry) {
         case 'notes':
+          if (config.source.constructor === [].constructor) {
+            console.log('store:INIT:notes:source', config.source)
+            state.notes = Object.assign([], config.source)
+          }
           break
         case 'filter':
+          if (config.source.constructor === [].constructor) {
+            console.log('store:INIT:filter:source', config.source)
+            state.filter = Object.assign([], config.source)
+          }
           break
         case 'tags':
+          if (config.source.constructor === [].constructor) {
+            console.log('store:INIT:tags:source', config.source)
+            state.tags = Object.assign([], config.source)
+          }
           break
         case 'selected':
+          if (config.source.constructor === [].constructor) {
+            console.log('store:INIT:selected:source', config.source)
+            state.selected = Object.assign([], config.source)
+          }
           break
         default: break
       }
@@ -102,7 +118,10 @@ const actions = {
 }
 
 function validate (config) {
-  return true
+  if (config && 'entry' in config && 'source' in config) {
+    return true
+  }
+  return false
 }
 
 export default {

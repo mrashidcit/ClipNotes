@@ -72,7 +72,34 @@ app.on('activate', () => {
 })
 
 ipcMain.on('sql', function (event, config) {
-  console.log(config)
+  if (config && config.constructor === {}.constructor &&
+    'command' in config && 'sql' in config) {
+    switch (config.command) {
+      case 'CREATE':
+        console.log('CREATE', config)
+        break
+      case 'READ':
+        if ('for' in config && config.for &&
+          'stage' in config && config.stage) {
+          db.read(config.sql, function (rows) {
+            event.sender.send('sql_read', {
+              data: rows,
+              for: config.for,
+              stage: config.stage
+            })
+          })
+          console.log('READ', config)
+        }
+        break
+      case 'UPDATE':
+        console.log('UPDATE', config)
+        break
+      case 'DELETE':
+        console.log('DELETE', config)
+        break
+      default: break
+    }
+  }
 })
 
 /**

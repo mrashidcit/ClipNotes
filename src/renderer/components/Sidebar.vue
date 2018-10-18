@@ -34,6 +34,7 @@
       <v-combobox
         v-model="select"
         :items="$store.state.notes.tags" solo flat
+        item-text="title"
         label="Select Tags"
         multiple chips>
       </v-combobox>
