@@ -94,6 +94,15 @@ ipcMain.on('sql', function (event, config) {
       case 'UPDATE':
         console.log('UPDATE', config)
         break
+      case 'ADD':
+        if ('data' in config) {
+          db.add({
+            sql: config.sql,
+            data: config.data
+          })
+        }
+        console.log('UPDATE', config)
+        break
       case 'DELETE':
         console.log('DELETE', config)
         break

@@ -4,40 +4,44 @@ const state = {
   },
   add: {
     state: false,
-    note: null
+    data: null,
+    type: null
   },
   delete: {
     state: false,
-    note: null
+    data: null
   },
   preview: {
     state: false,
-    note: null
+    data: null
   },
   loader: {
     state: true
-  }
+  },
+  resPath: null
 }
 
 const mutations = {
   SET_STATE (state, config) {
-    const note = config.note || null
     if (validate(config)) {
       switch (config.name) {
         case 'about':
-          state.about.state = config.state
+          state.about.state = ('state' in config && config.state) ? 1 : 0
           break
         case 'add':
-          state.add.state = config.state
+          console.log('store:setState:add')
+          state.add.data = ('data' in config && config.data) ? config.data : null
+          state.add.type = ('type' in config && config.type) ? config.type : null
+          state.add.state = ('state' in config && config.state) ? 1 : 0
           break
         case 'delete':
-          if (note) {
-            // To Do. Prepare for Delete
-          }
           break
         case 'preview':
           break
         case 'loader':
+          break
+        case 'resPath':
+          state.resPath = ('data' in config && config.data) ? config.data : null
           break
         default: break
       }
@@ -53,10 +57,7 @@ const actions = {
 }
 
 function validate (config) {
-  if (!(
-    config && 'name' in config && config.name &&
-    'state' in config
-  )) {
+  if (!(config && 'name' in config && config.name)) {
     return false
   }
   return true

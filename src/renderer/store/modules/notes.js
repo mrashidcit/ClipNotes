@@ -56,8 +56,21 @@ const mutations = {
     if (validate(config)) {
       switch (config.entry) {
         case 'notes':
+          if (
+            'title' in config.source && 'description' in config.source &&
+            'type' in config.source && 'path' in config.source &&
+            'id' in config.source && 'thumbnail' in config.source
+          ) {
+            state.notes.push(config.source)
+          }
           break
         case 'filter':
+          console.log('store:ADD:filter:source', config.source)
+          if (
+            'note' in config.source && 'tag' in config.source
+          ) {
+            state.filter.push(config.source)
+          }
           break
         case 'tags':
           break
@@ -100,19 +113,19 @@ const mutations = {
 }
 
 const actions = {
-  initNotes ({ commit }, config) {
+  initEntries ({ commit }, config) {
     commit('INIT', config)
   },
-  clearNotes ({ commit }, config) {
+  clearEntries ({ commit }, config) {
     commit('CLEAR', config)
   },
-  addNote ({ commit }, config) {
+  addEntry ({ commit }, config) {
     commit('ADD', config)
   },
-  removeNote ({ commit }, config) {
+  removeEntry ({ commit }, config) {
     commit('REMOVE', config)
   },
-  updateNote ({ commit }, config) {
+  updateEntry ({ commit }, config) {
     commit('UPDATE', config)
   }
 }

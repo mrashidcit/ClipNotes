@@ -28,8 +28,8 @@ DbHelper.prototype.init = () => {
     nodePath.join(
       config.homedir,
       '.xplorebits',
-      'briefnote',
-      'resource'
+      'clipnotes',
+      'resources'
     )
   )
   // Open SQL database; If there is no '.db' file, then Sqlite3 will create a new one.
@@ -41,8 +41,8 @@ DbHelper.prototype.init = () => {
     nodePath.join(
       config.homedir,
       '.xplorebits',
-      'briefnote',
-      'briefnote.db'
+      'clipnotes',
+      'clipnotes.db'
     ),
     (error) => {
       if (error) {

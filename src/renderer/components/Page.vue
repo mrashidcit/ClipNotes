@@ -1,6 +1,10 @@
 <template>
   <div id="app-content">
     <div class="wrapper">
+      Notes: {{$store.state.notes.notes}} <br/>
+      Filter: {{$store.state.notes.filter}} <br/>
+      Tags: {{$store.state.notes.tags}} <br/>
+      Selected: {{$store.state.notes.selected}} <br/>
       <v-layout row wrap>
         <v-flex
           v-for="n in $store.state.notes.selected"

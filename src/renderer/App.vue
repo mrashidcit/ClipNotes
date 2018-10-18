@@ -5,7 +5,7 @@
 </template>
 
 <script>
-const { ipcRenderer } = require('electron')
+const { ipcRenderer, clipboard } = require('electron')
 
 export default {
   name: 'app',
@@ -16,12 +16,7 @@ export default {
       this.init()
       document.onpaste = function () {
         if (!context.$store.state.config.add.state) {
-          console.log('onPaste')
           context.onPaste()
-          context.$store.dispatch('setState', {
-            name: 'add',
-            state: true
-          })
         }
       }
     })
@@ -39,7 +34,7 @@ export default {
           switch (config.stage) {
             case 'init':
               // For full initialization
-              context.$store.dispatch('initNotes', {
+              context.$store.dispatch('initEntries', {
                 entry: config.for,
                 source: config.data
               })
@@ -79,7 +74,12 @@ export default {
       })
     },
     onPaste () {
-      console.log('on Paste')
+      this.$store.dispatch('setState', {
+        name: 'add',
+        state: true,
+        data: clipboard.readText(),
+        type: 'TEXT'
+      })
     }
   }
 }
@@ -109,6 +109,10 @@ export default {
     background: rgba(255, 255, 255, 0.452);
     z-index: 600;
     overflow-y: auto;
+  }
+  .editor-buttons-bar {
+    line-height: 50px;
+    background-color: #E7E7E7;
   }
   #app {
     position: fixed;
