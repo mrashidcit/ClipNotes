@@ -90,7 +90,7 @@ export default {
           ) {
             // Found Image
             console.log('app:onPaste:darwin:hasImage')
-            this.$store.dispatch('setState', {
+            context.$store.dispatch('setState', {
               name: 'loadImage',
               state: true
             })
@@ -99,7 +99,6 @@ export default {
                 {
                   parent: context.$electron.remote.getCurrentWindow(),
                   modal: true,
-                  show: true,
                   width: 500,
                   maxWidth: 500,
                   height: 150,
@@ -107,7 +106,8 @@ export default {
                   backgroundColor: '#FFFFFF',
                   webPreferences: {
                     devTools: false
-                  }
+                  },
+                  show: true
                 }
               )
               helperWindow.loadFile(
@@ -116,19 +116,33 @@ export default {
                   'loadImage.html'
                 )
               )
-              getImageData().then(function (data) {
-                context.$store.dispatch('setState', {
-                  name: 'add',
-                  state: true,
-                  data: data,
-                  type: 'IMAGE'
+              getImageData()
+                .then(function (data) {
+                  context.$store.dispatch('setState', {
+                    name: 'add',
+                    state: true,
+                    data: data,
+                    type: 'IMAGE'
+                  })
+                  helperWindow.close()
+                  context.$store.dispatch('setState', {
+                    name: 'loadImage',
+                    state: false
+                  })
                 })
-                helperWindow.close()
-                context.$store.dispatch('setState', {
-                  name: 'loadImage',
-                  state: false
+                .catch(function (err) {
+                  console.log('invalid type', err)
+                  helperWindow.close()
+                  context.$store.dispatch('setState', {
+                    name: 'loadImage',
+                    state: false
+                  })
+                  context.$store.dispatch('setState', {
+                    name: 'genericMessage',
+                    state: true,
+                    data: 'Unable to create note! Please paste any Image or Text data to create notes.'
+                  })
                 })
-              })
             }, 100)
           } else if (
             formatList &&
@@ -160,14 +174,16 @@ async function getImageData () {
     const nImageHigh = clipboard.readImage()
     const size = nImageHigh.getSize()
     const nImageLow = nImageHigh.resize({
-      width: size.width > 1100 ? size.width / 3 : size.width,
-      height: size.height > 1100 ? size.height / 3 : size.height,
+      width: 500 * (size.width / size.height),
+      height: 500 * (size.height / size.width),
       quality: 'good'
     })
-    const lQality = nImageLow.toDataURL()
-    const hQality = nImageHigh.toDataURL()
-    if (lQality && hQality) {
-      resolve({ lQality: lQality, hQality: hQality })
+    const lQuality = nImageLow.toDataURL()
+    const hQuality = nImageHigh.toDataURL()
+    if (lQuality && hQuality &&
+      lQuality.split('data:image/png;base64,')[1] &&
+      hQuality.split('data:image/png;base64,')[1]) {
+      resolve({ lQuality: lQuality, hQuality: hQuality })
     } else {
       reject(new Error('Output image data url is invalid'))
     }
@@ -181,6 +197,12 @@ async function getImageData () {
   .wrapper {
     padding: 10px;
   }
+  .text-threedots {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 6;
+    -webkit-box-orient: vertical; 
+  }
   .hero-x {
     position: absolute;
     left: 50%;
@@ -192,13 +214,13 @@ async function getImageData () {
     left: 50%;
     transform: translate(-50%, -50%);
   }
-  .state-view {
+  .glass-view {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(255, 255, 255, 0.452);
+    background: rgba(255, 255, 255, 0.774);
     z-index: 600;
     overflow-y: auto;
   }

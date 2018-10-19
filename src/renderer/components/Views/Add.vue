@@ -1,5 +1,5 @@
 <template>
-  <div class="state-view"
+  <div class="glass-view"
     v-if="$store.state.config.add.state">
     <div class="wrapper hero-x"
       style="width: 600px">
@@ -33,7 +33,7 @@
         multiple chips>
       </v-combobox>
       <v-img v-if="$store.state.config.add.type === 'IMAGE'"
-        :src="`${$store.state.config.add.data.lQality}`">
+        :src="`${$store.state.config.add.data.lQuality}`">
       </v-img>
       <v-layout row style="margin-bottom: 20px;"
         v-if="$store.state.config.add.type === 'TEXT' && !loading">
@@ -109,16 +109,40 @@ export default {
     }
   },
   methods: {
-    /* generateSource () {
-      const context = this
-      const thread = new Spawn(threadHandler)
-      thread.send({
-        buffer: null
-      })
-      thread.on('message', function (response) {
-        thread.kill()
-      })
-    }, */
+    createNoteObject () {
+      let object = null
+      const config = this.$store.state.config.add
+      const _id = uid()
+      if (
+        config && config.constructor === {}.constructor &&
+        'type' in config && config.type
+      ) {
+        switch (config.type) {
+          case 'TEXT':
+            object = {
+              title: this.name || 'Untitled Note',
+              description: this.description || '',
+              type: 'TEXT',
+              path: `${((this.name).replace(/ /g, '_') || 'Untitled_note_') + '-' + _id}.html`,
+              id: _id,
+              thumbnail: null
+            }
+            break
+          case 'IMAGE':
+            object = {
+              title: this.name || 'Untitled Note',
+              description: this.description || '',
+              type: 'IMAGE',
+              path: `${((this.name).replace(/ /g, '_') || 'Untitled_note_') + '-' + _id}`,
+              id: _id,
+              thumbnail: `.t_${((this.name).replace(/ /g, '_') || 'Untitled_note_') + '-' + _id}`
+            }
+            break
+          default: break
+        }
+      }
+      return object
+    },
     onCloseView () {
       this.$store.dispatch('setState', {
         name: 'add',
@@ -134,34 +158,56 @@ export default {
           data: require('../../assets/defConfig').refPath
         })
       }
-      const _id = uid()
       const context = this
-      const noteObj = {
-        title: this.name || 'Untitled Note',
-        description: this.description || '',
-        type: 'TEXT',
-        path: `${((this.name).replace(/ /g, '_') || 'Untitled_note_') + '-' + _id + '.html'}`,
-        id: _id,
-        thumbnail: null
-      }
-      const sourceData = document.getElementById('add-note-text')
-        ? document.getElementById('add-note-text').innerHTML
-        : null
-      if (!sourceData) {
-        // Source Data cleared
+      const noteObj = this.createNoteObject()
+      if (!noteObj) {
         return
       }
+      console.log('DEBUG:1')
+      // Check if data is valid
+      let sourceData
+      if (noteObj.type === 'TEXT') {
+        sourceData = document.getElementById('add-note-text')
+          ? document.getElementById('add-note-text').innerHTML
+          : null
+        if (!sourceData) {
+          // Source Data cleared
+          return
+        }
+      } else {
+        if (
+          !this.$store.state.config.add.data.lQuality ||
+          !this.$store.state.config.add.data.hQuality
+        ) {
+          return
+        }
+      }
+      console.log('DEBUG:2')
       // Save File
       fops.writeFile(
         path.join(
           context.$store.state.config.resPath,
           noteObj.path
         ),
-        sourceData,
+        noteObj.type === 'TEXT'
+          ? sourceData
+          : context.$store.state.config.add.data.hQuality,
         function (err) {
           if (err) {
             console.error(err)
           } else {
+            console.log('DEBUG:3')
+            // Save if any thumbnail
+            if (noteObj.thumbnail) {
+              const result = fops.writeFileSync(
+                path.join(
+                  context.$store.state.config.resPath,
+                  noteObj.thumbnail
+                ),
+                context.$store.state.config.add.data.lQuality
+              )
+              console.log('saving thumbnail: ', result)
+            }
             // Add note
             // -> Into SQL
             context.$root.$emit(
@@ -205,6 +251,7 @@ export default {
                 tag: 'tag_unlisted'
               }
             })
+            context.onCloseView()
           }
         }
       )

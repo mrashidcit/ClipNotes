@@ -7,6 +7,8 @@
     </div>
     <add />
     <about />
+    <generic-message />
+    <loading />
   </div>
 </template>
 
@@ -15,6 +17,8 @@ import Sidebar from './Sidebar'
 import Page from './Page'
 import Add from './Views/Add'
 import About from './Views/About'
+import GenericMessage from './Views/GenericMessage'
+import Loading from './Views/Loading'
 
 export default {
   name: 'home',
@@ -22,14 +26,17 @@ export default {
     Sidebar,
     Page,
     Add,
-    About
+    About,
+    GenericMessage,
+    Loading
   },
   methods: {
     goBlur () {
       if (
         this.$store.state.config.add.state ||
         this.$store.state.config.about.state ||
-        this.$store.state.config.loadImage.state
+        this.$store.state.config.loadImage.state ||
+         this.$store.state.config.genericMessage.state
       ) {
         return true
       }

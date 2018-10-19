@@ -1,5 +1,5 @@
 <template>
-  <div class="state-view"
+  <div class="glass-view"
     v-if="$store.state.config.about.state">
     <div class="wrapper hero-x-y" style="text-align: center;">
       <img style="width: auto; height: 120px;display: block;margin: auto;padding: 10px;"

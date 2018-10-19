@@ -21,6 +21,10 @@ const state = {
   loadImage: {
     state: false
   },
+  genericMessage: {
+    state: false,
+    data: ''
+  },
   resPath: null
 }
 
@@ -29,10 +33,12 @@ const mutations = {
     if (validate(config)) {
       switch (config.name) {
         case 'about':
+          clearViews()
           state.about.state = ('state' in config && config.state) ? 1 : 0
           break
         case 'add':
           console.log('store:setState:add')
+          clearViews()
           state.add.data = ('data' in config && config.data) ? config.data : null
           state.add.type = ('type' in config && config.type) ? config.type : null
           state.add.state = ('state' in config && config.state) ? 1 : 0
@@ -40,6 +46,11 @@ const mutations = {
         case 'delete':
           break
         case 'preview':
+          break
+        case 'genericMessage':
+          clearViews()
+          state.genericMessage.state = ('state' in config && config.state) ? 1 : 0
+          state.genericMessage.data = ('data' in config && config.data) ? config.data : null
           break
         case 'loader':
           break
@@ -60,6 +71,11 @@ const actions = {
     // do something async
     commit('SET_STATE', config)
   }
+}
+
+function clearViews () {
+  state.genericMessage.state = false
+  state.genericMessage.message = ''
 }
 
 function validate (config) {

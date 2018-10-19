@@ -11,25 +11,25 @@ const mutations = {
       switch (config.entry) {
         case 'notes':
           if (config.source.constructor === [].constructor) {
-            console.log('store:INIT:notes:source', config.source)
+            console.log('store:INIT:notes:source')
             state.notes = Object.assign([], config.source)
           }
           break
         case 'filter':
           if (config.source.constructor === [].constructor) {
-            console.log('store:INIT:filter:source', config.source)
+            console.log('store:INIT:filter:source')
             state.filter = Object.assign([], config.source)
           }
           break
         case 'tags':
           if (config.source.constructor === [].constructor) {
-            console.log('store:INIT:tags:source', config.source)
+            console.log('store:INIT:tags:source')
             state.tags = Object.assign([], config.source)
           }
           break
         case 'selected':
           if (config.source.constructor === [].constructor) {
-            console.log('store:INIT:selected:source', config.source)
+            console.log('store:INIT:selected:source')
             state.selected = Object.assign([], config.source)
           }
           break
