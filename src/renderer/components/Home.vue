@@ -28,7 +28,8 @@ export default {
     goBlur () {
       if (
         this.$store.state.config.add.state ||
-        this.$store.state.config.about.state
+        this.$store.state.config.about.state ||
+        this.$store.state.config.loadImage.state
       ) {
         return true
       }

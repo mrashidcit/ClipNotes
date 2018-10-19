@@ -11,6 +11,7 @@
           <v-icon class="white--text">clear</v-icon>
         </v-btn>
         <v-btn icon color="primary"
+          :disabled="loading"
           @click="onClickCheck">
           <v-icon class="white--text">check</v-icon>
         </v-btn>
@@ -32,9 +33,10 @@
         multiple chips>
       </v-combobox>
       <v-img v-if="$store.state.config.add.type === 'IMAGE'"
-        src="https://cdn.vuetifyjs.com/images/cards/desert.jpg">
+        :src="`${$store.state.config.add.data.lQality}`">
       </v-img>
-      <v-layout row style="margin-bottom: 20px;">
+      <v-layout row style="margin-bottom: 20px;"
+        v-if="$store.state.config.add.type === 'TEXT' && !loading">
         <v-btn-toggle v-model="editor.textAlign">
           <v-btn flat>
             <v-icon>format_align_left</v-icon>
@@ -65,9 +67,22 @@
           </v-btn>
         </v-btn-toggle>
       </v-layout>
-      <p v-if="$store.state.config.add.type === 'TEXT'" contenteditable="true"
+      <p v-if="$store.state.config.add.type === 'TEXT' && !loading" contenteditable="true"
         style="padding: 10px;" id="add-note-text"
         v-html="`<p style='font-size: 25px;'>${$store.state.config.add.data}</p>`"></p>
+      <v-card flat height="200"
+        color="transparent"
+        v-if="loading">
+        <v-card-text>
+          <div class="hero-x-y">
+            <v-progress-circular
+              indeterminate
+              :width="3" :size="50"
+              color="primary">
+            </v-progress-circular>
+          </div>
+        </v-card-text>
+      </v-card>
     </div>
   </div>
 </template>
@@ -76,6 +91,7 @@
 const fops = require('fs-extra')
 const uid = require('uniqid')
 const path = require('path')
+// const Spawn = require('threads').spawn
 
 export default {
   name: 'add',
@@ -87,10 +103,22 @@ export default {
       editor: {
         textAlign: null,
         textFormat: null
-      }
+      },
+      loading: false,
+      source: null
     }
   },
   methods: {
+    /* generateSource () {
+      const context = this
+      const thread = new Spawn(threadHandler)
+      thread.send({
+        buffer: null
+      })
+      thread.on('message', function (response) {
+        thread.kill()
+      })
+    }, */
     onCloseView () {
       this.$store.dispatch('setState', {
         name: 'add',
@@ -183,4 +211,20 @@ export default {
     }
   }
 }
+
+/* function threadHandler (input, done) {
+  if (input.buffer) {
+    const Jimp = this.require('jimp')
+    Jimp.read(input.buffer)
+      .then(function (image) {
+        console.log('on image valid')
+      })
+      .catch(function (err) {
+        console.log('on image not valid')
+        done(err)
+      })
+  } else {
+    done(null)
+  }
+} */
 </script>

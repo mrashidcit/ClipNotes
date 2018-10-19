@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      .page {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        text-align: center;
+        color: #29384B;
+        font-family: Arial, Helvetica, sans-serif;
+      }
+      .hero {
+        position: relative;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
+      .dots {
+        display: flex;
+        align-center: center;
+        justify-content: center;
+        flex-wrap: wrap;
+        margin: auto;
+        background: transparent;
+        max-width: 80px;
+      }
+      .dots-item {
+        position: relative;
+	      background: transparent;
+        width: 20%;
+        min-width: 20%;
+        max-width: 20%;
+        height: 16px;
+        font-size: 0;
+      }
+      .dots-item--move-up {
+        animation: .8s move-up linear infinite;
+      }
+      .dots-item--move-right {
+        animation: .8s move-right linear infinite;
+      }
+      .dots-item--move-down {
+        animation: .8s move-down linear infinite;
+      }
+      .dots-item--move-left {
+        animation: .8s move-left linear infinite;
+      }
+      .dots-item:after {
+        content: "";
+        position: absolute;
+        margin: auto;
+        bottom: 0;
+        right: 0;
+        left: 0;
+        top: 0;
+        
+        width: 8px;
+        height: 8px;
+        
+        background-color: #30B37E;
+        border-radius: 50%;
+      }
+      @keyframes move-up {
+        30%,
+        100% {
+          transform: translateY(-100%);
+        }
+      }
+      @keyframes move-right {
+        30%,
+        100% {
+          transform: translateX(100%);
+        }
+      }
+      @keyframes move-down {
+        30%,
+        100% {
+          transform: translateY(100%);
+        }
+      }
+      @keyframes move-left {
+        30%,
+        100% {
+          transform: translateX(-100%);
+        }
+      }
+    </style>
+  </head>
+  <body>
+      <div class="page">
+        <div class="hero">
+          <div class="dots">
+            <i class="dots-item  dots-item--move-down"></i>
+            <i class="dots-item  dots-item--move-left"></i>
+            <i class="dots-item  dots-item--move-left"></i>
+            <i class="dots-item  dots-item--move-left"></i>
+            <i class="dots-item  dots-item--move-left"></i>
+            
+            <i class="dots-item  dots-item--move-down"></i>
+            <i class="dots-item  dots-item--move-right"></i>
+            <i class="dots-item  dots-item--move-right"></i>
+            <i class="dots-item  dots-item--move-down"></i>
+            <i class="dots-item  dots-item--move-up"></i>
+            
+            <i class="dots-item  dots-item--move-down"></i>
+            <i class="dots-item  dots-item--move-up"></i>
+            <i class="dots-item"></i>
+            <i class="dots-item  dots-item--move-down"></i>
+            <i class="dots-item  dots-item--move-up"></i>
+            
+            <i class="dots-item  dots-item--move-down"></i>
+            <i class="dots-item  dots-item--move-up"></i>
+            <i class="dots-item  dots-item--move-left"></i>
+            <i class="dots-item  dots-item--move-left"></i>
+            <i class="dots-item  dots-item--move-up"></i>
+            
+            <i class="dots-item  dots-item--move-right"></i>
+            <i class="dots-item  dots-item--move-right"></i>
+            <i class="dots-item  dots-item--move-right"></i>
+            <i class="dots-item  dots-item--move-right"></i>
+            <i class="dots-item  dots-item--move-up"></i>
+          </div>
+          <p style="font-size: 14px;">
+            <strong>Loading Image</strong>
+          </p>
+        </div>
+    </div>
+  </body>
+</html>

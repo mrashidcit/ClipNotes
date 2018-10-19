@@ -18,6 +18,9 @@ const state = {
   loader: {
     state: true
   },
+  loadImage: {
+    state: false
+  },
   resPath: null
 }
 
@@ -42,6 +45,9 @@ const mutations = {
           break
         case 'resPath':
           state.resPath = ('data' in config && config.data) ? config.data : null
+          break
+        case 'loadImage':
+          state.loadImage.state = ('state' in config && config.state) ? 1 : 0
           break
         default: break
       }

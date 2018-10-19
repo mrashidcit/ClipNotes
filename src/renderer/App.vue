@@ -6,6 +6,8 @@
 
 <script>
 const { ipcRenderer, clipboard } = require('electron')
+const os = require('os')
+const path = require('path')
 
 export default {
   name: 'app',
@@ -74,14 +76,104 @@ export default {
       })
     },
     onPaste () {
-      this.$store.dispatch('setState', {
-        name: 'add',
-        state: true,
-        data: clipboard.readText(),
-        type: 'TEXT'
-      })
+      const context = this
+      switch (os.platform()) {
+        case 'win32':
+          break
+        case 'darwin':
+          const formatList = clipboard.availableFormats()
+          console.log(formatList)
+          if (
+            formatList &&
+            formatList.constructor === [].constructor &&
+            formatList.findIndex(x => x === 'image/png') > -1
+          ) {
+            // Found Image
+            console.log('app:onPaste:darwin:hasImage')
+            this.$store.dispatch('setState', {
+              name: 'loadImage',
+              state: true
+            })
+            setTimeout(function () {
+              let helperWindow = new context.$electron.remote.BrowserWindow(
+                {
+                  parent: context.$electron.remote.getCurrentWindow(),
+                  modal: true,
+                  show: true,
+                  width: 500,
+                  maxWidth: 500,
+                  height: 150,
+                  maxHeight: 150,
+                  backgroundColor: '#FFFFFF',
+                  webPreferences: {
+                    devTools: false
+                  }
+                }
+              )
+              helperWindow.loadFile(
+                path.join(
+                  __static,
+                  'loadImage.html'
+                )
+              )
+              getImageData().then(function (data) {
+                context.$store.dispatch('setState', {
+                  name: 'add',
+                  state: true,
+                  data: data,
+                  type: 'IMAGE'
+                })
+                helperWindow.close()
+                context.$store.dispatch('setState', {
+                  name: 'loadImage',
+                  state: false
+                })
+              })
+            }, 100)
+          } else if (
+            formatList &&
+            formatList.constructor === [].constructor &&
+            formatList.findIndex(x => x === 'text/plain') > -1
+          ) {
+            // Found Text
+            console.log('app:onPaste:darwin:hasText')
+            console.log(clipboard.readRTF())
+            this.$store.dispatch('setState', {
+              name: 'add',
+              state: true,
+              data: clipboard.readText(),
+              type: 'TEXT'
+            })
+          }
+          break
+        case 'linux':
+          break
+        default:
+          // Not supported other OS platforms.
+          break
+      }
     }
   }
+}
+async function getImageData () {
+  const promise = new Promise(function (resolve, reject) {
+    const nImageHigh = clipboard.readImage()
+    const size = nImageHigh.getSize()
+    const nImageLow = nImageHigh.resize({
+      width: size.width > 1100 ? size.width / 3 : size.width,
+      height: size.height > 1100 ? size.height / 3 : size.height,
+      quality: 'good'
+    })
+    const lQality = nImageLow.toDataURL()
+    const hQality = nImageHigh.toDataURL()
+    if (lQality && hQality) {
+      resolve({ lQality: lQality, hQality: hQality })
+    } else {
+      reject(new Error('Output image data url is invalid'))
+    }
+  })
+  await promise
+  return promise
 }
 </script>
 
@@ -119,6 +211,13 @@ export default {
     top: 0; left: 0;
     bottom: 0; right: 0;
     background-color: #F7F7F7;
+  }
+  ::-webkit-scrollbar {
+    width: 0;
+    background: transparent
+  }
+  ::-webkit-scrollbar-thumb {
+    background: transparent;
   }
   #app-sidebar {
     position: fixed;
