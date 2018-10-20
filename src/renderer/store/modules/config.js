@@ -25,7 +25,9 @@ const state = {
     state: false,
     data: ''
   },
-  resPath: null
+  resPath: null,
+  nextPageIndex: 10,
+  nextPageIndexLoader: false
 }
 
 const mutations = {
@@ -59,6 +61,11 @@ const mutations = {
           break
         case 'loadImage':
           state.loadImage.state = ('state' in config && config.state) ? 1 : 0
+          break
+        case 'nextPageIndexLoader':
+          state.nextPageIndexLoader = ('state' in config && config.state) ? 1 : 0
+          state.nextPageIndex += 10
+          state.nextPageIndexLoader = false
           break
         default: break
       }

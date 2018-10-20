@@ -178,12 +178,19 @@ async function getImageData () {
       height: 500 * (size.height / size.width),
       quality: 'good'
     })
+    const nImageVLow = nImageHigh.resize({
+      width: 250 * (size.width / size.height),
+      height: 250 * (size.height / size.width),
+      quality: 'good'
+    })
     const lQuality = nImageLow.toDataURL()
+    const thumbnail = nImageVLow.toDataURL()
     const hQuality = nImageHigh.toDataURL()
-    if (lQuality && hQuality &&
+    if (lQuality && hQuality && thumbnail &&
       lQuality.split('data:image/png;base64,')[1] &&
-      hQuality.split('data:image/png;base64,')[1]) {
-      resolve({ lQuality: lQuality, hQuality: hQuality })
+      hQuality.split('data:image/png;base64,')[1] &&
+      thumbnail.split('data:image/png;base64,')[1]) {
+      resolve({ lQuality: lQuality, hQuality: hQuality, thumbnail: thumbnail })
     } else {
       reject(new Error('Output image data url is invalid'))
     }
@@ -200,7 +207,7 @@ async function getImageData () {
   .text-threedots {
     overflow: hidden;
     display: -webkit-box;
-    -webkit-line-clamp: 6;
+    -webkit-line-clamp: 2;
     -webkit-box-orient: vertical; 
   }
   .hero-x {

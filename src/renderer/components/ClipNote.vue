@@ -1,15 +1,37 @@
 <template>
-  <v-card flat tile height="300px" style="margin: 10px;">
+  <v-card flat tile style="margin: 10px;" height="300px"
+    @mouseover="onMouseOver" @mouseout="onMouseOut">
     <v-img
       v-if="note.type === 'IMAGE' && source"
       :src="`${source}`"
-      height="300px"
+      aspect-ratio="2.85"
     ></v-img>
+    <v-card-title primary-title
+      v-if="source">
+      <div class="text-threedots">
+        <h3 class="headline mb-0">{{note.title}}</h3>
+        <div>{{note.description || 'No Description'}}</div>
+      </div>
+    </v-card-title>
     <v-card-text
       v-if="note.type === 'TEXT' && source"
       class="text-threedots"
       v-html="`${source}`">
     </v-card-text>
+    <v-card-actions v-if="source">
+      <v-spacer></v-spacer>
+      <v-btn icon
+        v-if="hoverActions">
+        <v-icon class="primary--text">edit</v-icon>
+      </v-btn>
+      <v-btn icon
+        v-if="hoverActions">
+        <v-icon class="red--text">delete</v-icon>
+      </v-btn>
+      <v-btn icon>
+        <v-icon class="secondary--text">zoom_out_map</v-icon>
+      </v-btn>
+    </v-card-actions>
     <div class="hero-x-y"
       v-if="!source"
       :load-source="getSource(note)">
@@ -26,6 +48,7 @@
 <script>
 const fops = require('fs-extra')
 const path = require('path')
+const Spawn = require('threads').spawn
 
 export default {
   name: 'clip-note',
@@ -34,16 +57,25 @@ export default {
   ],
   data () {
     return {
-      source: ''
+      source: '',
+      hoverActions: false
     }
   },
   methods: {
+    onMouseOver () {
+      this.hoverActions = true
+    },
+    onMouseOut () {
+      this.hoverActions = false
+    },
     getSource (note) {
+      console.log('app:page:clipnote;getSource')
       if (
         note && note.constructor === {}.constructor &&
         'type' in note && note.type
       ) {
         const context = this
+        let filePath = null
         if (!this.$store.state.config.resPath) {
           this.$store.dispatch('setState', {
             name: 'resPath',
@@ -52,42 +84,51 @@ export default {
         }
         switch (note.type) {
           case 'TEXT':
-            fops.readFile(
-              path.join(
-                this.$store.state.config.resPath,
-                note.path
-              ),
-              'utf-8',
-              function (err, data) {
-                if (err) {
-                  console.error(err)
-                } else {
-                  context.source = data
-                }
-              }
+            filePath = path.join(
+              this.$store.state.config.resPath,
+              note.path
             )
             break
           case 'IMAGE':
-            fops.readFile(
-              path.join(
-                this.$store.state.config.resPath,
-                note.thumbnail
-              ),
-              'utf-8',
-              function (err, data) {
-                if (err) {
-                  console.error(err)
-                } else {
-                  context.source = data
-                }
-              }
+            filePath = path.join(
+              this.$store.state.config.resPath,
+              note.thumbnail
             )
             break
           default: break
         }
+        if (filePath && fops.existsSync(filePath)) {
+          const tds = new Spawn(threadHandler)
+          tds.send({
+            path: filePath
+          })
+          tds.on('message', function (response) {
+            if (response) {
+              setTimeout(function () {
+                context.source = response
+              }, 100)
+            }
+          })
+        }
       }
     }
   }
+}
+
+function threadHandler (input, done) {
+  const _fops = this.require('fs-extra')
+  _fops.readFile(
+    input.path,
+    'utf-8',
+    function (err, data) {
+      if (err) {
+        console.error(err)
+        done(null)
+      } else {
+        done(data)
+      }
+    }
+  )
 }
 </script>
 

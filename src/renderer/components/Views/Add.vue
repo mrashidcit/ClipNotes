@@ -143,7 +143,15 @@ export default {
       }
       return object
     },
+    clean () {
+      this.title = ''
+      this.description = ''
+      this.select = []
+      this.editor.textFormat = null
+      this.editor.textAlign = null
+    },
     onCloseView () {
+      this.clean()
       this.$store.dispatch('setState', {
         name: 'add',
         state: false,
@@ -204,7 +212,7 @@ export default {
                   context.$store.state.config.resPath,
                   noteObj.thumbnail
                 ),
-                context.$store.state.config.add.data.lQuality
+                context.$store.state.config.add.data.thumbnail
               )
               console.log('saving thumbnail: ', result)
             }
