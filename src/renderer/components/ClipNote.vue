@@ -2,8 +2,9 @@
   <v-card flat tile style="margin: 10px;" height="300px"
     @mouseover="onMouseOver" @mouseout="onMouseOut">
     <v-img
-      v-if="note.type === 'IMAGE' && source"
+      v-if="note.type === 'IMAGE'"
       :src="`${source}`"
+      :lazy-src="`${lazySrc}`"
       aspect-ratio="2.85"
     ></v-img>
     <v-card-title primary-title
@@ -49,6 +50,7 @@
 const fops = require('fs-extra')
 const path = require('path')
 const Spawn = require('threads').spawn
+const lazyImage = require('../assets/lazyImage.js')
 
 export default {
   name: 'clip-note',
@@ -58,7 +60,8 @@ export default {
   data () {
     return {
       source: '',
-      hoverActions: false
+      hoverActions: false,
+      lazySrc: ''
     }
   },
   methods: {
@@ -70,6 +73,7 @@ export default {
     },
     getSource (note) {
       console.log('app:page:clipnote;getSource')
+      this.lazySrc = lazyImage
       if (
         note && note.constructor === {}.constructor &&
         'type' in note && note.type
@@ -107,6 +111,7 @@ export default {
               setTimeout(function () {
                 context.source = response
               }, 100)
+              tds.kill()
             }
           })
         }

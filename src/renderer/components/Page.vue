@@ -46,10 +46,16 @@ export default {
           this.$store.state.config.nextPageIndex < this.$store.state.notes.notes.length
         ) {
           console.log('hit bottom')
+          const context = this
           this.$store.dispatch('setState', {
             name: 'nextPageIndexLoader',
             state: true
           })
+          setTimeout(function () {
+            context.$store.dispatch('setState', {
+              name: 'nextPageIndex'
+            })
+          }, 500)
         }
       }
     }

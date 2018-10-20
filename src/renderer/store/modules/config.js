@@ -64,6 +64,8 @@ const mutations = {
           break
         case 'nextPageIndexLoader':
           state.nextPageIndexLoader = ('state' in config && config.state) ? 1 : 0
+          break
+        case 'nextPageIndex':
           state.nextPageIndex += 10
           state.nextPageIndexLoader = false
           break
