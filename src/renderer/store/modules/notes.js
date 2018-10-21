@@ -11,25 +11,21 @@ const mutations = {
       switch (config.entry) {
         case 'notes':
           if (config.source.constructor === [].constructor) {
-            console.log('store:INIT:notes:source')
             state.notes = Object.assign([], config.source)
           }
           break
         case 'filter':
           if (config.source.constructor === [].constructor) {
-            console.log('store:INIT:filter:source')
             state.filter = Object.assign([], config.source)
           }
           break
         case 'tags':
           if (config.source.constructor === [].constructor) {
-            console.log('store:INIT:tags:source')
             state.tags = Object.assign([], config.source)
           }
           break
         case 'selected':
           if (config.source.constructor === [].constructor) {
-            console.log('store:INIT:selected:source')
             state.selected = Object.assign([], config.source)
           }
           break
@@ -47,6 +43,7 @@ const mutations = {
         case 'tags':
           break
         case 'selected':
+          state.selected = []
           break
         default: break
       }
@@ -65,7 +62,6 @@ const mutations = {
           }
           break
         case 'filter':
-          console.log('store:ADD:filter:source', config.source)
           if (
             'note' in config.source && 'tag' in config.source
           ) {
@@ -73,7 +69,6 @@ const mutations = {
           }
           break
         case 'tags':
-          console.log('store:ADD:tags:source', config.source)
           if (
             'id' in config.source && 'title' in config.source &&
             'value' in config.source
@@ -82,13 +77,12 @@ const mutations = {
           }
           break
         case 'selected':
-          console.log('store:ADD:selected:source', config.source)
           if (
             'title' in config.source && 'description' in config.source &&
             'type' in config.source && 'path' in config.source &&
             'id' in config.source && 'thumbnail' in config.source
           ) {
-            state.tags.push(config.source)
+            state.selected.push(config.source)
           }
           break
         default: break

@@ -40,7 +40,6 @@ const mutations = {
           state.about.state = ('state' in config && config.state) ? 1 : 0
           break
         case 'add':
-          console.log('store:setState:add')
           clearViews()
           state.add.data = ('data' in config && config.data) ? config.data : null
           state.add.type = ('type' in config && config.type) ? config.type : null
@@ -82,7 +81,6 @@ const mutations = {
 
 const actions = {
   setState ({ commit }, config) {
-    // do something async
     commit('SET_STATE', config)
   }
 }

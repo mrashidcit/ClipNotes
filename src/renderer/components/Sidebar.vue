@@ -23,7 +23,11 @@
     </div>
     <div class="sidebar-info">
       <v-subheader>Total Filtered Notes</v-subheader>
-      <p class="filter-count">0</p>
+      <p class="filter-count">
+        {{$store.state.notes.selected.length > 0
+          ? $store.state.notes.selected.length
+          : $store.state.notes.notes.length}}
+      </p>
       <v-switch class="wrapper" small
       :label="`Hard Filter: ${hardFilter ? 'ON' : 'OFF'}`"
       v-model="hardFilter">
@@ -87,28 +91,67 @@ export default {
   },
   methods: {
     onChangeFilter () {
-      console.log('onChangeFilter: ', this.select)
       if (
         this.select &&
         this.select.constructor === [].constructor &&
         this.select.length > 0
       ) {
         const context = this
-        if (this.$store.state.notes.selected.length < 1) {
-          if (this.$store.state.notes.filter.length > 0) {
-            console.log('selected are empty')
-          }
-        } else {
-          this.select.forEach((item) => {
-            const targetIndex = context.$store.state.notes.selected
-              .findIndex(x => x.title === item)
-            if (targetIndex < 0) {
-              // Modify
+        context.$store.dispatch('clearEntries', {
+          entry: 'selected',
+          source: null
+        })
+        setTimeout(() => {
+          if (this.$store.state.notes.selected.length < 1) {
+            if (this.$store.state.notes.filter.length > 0) {
+              this.select.forEach((selection) => {
+                if (selection) {
+                  // Get Tag Id of selected tag
+                  console.log(selection)
+                  let tagIndex = null
+                  if (selection && selection.constructor === {}.constructor) {
+                    tagIndex = context.$store.state.notes.tags
+                      .findIndex(x => x.title === selection.title)
+                  } else if (selection && typeof selection === 'string') {
+                    tagIndex = context.$store.state.notes.tags
+                      .findIndex(x => x.title === selection)
+                  }
+                  if (tagIndex !== null && tagIndex > -1) {
+                    console.log(context.$store.state.notes.tags[tagIndex].title)
+                    const tagId = context.$store.state.notes.tags[tagIndex].id
+                    const filter = context.$store.state.notes.filter
+                    if (filter.constructor === [].constructor) {
+                      filter.forEach((filterItem) => {
+                        if (filterItem.tag === tagId) {
+                          if (
+                            context.$store.state.notes.selected
+                              .findIndex(x => x.id === filterItem.note) < 0
+                          ) {
+                            const noteId = filterItem.note
+                            const noteIndex = context.$store.state.notes.notes
+                              .findIndex(x => x.id === noteId)
+                            if (noteIndex > -1) {
+                              context.$store.dispatch('addEntry', {
+                                entry: 'selected',
+                                source: context.$store.state.notes.notes[noteIndex]
+                              })
+                            }
+                          }
+                        }
+                      })
+                    }
+                  }
+                }
+              })
             }
-          })
-        }
+          }
+        }, 100)
+      } else {
+        this.$store.dispatch('clearEntries', {
+          entry: 'selected',
+          source: null
+        })
       }
-      console.log(this.$store.state.notes.selected)
     }
   }
 }
