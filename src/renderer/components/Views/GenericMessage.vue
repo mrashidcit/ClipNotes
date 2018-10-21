@@ -1,4 +1,5 @@
 <template>
+  <transition name="fade">
   <div class="glass-view"
     v-if="$store.state.config.genericMessage.state">
     <div class="wrapper hero-x-y">
@@ -21,4 +22,5 @@
       </v-card>
     </div>
   </div>
+  </transition>
 </template>

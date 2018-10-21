@@ -201,14 +201,29 @@ async function getImageData () {
 </script>
 
 <style>
+  .fade-enter-active, .fade-leave-active {
+    transition: opacity .5s;
+  }
+  .fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+    opacity: 0;
+  }
   .wrapper {
     padding: 10px;
   }
-  .text-threedots {
+  .text-clamp {
     overflow: hidden;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical; 
+  }
+  .text-clamp {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical; 
+  }
+  .text-clamp[single-line] {
+    -webkit-line-clamp: 1;
   }
   .hero-x {
     position: absolute;

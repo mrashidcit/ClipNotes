@@ -1,27 +1,33 @@
 <template>
-  <div id="app-content" @scroll="onScrollPage">
-    <div class="wrapper">
-      <v-layout row wrap>
-        <v-flex
-          v-for="(note, index) in $store.state.notes.notes"
-          :key="note.id"
-          xs6>
-          <clip-note :note="note" v-if="index < $store.state.config.nextPageIndex"/>
-        </v-flex>
-      </v-layout>
-    </div>
-    <div style="height: 60px"
-      v-if="$store.state.config.nextPageIndexLoader">
-      <div class="hero-x" style="margin: 10px 0;">
-        <v-progress-circular
-          :size="40"
-          :width="4"
-          color="primary"
-          indeterminate>
-        </v-progress-circular>
+  <transition name="fade">
+    <div id="app-content" @scroll="onScrollPage">
+      <div class="wrapper">
+        <v-layout row wrap>
+          <v-flex
+            v-for="
+              (note, index) in 
+              ($store.state.notes.selected.length > 0) 
+              ? $store.state.notes.selected
+              : $store.state.notes.notes"
+            :key="note.id"
+            xs6>
+            <clip-note :note="note" v-if="index < $store.state.config.nextPageIndex"/>
+          </v-flex>
+        </v-layout>
+      </div>
+      <div style="height: 60px"
+        v-if="$store.state.config.nextPageIndexLoader">
+        <div class="hero-x" style="margin: 10px 0;">
+          <v-progress-circular
+            :size="40"
+            :width="4"
+            color="primary"
+            indeterminate>
+          </v-progress-circular>
+        </div>
       </div>
     </div>
-  </div>
+  </transition>
 </template>
 
 <script>
@@ -55,7 +61,7 @@ export default {
             context.$store.dispatch('setState', {
               name: 'nextPageIndex'
             })
-          }, 500)
+          }, 0)
         }
       }
     }

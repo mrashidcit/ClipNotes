@@ -16,18 +16,32 @@ function MenuTemplate (_config) {
           {role: 'cut'},
           {role: 'copy'},
           {role: 'paste'},
-          {
-            label: 'Find',
-            accelerator: 'CmdOrCtrl+F',
-            click () {
-              _config.window.webContents.send('onMenuItemClick', {
-                label: 'find'
-              })
-            }
-          },
           {role: 'pasteandmatchstyle'},
           {role: 'delete'},
           {role: 'selectall'}
+        ]
+      },
+      {
+        label: 'Notes',
+        submenu: [
+          {
+            label: 'Create Note',
+            accelerator: 'CmdOrCtrl+S',
+            click () {
+              _config.window.webContents.send('onMenuItemClick', {
+                label: 'create_note'
+              })
+            }
+          },
+          {
+            label: 'Filter',
+            accelerator: 'CmdOrCtrl+F',
+            click () {
+              _config.window.webContents.send('onMenuItemClick', {
+                label: 'filter'
+              })
+            }
+          }
         ]
       },
       {

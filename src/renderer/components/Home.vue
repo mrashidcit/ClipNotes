@@ -1,9 +1,16 @@
 <template>
   <div>
-    <div
-      :style="goBlur() ? `filter: blur(8px);-webkit-filter: blur(8px);`: null">
-      <sidebar />
-      <page />
+    <transition name="fade">
+      <div v-if="!$store.state.config.loader.state"
+        :style="goBlur() ? `filter: blur(8px);-webkit-filter: blur(8px);`: null">
+          <sidebar />
+          <page />
+      </div>
+    </transition>
+    <div class="hero-x-y"
+      v-if="$store.state.config.loader.state">
+      <img style="height: 120px;width: auto;"
+        src="../assets/logo-hero.png">
     </div>
     <add />
     <about />
@@ -29,6 +36,17 @@ export default {
     About,
     GenericMessage,
     Loading
+  },
+  mounted () {
+    const context = this
+    this.$nextTick(function () {
+      setTimeout(function () {
+        context.$store.dispatch('setState', {
+          name: 'loader',
+          state: false
+        })
+      }, 2000)
+    })
   },
   methods: {
     goBlur () {

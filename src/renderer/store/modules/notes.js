@@ -73,8 +73,23 @@ const mutations = {
           }
           break
         case 'tags':
+          console.log('store:ADD:tags:source', config.source)
+          if (
+            'id' in config.source && 'title' in config.source &&
+            'value' in config.source
+          ) {
+            state.tags.push(config.source)
+          }
           break
         case 'selected':
+          console.log('store:ADD:selected:source', config.source)
+          if (
+            'title' in config.source && 'description' in config.source &&
+            'type' in config.source && 'path' in config.source &&
+            'id' in config.source && 'thumbnail' in config.source
+          ) {
+            state.tags.push(config.source)
+          }
           break
         default: break
       }

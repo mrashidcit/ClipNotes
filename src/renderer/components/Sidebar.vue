@@ -32,9 +32,9 @@
     <v-subheader>Filter Notes with Tags</v-subheader>
     <div class="sidebar-tags">
       <v-combobox
-        v-model="select"
+        v-model="select" ref="sidebarFilter"
         :items="$store.state.notes.tags" solo flat
-        item-text="title"
+        item-text="title" @change="onChangeFilter"
         label="Select Tags"
         multiple chips>
       </v-combobox>
@@ -43,6 +43,10 @@
 </template>
 
 <script>
+const {
+  ipcRenderer
+} = require('electron')
+
 export default {
   name: 'sidebar',
   data () {
@@ -66,6 +70,45 @@ export default {
           }
         }
       ]
+    }
+  },
+  mounted () {
+    const context = this
+    ipcRenderer.on('onMenuItemClick', (event, arg) => {
+      if (arg && arg.constructor === {}.constructor && 'label' in arg) {
+        switch (arg.label) {
+          case 'filter':
+            context.$refs.sidebarFilter.focus()
+            break
+          default: break
+        }
+      }
+    })
+  },
+  methods: {
+    onChangeFilter () {
+      console.log('onChangeFilter: ', this.select)
+      if (
+        this.select &&
+        this.select.constructor === [].constructor &&
+        this.select.length > 0
+      ) {
+        const context = this
+        if (this.$store.state.notes.selected.length < 1) {
+          if (this.$store.state.notes.filter.length > 0) {
+            console.log('selected are empty')
+          }
+        } else {
+          this.select.forEach((item) => {
+            const targetIndex = context.$store.state.notes.selected
+              .findIndex(x => x.title === item)
+            if (targetIndex < 0) {
+              // Modify
+            }
+          })
+        }
+      }
+      console.log(this.$store.state.notes.selected)
     }
   }
 }

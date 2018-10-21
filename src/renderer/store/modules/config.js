@@ -19,7 +19,8 @@ const state = {
     state: true
   },
   loadImage: {
-    state: false
+    state: false,
+    text: 'Loading ...'
   },
   genericMessage: {
     state: false,
@@ -55,6 +56,7 @@ const mutations = {
           state.genericMessage.data = ('data' in config && config.data) ? config.data : null
           break
         case 'loader':
+          state.loader.state = ('state' in config && config.state) ? 1 : 0
           break
         case 'resPath':
           state.resPath = ('data' in config && config.data) ? config.data : null
@@ -68,6 +70,9 @@ const mutations = {
         case 'nextPageIndex':
           state.nextPageIndex += 10
           state.nextPageIndexLoader = false
+          break
+        case 'nextPageIndexPlusPlus':
+          state.nextPageIndex += 1
           break
         default: break
       }

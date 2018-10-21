@@ -1,93 +1,98 @@
 <template>
-  <div class="glass-view"
-    v-if="$store.state.config.add.state">
-    <div class="wrapper hero-x"
-      style="width: 600px">
-      <v-layout row>
-        <h1>{{ name || `New Note`}}</h1>
-        <v-spacer></v-spacer>
-        <v-btn icon color="red"
-          @click="onCloseView">
-          <v-icon class="white--text">clear</v-icon>
-        </v-btn>
-        <v-btn icon color="primary"
-          :disabled="loading"
-          @click="onClickCheck">
-          <v-icon class="white--text">check</v-icon>
-        </v-btn>
-      </v-layout>
-      <v-text-field box
-        v-model="name"
-        label="Note Name">
-      </v-text-field>
-      <v-textarea
-        v-model="description"
-        name="input-description"
-        label="Note Description">
-      </v-textarea>
-      <v-combobox
-        v-model="select" box
-        item-text="title"
-        :items="$store.state.notes.tags"
-        label="Select Tags"
-        multiple chips>
-      </v-combobox>
-      <v-img v-if="$store.state.config.add.type === 'IMAGE'"
-        :src="`${$store.state.config.add.data.lQuality}`">
-      </v-img>
-      <v-layout row style="margin-bottom: 20px;"
-        v-if="$store.state.config.add.type === 'TEXT' && !loading">
-        <v-btn-toggle v-model="editor.textAlign">
-          <v-btn flat>
-            <v-icon>format_align_left</v-icon>
+  <transition name="fade">
+    <div class="glass-view"
+      v-if="$store.state.config.add.state">
+      <div class="wrapper hero-x"
+        style="width: 600px">
+        <v-layout row>
+          <h1>{{ name || `New Note`}}</h1>
+          <v-spacer></v-spacer>
+          <v-btn icon color="red"
+            @click="onCloseView">
+            <v-icon class="white--text">clear</v-icon>
           </v-btn>
-          <v-btn flat>
-            <v-icon>format_align_center</v-icon>
+          <v-btn icon color="primary"
+            :disabled="loading"
+            @click="onClickCheck">
+            <v-icon class="white--text">check</v-icon>
           </v-btn>
-          <v-btn flat>
-            <v-icon>format_align_right</v-icon>
-          </v-btn>
-          <v-btn flat>
-            <v-icon>format_align_justify</v-icon>
-          </v-btn>
-        </v-btn-toggle>
-        <v-spacer></v-spacer>
-        <v-btn-toggle v-model="editor.textFormat">
-          <v-btn flat>
-            <v-icon>format_bold</v-icon>
-          </v-btn>
-          <v-btn flat>
-            <v-icon>format_italic</v-icon>
-          </v-btn>
-          <v-btn flat>
-            <v-icon>format_underlined</v-icon>
-          </v-btn>
-          <v-btn flat>
-            <v-icon>format_color_fill</v-icon>
-          </v-btn>
-        </v-btn-toggle>
-      </v-layout>
-      <p v-if="$store.state.config.add.type === 'TEXT' && !loading" contenteditable="true"
-        style="padding: 10px;" id="add-note-text"
-        v-html="`<p style='font-size: 25px;'>${$store.state.config.add.data}</p>`"></p>
-      <v-card flat height="200"
-        color="transparent"
-        v-if="loading">
-        <v-card-text>
-          <div class="hero-x-y">
-            <v-progress-circular
-              indeterminate
-              :width="3" :size="50"
-              color="primary">
-            </v-progress-circular>
-          </div>
-        </v-card-text>
-      </v-card>
+        </v-layout>
+        <v-text-field box
+          v-model="name" ref="name"
+          label="Note Name">
+        </v-text-field>
+        <v-textarea
+          v-model="description"
+          name="input-description"
+          label="Note Description">
+        </v-textarea>
+        <v-combobox
+          v-model="select" box
+          item-text="title"
+          :items="$store.state.notes.tags"
+          label="Select Tags"
+          multiple chips>
+        </v-combobox>
+        <v-img v-if="$store.state.config.add.type === 'IMAGE'"
+          :src="`${$store.state.config.add.data.lQuality}`">
+        </v-img>
+        <v-layout row style="margin-bottom: 20px;"
+          v-if="$store.state.config.add.type === 'TEXT' && !loading">
+          <v-btn-toggle v-model="editor.textAlign">
+            <v-btn flat>
+              <v-icon>format_align_left</v-icon>
+            </v-btn>
+            <v-btn flat>
+              <v-icon>format_align_center</v-icon>
+            </v-btn>
+            <v-btn flat>
+              <v-icon>format_align_right</v-icon>
+            </v-btn>
+            <v-btn flat>
+              <v-icon>format_align_justify</v-icon>
+            </v-btn>
+          </v-btn-toggle>
+          <v-spacer></v-spacer>
+          <v-btn-toggle v-model="editor.textFormat">
+            <v-btn flat>
+              <v-icon>format_bold</v-icon>
+            </v-btn>
+            <v-btn flat>
+              <v-icon>format_italic</v-icon>
+            </v-btn>
+            <v-btn flat>
+              <v-icon>format_underlined</v-icon>
+            </v-btn>
+            <v-btn flat>
+              <v-icon>format_color_fill</v-icon>
+            </v-btn>
+          </v-btn-toggle>
+        </v-layout>
+        <p v-if="$store.state.config.add.type === 'TEXT' && !loading" contenteditable="true"
+          style="padding: 10px;" id="add-note-text"
+          v-html="`<p style='font-size: 25px;'>${$store.state.config.add.data}</p>`"></p>
+        <v-card flat height="200"
+          color="transparent"
+          v-if="loading">
+          <v-card-text>
+            <div class="hero-x-y">
+              <v-progress-circular
+                indeterminate
+                :width="3" :size="50"
+                color="primary">
+              </v-progress-circular>
+            </div>
+          </v-card-text>
+        </v-card>
+      </div>
     </div>
-  </div>
+  </transition>
 </template>
 
 <script>
+const {
+  ipcRenderer
+} = require('electron')
 const fops = require('fs-extra')
 const uid = require('uniqid')
 const path = require('path')
@@ -108,7 +113,42 @@ export default {
       source: null
     }
   },
+  computed: {
+    onChangeState () {
+      return this.$store.state.config.add.state
+    }
+  },
+  watch: {
+    onChangeState () {
+      if (this.$store.state.config.add.state) {
+        const context = this
+        this.$nextTick(function () {
+          setTimeout(function () {
+            context.$refs.name.focus()
+          }, 100)
+        })
+      }
+    }
+  },
+  mounted () {
+    const context = this
+    ipcRenderer.on('onMenuItemClick', (event, arg) => {
+      if (arg && arg.constructor === {}.constructor && 'label' in arg) {
+        switch (arg.label) {
+          case 'create_note':
+            if (context.$store.state.config.add.state) {
+              context.onClickCheck()
+            }
+            break
+          default: break
+        }
+      }
+    })
+  },
   methods: {
+    init () {
+      console.log('app:add:init')
+    },
     createNoteObject () {
       let object = null
       const config = this.$store.state.config.add
@@ -144,7 +184,7 @@ export default {
       return object
     },
     clean () {
-      this.title = ''
+      this.name = ''
       this.description = ''
       this.select = []
       this.editor.textFormat = null
@@ -171,7 +211,6 @@ export default {
       if (!noteObj) {
         return
       }
-      console.log('DEBUG:1')
       // Check if data is valid
       let sourceData
       if (noteObj.type === 'TEXT') {
@@ -190,7 +229,6 @@ export default {
           return
         }
       }
-      console.log('DEBUG:2')
       // Save File
       fops.writeFile(
         path.join(
@@ -204,7 +242,6 @@ export default {
           if (err) {
             console.error(err)
           } else {
-            console.log('DEBUG:3')
             // Save if any thumbnail
             if (noteObj.thumbnail) {
               const result = fops.writeFileSync(
@@ -216,6 +253,12 @@ export default {
               )
               console.log('saving thumbnail: ', result)
             }
+            // Add Tags
+            const newTags = createNewTagsIfAny(
+              context.$store.state.notes.tags,
+              context.select
+            )
+            console.log('New Tags: ', newTags)
             // Add note
             // -> Into SQL
             context.$root.$emit(
@@ -238,26 +281,97 @@ export default {
               entry: 'notes',
               source: noteObj
             })
+            // Add tags
+            if (newTags && newTags.length > 0) {
+              newTags.forEach((newTagItem) => {
+                context.$root.$emit(
+                  'sql',
+                  {
+                    command: 'ADD',
+                    sql: 'INSERT INTO tags(id, title, value) VALUES(?,?,?)',
+                    data: [
+                      newTagItem.id,
+                      newTagItem.title,
+                      newTagItem.value
+                    ]
+                  }
+                )
+                context.$store.dispatch('addEntry', {
+                  entry: 'tags',
+                  source: {
+                    id: newTagItem.id,
+                    title: newTagItem.title,
+                    value: newTagItem.value
+                  }
+                })
+              })
+            } else {
+              context.$root.$emit(
+                'sql',
+                {
+                  command: 'ADD',
+                  sql: 'INSERT INTO filter(note, tag) VALUES(?,?)',
+                  data: [
+                    noteObj.id,
+                    'tag_unlisted'
+                  ]
+                }
+              )
+              // -> Into Store
+              context.$store.dispatch('addEntry', {
+                entry: 'filter',
+                source: {
+                  note: noteObj.id,
+                  tag: 'tag_unlisted'
+                }
+              })
+            }
             // Add filter
             // -> Into SQL
-            context.$root.$emit(
-              'sql',
-              {
-                command: 'ADD',
-                sql: 'INSERT INTO filter(note, tag) VALUES(?,?)',
-                data: [
-                  noteObj.id,
-                  'tag_unlisted'
-                ]
-              }
-            )
-            // -> Into Store
-            context.$store.dispatch('addEntry', {
-              entry: 'filter',
-              source: {
-                note: noteObj.id,
-                tag: 'tag_unlisted'
-              }
+            if (newTags && newTags.length > 0) {
+              newTags.forEach((newTagItem) => {
+                context.$root.$emit(
+                  'sql',
+                  {
+                    command: 'ADD',
+                    sql: 'INSERT INTO filter(note, tag) VALUES(?,?)',
+                    data: [
+                      noteObj.id,
+                      newTagItem.id
+                    ]
+                  }
+                )
+                context.$store.dispatch('addEntry', {
+                  entry: 'filter',
+                  source: {
+                    note: noteObj.id,
+                    tag: newTagItem.id
+                  }
+                })
+              })
+            } else {
+              context.$root.$emit(
+                'sql',
+                {
+                  command: 'ADD',
+                  sql: 'INSERT INTO filter(note, tag) VALUES(?,?)',
+                  data: [
+                    noteObj.id,
+                    'tag_unlisted'
+                  ]
+                }
+              )
+              // -> Into Store
+              context.$store.dispatch('addEntry', {
+                entry: 'filter',
+                source: {
+                  note: noteObj.id,
+                  tag: 'tag_unlisted'
+                }
+              })
+            }
+            context.$store.dispatch('setState', {
+              name: 'nextPageIndexPlusPlus'
             })
             context.onCloseView()
           }
@@ -265,6 +379,37 @@ export default {
       )
     }
   }
+}
+
+function createNewTagsIfAny (source, select) {
+  const newTags = []
+  if (
+    source && select &&
+    source.constructor === [].constructor &&
+    select.constructor === [].constructor &&
+    select.length > 0
+  ) {
+    select.forEach((item) => {
+      let searchIndex = null
+      if (item && item.constructor === {}.constructor) {
+        searchIndex = source.findIndex(x => x.title === item.title)
+      } else if (item && typeof item === 'string') {
+        searchIndex = source.findIndex(x => x.title === item)
+      }
+      if (searchIndex !== null && searchIndex < 0) {
+        newTags.push({
+          id: uid(),
+          value: item.constructor === {}.constructor
+            ? item.title.replace(/ /g, '_')
+            : item.replace(/ /g, '_'),
+          title: item.constructor === {}.constructor
+            ? item.title
+            : item
+        })
+      }
+    })
+  }
+  return newTags
 }
 
 /* function threadHandler (input, done) {

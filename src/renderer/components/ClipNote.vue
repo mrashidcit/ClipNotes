@@ -1,5 +1,5 @@
 <template>
-  <v-card flat tile style="margin: 10px;" height="300px"
+  <v-card flat tile style="margin: 10px;min-height: 250px;"
     @mouseover="onMouseOver" @mouseout="onMouseOut">
     <v-img
       v-if="note.type === 'IMAGE'"
@@ -9,14 +9,14 @@
     ></v-img>
     <v-card-title primary-title
       v-if="source">
-      <div class="text-threedots">
+      <div class="text-clamp" single-line>
         <h3 class="headline mb-0">{{note.title}}</h3>
         <div>{{note.description || 'No Description'}}</div>
       </div>
     </v-card-title>
     <v-card-text
       v-if="note.type === 'TEXT' && source"
-      class="text-threedots"
+      class="text-clamp"
       v-html="`${source}`">
     </v-card-text>
     <v-card-actions v-if="source">
@@ -108,9 +108,12 @@ export default {
           })
           tds.on('message', function (response) {
             if (response) {
-              setTimeout(function () {
+              if (note.type === 'IMAGE') {
+                // Load async
                 context.source = response
-              }, 100)
+              } else {
+                context.source = response
+              }
               tds.kill()
             }
           })
