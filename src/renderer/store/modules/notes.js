@@ -99,6 +99,16 @@ const mutations = {
         case 'tags':
           break
         case 'selected':
+          if (
+            'title' in config.source && 'description' in config.source &&
+            'type' in config.source && 'path' in config.source &&
+            'id' in config.source && 'thumbnail' in config.source
+          ) {
+            const deleteIndex = state.selected.findIndex(x => x.id === config.source.id)
+            if (deleteIndex > -1) {
+              state.selected.splice(deleteIndex, 1)
+            }
+          }
           break
         default: break
       }

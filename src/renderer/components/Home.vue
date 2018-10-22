@@ -53,7 +53,7 @@ export default {
       if (
         this.$store.state.config.add.state ||
         this.$store.state.config.about.state ||
-        this.$store.state.config.loadImage.state ||
+        this.$store.state.config.loading.state ||
          this.$store.state.config.genericMessage.state
       ) {
         return true

@@ -2,13 +2,19 @@
   <transition name="fade">
     <div id="app-content" @scroll="onScrollPage">
       <div class="wrapper">
-        <v-layout row wrap>
+        <v-layout row wrap
+          v-if="$store.state.notes.selected.length > 0">
           <v-flex
-            v-for="
-              (note, index) in 
-              ($store.state.notes.selected.length > 0) 
-              ? $store.state.notes.selected
-              : $store.state.notes.notes"
+            v-for="(note, index) in $store.state.notes.selected"
+            :key="note.id"
+            xs6>
+            <clip-note :note="note" v-if="index < $store.state.config.nextPageIndex"/>
+          </v-flex>
+        </v-layout>
+        <v-layout row wrap
+          v-else>
+          <v-flex
+            v-for="(note, index) in notes"
             :key="note.id"
             xs6>
             <clip-note :note="note" v-if="index < $store.state.config.nextPageIndex"/>
@@ -40,10 +46,61 @@ export default {
   },
   data () {
     return {
-      source: ``
+      notes: [],
+      modal: null
     }
   },
+  computed: {
+    onNotesChange () {
+      return this.$store.state.notes.notes
+    },
+    onListReadyChange () {
+      return this.$store.state.config.listReady
+    },
+    onListCountChange () {
+      return this.$store.state.config.listCount
+    }
+  },
+  watch: {
+    onNotesChange () {
+      this.notes = this.$store.state.notes.notes
+    },
+    onListReadyChange () {
+      this.dummy()
+    },
+    onListCountChange () {
+      console.log(this.$store.state.config.listCount)
+      const countLimit = this.$store.state.notes.selected.length < 0
+        ? this.$store.state.notes.notes.length
+        : this.$store.state.notes.selected.length
+      if (this.$store.state.config.listCount >= countLimit) {
+        this.$store.dispatch('setState', {
+          name: 'listReady',
+          state: false
+        })
+      }
+    }
+  },
+  mounted () {
+    this.notes = this.$store.state.notes.notes
+    this.dummy()
+  },
   methods: {
+    dummy () {
+      if (this.$store.state.config.listReady) {
+        this.$store.dispatch('setState', {
+          name: 'loading',
+          state: true
+        })
+      } else {
+        setTimeout(() => {
+          this.$store.dispatch('setState', {
+            name: 'loading',
+            state: false
+          })
+        }, 1000)
+      }
+    },
     onScrollPage () {
       if (!this.$store.state.config.nextPageIndexLoader) {
         const pageEle = document.getElementById('app-content')

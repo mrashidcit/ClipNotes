@@ -18,7 +18,7 @@ const state = {
   loader: {
     state: true
   },
-  loadImage: {
+  loading: {
     state: false,
     text: 'Loading ...'
   },
@@ -26,6 +26,8 @@ const state = {
     state: false,
     data: ''
   },
+  listCount: 0,
+  listReady: false,
   resPath: null,
   nextPageIndex: 10,
   nextPageIndexLoader: false
@@ -60,11 +62,16 @@ const mutations = {
         case 'resPath':
           state.resPath = ('data' in config && config.data) ? config.data : null
           break
-        case 'loadImage':
-          state.loadImage.state = ('state' in config && config.state) ? 1 : 0
+        case 'loading':
+          console.log('here')
+          state.loading.state = ('state' in config && config.state) ? 1 : 0
           break
         case 'nextPageIndexLoader':
           state.nextPageIndexLoader = ('state' in config && config.state) ? 1 : 0
+          break
+        case 'listReady':
+          state.listReady = ('state' in config && config.state) ? 1 : 0
+          state.listCount = 0
           break
         case 'nextPageIndex':
           state.nextPageIndex += 10
@@ -76,12 +83,25 @@ const mutations = {
         default: break
       }
     }
+  },
+  INC_STATE (state, config) {
+    if (validate(config)) {
+      switch (config.name) {
+        case 'listCount':
+          state.listCount += 1
+          break
+        default: break
+      }
+    }
   }
 }
 
 const actions = {
   setState ({ commit }, config) {
     commit('SET_STATE', config)
+  },
+  incState ({ commit }, config) {
+    commit('INC_STATE', config)
   }
 }
 

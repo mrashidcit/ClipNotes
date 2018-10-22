@@ -97,59 +97,80 @@ export default {
         this.select.length > 0
       ) {
         const context = this
-        context.$store.dispatch('clearEntries', {
-          entry: 'selected',
-          source: null
-        })
-        setTimeout(() => {
-          if (this.$store.state.notes.selected.length < 1) {
-            if (this.$store.state.notes.filter.length > 0) {
-              this.select.forEach((selection) => {
-                if (selection) {
-                  // Get Tag Id of selected tag
-                  console.log(selection)
-                  let tagIndex = null
-                  if (selection && selection.constructor === {}.constructor) {
-                    tagIndex = context.$store.state.notes.tags
-                      .findIndex(x => x.title === selection.title)
-                  } else if (selection && typeof selection === 'string') {
-                    tagIndex = context.$store.state.notes.tags
-                      .findIndex(x => x.title === selection)
-                  }
-                  if (tagIndex !== null && tagIndex > -1) {
-                    console.log(context.$store.state.notes.tags[tagIndex].title)
-                    const tagId = context.$store.state.notes.tags[tagIndex].id
-                    const filter = context.$store.state.notes.filter
-                    if (filter.constructor === [].constructor) {
-                      filter.forEach((filterItem) => {
-                        if (filterItem.tag === tagId) {
-                          if (
-                            context.$store.state.notes.selected
-                              .findIndex(x => x.id === filterItem.note) < 0
-                          ) {
-                            const noteId = filterItem.note
-                            const noteIndex = context.$store.state.notes.notes
-                              .findIndex(x => x.id === noteId)
-                            if (noteIndex > -1) {
-                              context.$store.dispatch('addEntry', {
-                                entry: 'selected',
-                                source: context.$store.state.notes.notes[noteIndex]
-                              })
-                            }
-                          }
+        // Generate Valid IDs
+        const validIds = []
+        if (this.$store.state.notes.filter.length > 0) {
+          this.select.forEach((selection) => {
+            if (selection) {
+              let tagIndex = null
+              if (selection && selection.constructor === {}.constructor) {
+                tagIndex = context.$store.state.notes.tags
+                  .findIndex(x => x.title === selection.title)
+              } else if (selection && typeof selection === 'string') {
+                tagIndex = context.$store.state.notes.tags
+                  .findIndex(x => x.title === selection)
+              }
+              if (tagIndex !== null && tagIndex > -1) {
+                const tagId = context.$store.state.notes.tags[tagIndex].id
+                const filter = context.$store.state.notes.filter
+                if (filter.constructor === [].constructor) {
+                  filter.forEach((filterItem) => {
+                    if (filterItem.tag === tagId) {
+                      if (validIds.findIndex(x => x === filterItem.note) < 0) {
+                        const noteId = filterItem.note
+                        const noteIndex = context.$store.state.notes.notes
+                          .findIndex(x => x.id === noteId)
+                        if (noteIndex > -1) {
+                          validIds.push(context.$store.state.notes.notes[noteIndex].id)
                         }
-                      })
+                      }
                     }
-                  }
+                  })
                 }
+              }
+            }
+          })
+        }
+        console.log('valid Ids:', validIds)
+        // Add notes if any
+        validIds.forEach((validId) => {
+          const noteIndex = context.$store.state.notes.notes
+            .findIndex(x => x.id === validId)
+          if (noteIndex > -1) {
+            if (context.$store.state.notes.selected.findIndex(x => x.id === validId) < 0) {
+              context.$store.dispatch('addEntry', {
+                entry: 'selected',
+                source: context.$store.state.notes.notes[noteIndex]
               })
             }
           }
-        }, 100)
+        })
+        // Remove notes if any
+        const selectedClone = Object.assign([], context.$store.state.notes.selected)
+        selectedClone.forEach((item) => {
+          let valid = false
+          for (let loop = 0; loop < validIds.length; loop++) {
+            if (validIds[loop] === item.id) {
+              valid = true
+              break
+            }
+          }
+          if (!valid) {
+            this.$store.dispatch('removeEntry', {
+              entry: 'selected',
+              source: item
+            })
+          }
+        })
       } else {
         this.$store.dispatch('clearEntries', {
           entry: 'selected',
           source: null
+        })
+        console.log('DEBUG 1')
+        this.$store.dispatch('setState', {
+          name: 'listReady',
+          state: true
         })
       }
     }

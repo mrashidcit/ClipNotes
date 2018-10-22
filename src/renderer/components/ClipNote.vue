@@ -2,7 +2,7 @@
   <v-card flat tile style="margin: 10px;min-height: 250px;"
     @mouseover="onMouseOver" @mouseout="onMouseOut">
     <v-img
-      v-if="note.type === 'IMAGE'"
+      v-if="note.type === 'IMAGE' && ready"
       :src="`${source}`"
       :lazy-src="`${lazySrc}`"
       aspect-ratio="2.85"
@@ -15,11 +15,11 @@
       </div>
     </v-card-title>
     <v-card-text
-      v-if="note.type === 'TEXT' && source"
+      v-if="note.type === 'TEXT' && source && ready"
       class="text-clamp"
       v-html="`${source}`">
     </v-card-text>
-    <v-card-actions v-if="source">
+    <v-card-actions v-if="source && ready">
       <v-spacer></v-spacer>
       <v-btn icon
         v-if="hoverActions">
@@ -61,8 +61,17 @@ export default {
     return {
       source: '',
       hoverActions: false,
-      lazySrc: ''
+      lazySrc: '',
+      ready: false
     }
+  },
+  mounted () {
+    const context = this
+    this.$nextTick(function () {
+      context.$store.dispatch('incState', {
+        name: 'listCount'
+      })
+    })
   },
   methods: {
     onMouseOver () {
@@ -72,7 +81,6 @@ export default {
       this.hoverActions = false
     },
     getSource (note) {
-      console.log('app:page:clipnote;getSource')
       this.lazySrc = lazyImage
       if (
         note && note.constructor === {}.constructor &&
@@ -114,6 +122,7 @@ export default {
               } else {
                 context.source = response
               }
+              context.ready = true
               tds.kill()
             }
           })

@@ -91,7 +91,7 @@ export default {
             // Found Image
             console.log('app:onPaste:darwin:hasImage')
             context.$store.dispatch('setState', {
-              name: 'loadImage',
+              name: 'loading',
               state: true
             })
             setTimeout(function () {
@@ -126,7 +126,7 @@ export default {
                   })
                   helperWindow.close()
                   context.$store.dispatch('setState', {
-                    name: 'loadImage',
+                    name: 'loading',
                     state: false
                   })
                 })
@@ -134,7 +134,7 @@ export default {
                   console.log('invalid type', err)
                   helperWindow.close()
                   context.$store.dispatch('setState', {
-                    name: 'loadImage',
+                    name: 'loading',
                     state: false
                   })
                   context.$store.dispatch('setState', {
