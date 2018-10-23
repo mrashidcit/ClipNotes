@@ -2,7 +2,7 @@
   <v-card flat tile style="margin: 10px;min-height: 250px;"
     @mouseover="onMouseOver" @mouseout="onMouseOut">
     <v-img
-      v-if="note.type === 'IMAGE' && ready"
+      v-if="note.type === 'IMAGE'"
       :src="`${source}`"
       :lazy-src="`${lazySrc}`"
       aspect-ratio="2.85"
@@ -15,11 +15,11 @@
       </div>
     </v-card-title>
     <v-card-text
-      v-if="note.type === 'TEXT' && source && ready"
+      v-if="note.type === 'TEXT' && source"
       class="text-clamp"
       v-html="`${source}`">
     </v-card-text>
-    <v-card-actions v-if="source && ready">
+    <v-card-actions v-if="source">
       <v-spacer></v-spacer>
       <v-btn icon
         v-if="hoverActions">
@@ -35,7 +35,7 @@
     </v-card-actions>
     <div class="hero-x-y"
       v-if="!source"
-      :load-source="getSource(note)">
+      :load-source="getPath(note)">
       <v-progress-circular
         :size="100"
         :width="4"
@@ -50,6 +50,7 @@
 const fops = require('fs-extra')
 const path = require('path')
 const Spawn = require('threads').spawn
+const normalizeUrl = require('normalize-url')
 const lazyImage = require('../assets/lazyImage.js')
 
 export default {
@@ -61,8 +62,7 @@ export default {
     return {
       source: '',
       hoverActions: false,
-      lazySrc: '',
-      ready: false
+      lazySrc: ''
     }
   },
   mounted () {
@@ -79,6 +79,40 @@ export default {
     },
     onMouseOut () {
       this.hoverActions = false
+    },
+    getPath (note) {
+      if (!this.$store.state.config.resPath) {
+        this.$store.dispatch('setState', {
+          name: 'resPath',
+          data: require('../assets/defConfig').refPath
+        })
+      }
+      const context = this
+      if (note.type === 'IMAGE') {
+        const fileUrl = normalizeUrl(
+          'file://' +
+          path.join(
+            context.$store.state.config.resPath,
+            note.thumbnail
+          ) + '.png'
+        )
+        context.source = fileUrl
+      } else if (note.type === 'TEXT') {
+        fops.readFile(
+          path.join(
+            this.$store.state.config.resPath,
+            note.path
+          ),
+          'utf8',
+          function (err, data) {
+            if (err) {
+              console.error(err)
+            } else {
+              context.source = data
+            }
+          }
+        )
+      }
     },
     getSource (note) {
       this.lazySrc = lazyImage
@@ -122,7 +156,6 @@ export default {
               } else {
                 context.source = response
               }
-              context.ready = true
               tds.kill()
             }
           })

@@ -89,7 +89,6 @@ export default {
             formatList.findIndex(x => x === 'image/png') > -1
           ) {
             // Found Image
-            console.log('app:onPaste:darwin:hasImage')
             context.$store.dispatch('setState', {
               name: 'loading',
               state: true
@@ -173,18 +172,28 @@ async function getImageData () {
   const promise = new Promise(function (resolve, reject) {
     const nImageHigh = clipboard.readImage()
     const size = nImageHigh.getSize()
-    const nImageLow = nImageHigh.resize({
-      width: 500 * (size.width / size.height),
-      height: 500 * (size.height / size.width),
+    const thumbnailSize = proportionalScale(
+      [size.width, size.height],
+      [250, 250]
+    )
+    const repImageSize = proportionalScale(
+      [size.width, size.height],
+      [500, 500]
+    )
+    console.log('thumbnailSize:', thumbnailSize)
+    console.log('repImageSize:', repImageSize)
+    const repImage = nImageHigh.resize({
+      width: repImageSize[0],
+      height: repImageSize[1],
       quality: 'good'
     })
-    const nImageVLow = nImageHigh.resize({
-      width: 250 * (size.width / size.height),
-      height: 250 * (size.height / size.width),
+    const thumbnailImage = nImageHigh.resize({
+      width: thumbnailSize[0],
+      height: thumbnailSize[1],
       quality: 'good'
     })
-    const lQuality = nImageLow.toDataURL()
-    const thumbnail = nImageVLow.toDataURL()
+    const lQuality = repImage.toDataURL()
+    const thumbnail = thumbnailImage.toDataURL()
     const hQuality = nImageHigh.toDataURL()
     if (lQuality && hQuality && thumbnail &&
       lQuality.split('data:image/png;base64,')[1] &&
@@ -197,6 +206,19 @@ async function getImageData () {
   })
   await promise
   return promise
+}
+
+function proportionalScale (originalSize, newSize) {
+  var ratio = originalSize[0] / originalSize[1]
+
+  var maximizedToWidth = [newSize[0], newSize[0] / ratio]
+  var maximizedToHeight = [newSize[1] * ratio, newSize[1]]
+
+  if (maximizedToWidth[1] > newSize[1]) {
+    return maximizedToHeight
+  } else {
+    return maximizedToWidth
+  }
 }
 </script>
 

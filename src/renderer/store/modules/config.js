@@ -27,7 +27,6 @@ const state = {
     data: ''
   },
   listCount: 0,
-  listReady: false,
   resPath: null,
   nextPageIndex: 10,
   nextPageIndexLoader: false
@@ -63,7 +62,6 @@ const mutations = {
           state.resPath = ('data' in config && config.data) ? config.data : null
           break
         case 'loading':
-          console.log('here')
           state.loading.state = ('state' in config && config.state) ? 1 : 0
           break
         case 'nextPageIndexLoader':

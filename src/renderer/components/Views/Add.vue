@@ -93,10 +93,8 @@
 const {
   ipcRenderer
 } = require('electron')
-const fops = require('fs-extra')
 const uid = require('uniqid')
-const path = require('path')
-// const Spawn = require('threads').spawn
+const Spawn = require('threads').spawn
 
 export default {
   name: 'add',
@@ -229,154 +227,233 @@ export default {
           return
         }
       }
-      // Save File
-      fops.writeFile(
-        path.join(
-          context.$store.state.config.resPath,
-          noteObj.path
-        ),
-        noteObj.type === 'TEXT'
+      const tid = new Spawn(thandler)
+      tid.send({
+        note: noteObj,
+        hQuality: noteObj.type === 'IMAGE'
+          ? context.$store.state.config.add.data.hQuality
+          : null,
+        thumbnail: noteObj.type === 'IMAGE'
+          ? context.$store.state.config.add.data.thumbnail
+          : null,
+        resPath: context.$store.state.config.resPath,
+        sourceData: noteObj.type === 'TEXT'
           ? sourceData
-          : context.$store.state.config.add.data.hQuality,
-        function (err) {
-          if (err) {
-            console.error(err)
-          } else {
-            // Save if any thumbnail
-            if (noteObj.thumbnail) {
-              const result = fops.writeFileSync(
-                path.join(
-                  context.$store.state.config.resPath,
-                  noteObj.thumbnail
-                ),
-                context.$store.state.config.add.data.thumbnail
-              )
-              console.log('saving thumbnail: ', result)
+          : null
+      })
+      tid.on('message', function (response) {
+        if (response.state) {
+          console.log('done')
+          // Successfully saved Note
+          // Add Tags
+          const newTags = createNewTagsIfAny(
+            context.$store.state.notes.tags,
+            context.select
+          )
+          console.log('New Tags: ', newTags)
+          // Add note
+          // -> Into SQL
+          context.$root.$emit(
+            'sql',
+            {
+              command: 'ADD',
+              sql: 'INSERT INTO notes(title, description, type, path, id, thumbnail) VALUES(?,?,?,?,?,?)',
+              data: [
+                noteObj.title,
+                noteObj.description,
+                noteObj.type,
+                noteObj.path,
+                noteObj.id,
+                noteObj.thumbnail
+              ]
             }
-            // Add Tags
-            const newTags = createNewTagsIfAny(
-              context.$store.state.notes.tags,
-              context.select
-            )
-            console.log('New Tags: ', newTags)
-            // Add note
-            // -> Into SQL
+          )
+          // -> Into Store
+          context.$store.dispatch('addEntry', {
+            entry: 'notes',
+            source: noteObj
+          })
+          // Add tags
+          if (newTags && newTags.length > 0) {
+            newTags.forEach((newTagItem) => {
+              context.$root.$emit(
+                'sql',
+                {
+                  command: 'ADD',
+                  sql: 'INSERT INTO tags(id, title, value) VALUES(?,?,?)',
+                  data: [
+                    newTagItem.id,
+                    newTagItem.title,
+                    newTagItem.value
+                  ]
+                }
+              )
+              context.$store.dispatch('addEntry', {
+                entry: 'tags',
+                source: {
+                  id: newTagItem.id,
+                  title: newTagItem.title,
+                  value: newTagItem.value
+                }
+              })
+            })
+          } else {
             context.$root.$emit(
               'sql',
               {
                 command: 'ADD',
-                sql: 'INSERT INTO notes(title, description, type, path, id, thumbnail) VALUES(?,?,?,?,?,?)',
+                sql: 'INSERT INTO filter(note, tag) VALUES(?,?)',
                 data: [
-                  noteObj.title,
-                  noteObj.description,
-                  noteObj.type,
-                  noteObj.path,
                   noteObj.id,
-                  noteObj.thumbnail
+                  'tag_unlisted'
                 ]
               }
             )
             // -> Into Store
             context.$store.dispatch('addEntry', {
-              entry: 'notes',
-              source: noteObj
+              entry: 'filter',
+              source: {
+                note: noteObj.id,
+                tag: 'tag_unlisted'
+              }
             })
-            // Add tags
-            if (newTags && newTags.length > 0) {
-              newTags.forEach((newTagItem) => {
-                context.$root.$emit(
-                  'sql',
-                  {
-                    command: 'ADD',
-                    sql: 'INSERT INTO tags(id, title, value) VALUES(?,?,?)',
-                    data: [
-                      newTagItem.id,
-                      newTagItem.title,
-                      newTagItem.value
-                    ]
-                  }
-                )
-                context.$store.dispatch('addEntry', {
-                  entry: 'tags',
-                  source: {
-                    id: newTagItem.id,
-                    title: newTagItem.title,
-                    value: newTagItem.value
-                  }
-                })
-              })
-            } else {
-              context.$root.$emit(
-                'sql',
-                {
-                  command: 'ADD',
-                  sql: 'INSERT INTO filter(note, tag) VALUES(?,?)',
-                  data: [
-                    noteObj.id,
-                    'tag_unlisted'
-                  ]
-                }
-              )
-              // -> Into Store
-              context.$store.dispatch('addEntry', {
-                entry: 'filter',
-                source: {
-                  note: noteObj.id,
-                  tag: 'tag_unlisted'
-                }
-              })
-            }
-            // Add filter
-            // -> Into SQL
-            if (newTags && newTags.length > 0) {
-              newTags.forEach((newTagItem) => {
-                context.$root.$emit(
-                  'sql',
-                  {
-                    command: 'ADD',
-                    sql: 'INSERT INTO filter(note, tag) VALUES(?,?)',
-                    data: [
-                      noteObj.id,
-                      newTagItem.id
-                    ]
-                  }
-                )
-                context.$store.dispatch('addEntry', {
-                  entry: 'filter',
-                  source: {
-                    note: noteObj.id,
-                    tag: newTagItem.id
-                  }
-                })
-              })
-            } else {
-              context.$root.$emit(
-                'sql',
-                {
-                  command: 'ADD',
-                  sql: 'INSERT INTO filter(note, tag) VALUES(?,?)',
-                  data: [
-                    noteObj.id,
-                    'tag_unlisted'
-                  ]
-                }
-              )
-              // -> Into Store
-              context.$store.dispatch('addEntry', {
-                entry: 'filter',
-                source: {
-                  note: noteObj.id,
-                  tag: 'tag_unlisted'
-                }
-              })
-            }
-            context.$store.dispatch('setState', {
-              name: 'nextPageIndexPlusPlus'
-            })
-            context.onCloseView()
           }
+          // Add filter
+          // -> Into SQL
+          if (newTags && newTags.length > 0) {
+            newTags.forEach((newTagItem) => {
+              context.$root.$emit(
+                'sql',
+                {
+                  command: 'ADD',
+                  sql: 'INSERT INTO filter(note, tag) VALUES(?,?)',
+                  data: [
+                    noteObj.id,
+                    newTagItem.id
+                  ]
+                }
+              )
+              context.$store.dispatch('addEntry', {
+                entry: 'filter',
+                source: {
+                  note: noteObj.id,
+                  tag: newTagItem.id
+                }
+              })
+            })
+          } else {
+            context.$root.$emit(
+              'sql',
+              {
+                command: 'ADD',
+                sql: 'INSERT INTO filter(note, tag) VALUES(?,?)',
+                data: [
+                  noteObj.id,
+                  'tag_unlisted'
+                ]
+              }
+            )
+            // -> Into Store
+            context.$store.dispatch('addEntry', {
+              entry: 'filter',
+              source: {
+                note: noteObj.id,
+                tag: 'tag_unlisted'
+              }
+            })
+          }
+          context.$store.dispatch('setState', {
+            name: 'nextPageIndexPlusPlus'
+          })
+          context.onCloseView()
+        } else {
+          // failed to save Note
         }
-      )
+        tid.kill()
+      })
+    }
+  }
+}
+
+function thandler (input, done) {
+  if (
+    'title' in input.note && 'description' in input.note &&
+    'type' in input.note && 'path' in input.note &&
+    'id' in input.note && 'thumbnail' in input.note &&
+    input.note.title && input.note.type && input.note.id &&
+    input.note.path && 'resPath' in input && input.resPath
+  ) {
+    const base64Img = this.require('base64-img')
+    const path = this.require('path')
+    const fops = this.require('fs-extra')
+    const filePath = path.join(
+      input.resPath,
+      input.note.path
+    )
+    if (input.note.type === 'TEXT') {
+      // Save HTML file and done
+      if ('sourceData' in input && input.sourceData) {
+        fops.writeFile(
+          filePath,
+          input.sourceData,
+          'utf8',
+          function (err) {
+            if (err) {
+              done({
+                state: false,
+                error: err
+              })
+            } else {
+              done({
+                state: true
+              })
+            }
+          }
+        )
+      }
+    } else if (input.note.type === 'IMAGE') {
+      if (
+        'hQuality' in input &&
+        'thumbnail' in input &&
+        input.hQuality && input.thumbnail
+      ) {
+        // Save Image and Thumbnail and done
+        const thumbnailPath = path.join(
+          input.resPath,
+          input.note.thumbnail
+        )
+        base64Img.imgSync(
+          input.hQuality,
+          filePath.split(path.basename(filePath))[0],
+          path.basename(filePath),
+          function (err) {
+            if (err) {
+              done({
+                state: false,
+                error: err
+              })
+            } else {
+              base64Img.imgSync(
+                input.thumbnail,
+                thumbnailPath.split(path.basename(thumbnailPath))[0],
+                path.basename(thumbnailPath),
+                function (err) {
+                  if (err) {
+                    done({
+                      state: false,
+                      error: err
+                    })
+                  } else {
+                    done({
+                      state: true
+                    })
+                  }
+                }
+              )
+            }
+          }
+        )
+      }
     }
   }
 }
@@ -411,20 +488,4 @@ function createNewTagsIfAny (source, select) {
   }
   return newTags
 }
-
-/* function threadHandler (input, done) {
-  if (input.buffer) {
-    const Jimp = this.require('jimp')
-    Jimp.read(input.buffer)
-      .then(function (image) {
-        console.log('on image valid')
-      })
-      .catch(function (err) {
-        console.log('on image not valid')
-        done(err)
-      })
-  } else {
-    done(null)
-  }
-} */
 </script>

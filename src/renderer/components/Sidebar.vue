@@ -29,8 +29,8 @@
           : $store.state.notes.notes.length}}
       </p>
       <v-switch class="wrapper" small
-      :label="`Hard Filter: ${hardFilter ? 'ON' : 'OFF'}`"
-      v-model="hardFilter">
+      :label="`Strict Filter: ${strictFilter ? 'ON' : 'OFF'}`"
+      v-model="strictFilter">
       </v-switch>
     </div>
     <v-subheader>Filter Notes with Tags</v-subheader>
@@ -55,7 +55,7 @@ export default {
   name: 'sidebar',
   data () {
     return {
-      hardFilter: false,
+      strictFilter: false,
       select: [],
       tags: [
         'hello',
@@ -166,11 +166,6 @@ export default {
         this.$store.dispatch('clearEntries', {
           entry: 'selected',
           source: null
-        })
-        console.log('DEBUG 1')
-        this.$store.dispatch('setState', {
-          name: 'listReady',
-          state: true
         })
       }
     }
