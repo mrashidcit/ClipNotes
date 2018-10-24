@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="screenshots/briefnote-hero.png"
+  <img src="screenshots/logo-hero.png"
     height="auto" width="auto"/>
 </p>
 
