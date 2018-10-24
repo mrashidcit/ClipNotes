@@ -26,6 +26,11 @@ const state = {
     state: false,
     data: ''
   },
+  strictFilter: {
+    state: false,
+    data: null
+  },
+  tagSelection: [],
   listCount: 0,
   resPath: null,
   nextPageIndex: 10,
@@ -77,6 +82,15 @@ const mutations = {
           break
         case 'nextPageIndexPlusPlus':
           state.nextPageIndex += 1
+          break
+        case 'strictFilter':
+          state.strictFilter.state = ('state' in config && config.state) ? 1 : 0
+          state.strictFilter.data = ('data' in config && config.state) ? 1 : 0
+          break
+        case 'tagSelection':
+          if ('data' in config && config.data.constructor === [].constructor) {
+            state.tagSelection = config.data
+          }
           break
         default: break
       }

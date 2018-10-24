@@ -422,18 +422,19 @@ function thandler (input, done) {
           input.resPath,
           input.note.thumbnail
         )
-        base64Img.imgSync(
+        base64Img.img(
           input.hQuality,
           filePath.split(path.basename(filePath))[0],
           path.basename(filePath),
           function (err) {
             if (err) {
+              console.log('DEBUG:3:ERROR', err)
               done({
                 state: false,
                 error: err
               })
             } else {
-              base64Img.imgSync(
+              base64Img.img(
                 input.thumbnail,
                 thumbnailPath.split(path.basename(thumbnailPath))[0],
                 path.basename(thumbnailPath),

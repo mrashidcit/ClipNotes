@@ -29,8 +29,8 @@
           : $store.state.notes.notes.length}}
       </p>
       <v-switch class="wrapper" small
-      :label="`Strict Filter: ${strictFilter ? 'ON' : 'OFF'}`"
-      v-model="strictFilter">
+      :label="`Strict Filter: ${strictFilterState ? 'ON' : 'OFF'}`"
+      v-model="strictFilterState">
       </v-switch>
     </div>
     <v-subheader>Filter Notes with Tags</v-subheader>
@@ -55,12 +55,8 @@ export default {
   name: 'sidebar',
   data () {
     return {
-      strictFilter: false,
+      strictFilterState: false,
       select: [],
-      tags: [
-        'hello',
-        'test'
-      ],
       more: [
         {
           title: 'About',
@@ -74,6 +70,22 @@ export default {
           }
         }
       ]
+    }
+  },
+  computed: {
+    onStrictFitlerChange () {
+      return this.strictFilterState
+    },
+    onTagSelctionChange () {
+      return this.$store.state.config.tagSelection
+    }
+  },
+  watch: {
+    onStrictFitlerChange (state) {
+      this.onToggleStrictFilter(state)
+    },
+    onTagSelctionChange (selection) {
+      this.onToggleStrictFilter(this.onStrictFitlerChange)
     }
   },
   mounted () {
@@ -131,7 +143,6 @@ export default {
             }
           })
         }
-        console.log('valid Ids:', validIds)
         // Add notes if any
         validIds.forEach((validId) => {
           const noteIndex = context.$store.state.notes.notes
@@ -162,11 +173,47 @@ export default {
             })
           }
         })
+        this.$store.dispatch('setState', {
+          name: 'tagSelection',
+          data: this.select
+        })
       } else {
         this.$store.dispatch('clearEntries', {
           entry: 'selected',
           source: null
         })
+      }
+    },
+    onToggleStrictFilter (state) {
+      this.$store.dispatch('setState', {
+        name: 'strictFilter',
+        state: state
+      })
+      if (this.$store.state.notes.selected.length < 1 || !state) {
+        return
+      }
+      const context = this
+      const tagSelection = this.$store.state.config.tagSelection
+      if (tagSelection && tagSelection.constructor === [].constructor) {
+        const tagIDs = []
+        tagSelection.forEach((tag) => {
+          let tagIndex = null
+          if (tag && tag.constructor === {}.constructor) {
+            tagIndex = context.$store.state.notes.tags
+              .findIndex(x => x.title === tag.title)
+          } else if (tag && typeof tag === 'string') {
+            tagIndex = context.$store.state.notes.tags
+              .findIndex(x => x.title === tag)
+          }
+          tagIDs.push(context.$store.state.notes.tags[tagIndex].id)
+        })
+        if (tagIDs && tagIDs.constructor === [].constructor &&
+          tagIDs.length > 0) {
+          const selected = this.$store.state.notes.selected
+          selected.forEach((noteItem) => {
+            // Iterate Filter
+          })
+        }
       }
     }
   }
