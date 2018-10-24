@@ -86,10 +86,7 @@ export default {
       if (state) {
         this.onToggleStrictFilter(state)
       } else {
-        this.$store.dispatch('initEntries', {
-          entry: 'selected',
-          source: Object.assign([], this.selectedBackup)
-        })
+        this.onChangeFilter()
       }
     },
     onTagSelctionChange (selection) {
@@ -233,7 +230,6 @@ export default {
               }
             }
             if (toDelete) {
-              console.log('delete', noteItem.title)
               context.$store.dispatch('removeEntry', {
                 entry: 'selected',
                 source: noteItem

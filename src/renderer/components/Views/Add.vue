@@ -246,10 +246,12 @@ export default {
           console.log('done')
           // Successfully saved Note
           // Add Tags
-          const newTags = createNewTagsIfAny(
+          const tagObjects = createNewTagsIfAny(
             context.$store.state.notes.tags,
             context.select
           )
+          const newTags = tagObjects._newTags
+          const oldTags = tagObjects._oldTags
           console.log('New Tags: ', newTags)
           // Add note
           // -> Into SQL
@@ -273,31 +275,7 @@ export default {
             entry: 'notes',
             source: noteObj
           })
-          // Add tags
-          if (newTags && newTags.length > 0) {
-            newTags.forEach((newTagItem) => {
-              context.$root.$emit(
-                'sql',
-                {
-                  command: 'ADD',
-                  sql: 'INSERT INTO tags(id, title, value) VALUES(?,?,?)',
-                  data: [
-                    newTagItem.id,
-                    newTagItem.title,
-                    newTagItem.value
-                  ]
-                }
-              )
-              context.$store.dispatch('addEntry', {
-                entry: 'tags',
-                source: {
-                  id: newTagItem.id,
-                  title: newTagItem.title,
-                  value: newTagItem.value
-                }
-              })
-            })
-          } else {
+          if (context.select.length < 1) {
             context.$root.$emit(
               'sql',
               {
@@ -317,57 +295,83 @@ export default {
                 tag: 'tag_unlisted'
               }
             })
-          }
-          // Add filter
-          // -> Into SQL
-          if (newTags && newTags.length > 0) {
-            newTags.forEach((newTagItem) => {
-              context.$root.$emit(
-                'sql',
-                {
-                  command: 'ADD',
-                  sql: 'INSERT INTO filter(note, tag) VALUES(?,?)',
-                  data: [
-                    noteObj.id,
-                    newTagItem.id
-                  ]
-                }
-              )
-              context.$store.dispatch('addEntry', {
-                entry: 'filter',
-                source: {
-                  note: noteObj.id,
-                  tag: newTagItem.id
-                }
-              })
-            })
           } else {
-            context.$root.$emit(
-              'sql',
-              {
-                command: 'ADD',
-                sql: 'INSERT INTO filter(note, tag) VALUES(?,?)',
-                data: [
-                  noteObj.id,
-                  'tag_unlisted'
-                ]
-              }
-            )
-            // -> Into Store
-            context.$store.dispatch('addEntry', {
-              entry: 'filter',
-              source: {
-                note: noteObj.id,
-                tag: 'tag_unlisted'
-              }
+            // Add tags
+            if (newTags && newTags.length > 0) {
+              newTags.forEach((newTagItem) => {
+                context.$root.$emit(
+                  'sql',
+                  {
+                    command: 'ADD',
+                    sql: 'INSERT INTO tags(id, title, value) VALUES(?,?,?)',
+                    data: [
+                      newTagItem.id,
+                      newTagItem.title,
+                      newTagItem.value
+                    ]
+                  }
+                )
+                context.$store.dispatch('addEntry', {
+                  entry: 'tags',
+                  source: {
+                    id: newTagItem.id,
+                    title: newTagItem.title,
+                    value: newTagItem.value
+                  }
+                })
+              })
+            }
+            // Add filter
+            // -> Into SQL
+            if (newTags && newTags.length > 0) {
+              newTags.forEach((newTagItem) => {
+                context.$root.$emit(
+                  'sql',
+                  {
+                    command: 'ADD',
+                    sql: 'INSERT INTO filter(note, tag) VALUES(?,?)',
+                    data: [
+                      noteObj.id,
+                      newTagItem.id
+                    ]
+                  }
+                )
+                context.$store.dispatch('addEntry', {
+                  entry: 'filter',
+                  source: {
+                    note: noteObj.id,
+                    tag: newTagItem.id
+                  }
+                })
+              })
+            }
+            if (oldTags && oldTags.length > 0) {
+              oldTags.forEach((oldTagItem) => {
+                context.$root.$emit(
+                  'sql',
+                  {
+                    command: 'ADD',
+                    sql: 'INSERT INTO filter(note, tag) VALUES(?,?)',
+                    data: [
+                      noteObj.id,
+                      oldTagItem.id
+                    ]
+                  }
+                )
+                context.$store.dispatch('addEntry', {
+                  entry: 'filter',
+                  source: {
+                    note: noteObj.id,
+                    tag: oldTagItem.id
+                  }
+                })
+              })
+            }
+            context.$store.dispatch('setState', {
+              name: 'nextPageIndexPlusPlus'
             })
+            context.onCloseView()
           }
-          context.$store.dispatch('setState', {
-            name: 'nextPageIndexPlusPlus'
-          })
-          context.onCloseView()
-        } else {
-          // failed to save Note
         }
         tid.kill()
       })
@@ -460,6 +464,7 @@ function thandler (input, done) {
 
 function createNewTagsIfAny (source, select) {
   const newTags = []
+  const oldTags = []
   if (
     source && select &&
     source.constructor === [].constructor &&
@@ -483,9 +488,22 @@ function createNewTagsIfAny (source, select) {
             ? item.title
             : item
         })
+      } else {
+        if (item && item.constructor === {}.constructor) {
+          oldTags.push(item)
+        } else if (item && typeof item === 'string') {
+          const tagIndex = source.findIndex(x => x.title === item)
+          if (tagIndex > -1) {
+            oldTags.push(source[tagIndex])
+          }
+        }
       }
     })
   }
-  return newTags
+  console.log('old tags', oldTags)
+  return {
+    _newTags: newTags,
+    _oldTags: oldTags
+  }
 }
 </script>

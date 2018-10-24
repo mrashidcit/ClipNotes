@@ -89,7 +89,7 @@ const mutations = {
           break
         case 'tagSelection':
           if ('data' in config && config.data.constructor === [].constructor) {
-            state.tagSelection = config.data
+            state.tagSelection = Object.assign([], config.data)
           }
           break
         default: break

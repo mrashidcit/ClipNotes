@@ -16,7 +16,8 @@ export default {
     this.$nextTick(function () {
       this.registerEvents()
       this.init()
-      document.onpaste = function () {
+      document.onpaste = function (e) {
+        e.preventDefault()
         if (!context.$store.state.config.add.state) {
           context.onPaste()
         }
