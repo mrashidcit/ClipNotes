@@ -4,7 +4,8 @@
       <div class="wrapper">
         <v-layout row wrap>
           <v-flex
-            v-for="(note, index) in ($store.state.notes.selected.length > 0)
+            v-for="(note, index) in ($store.state.notes.selected.length > 0 ||
+            $store.state.config.tagSelection.length > 0)
               ? $store.state.notes.selected
               : $store.state.notes.notes"
             :key="note.id"

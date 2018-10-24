@@ -57,6 +57,7 @@ export default {
     return {
       strictFilterState: false,
       select: [],
+      selectedBackup: [],
       more: [
         {
           title: 'About',
@@ -82,7 +83,14 @@ export default {
   },
   watch: {
     onStrictFitlerChange (state) {
-      this.onToggleStrictFilter(state)
+      if (state) {
+        this.onToggleStrictFilter(state)
+      } else {
+        this.$store.dispatch('initEntries', {
+          entry: 'selected',
+          source: Object.assign([], this.selectedBackup)
+        })
+      }
     },
     onTagSelctionChange (selection) {
       this.onToggleStrictFilter(this.onStrictFitlerChange)
@@ -182,6 +190,10 @@ export default {
           entry: 'selected',
           source: null
         })
+        this.$store.dispatch('setState', {
+          name: 'tagSelection',
+          data: []
+        })
       }
     },
     onToggleStrictFilter (state) {
@@ -209,9 +221,24 @@ export default {
         })
         if (tagIDs && tagIDs.constructor === [].constructor &&
           tagIDs.length > 0) {
-          const selected = this.$store.state.notes.selected
+          context.selectedBackup = Object.assign([], context.$store.state.notes.selected)
+          const selected = Object.assign([], context.$store.state.notes.selected)
+          const filter = Object.assign([], context.$store.state.notes.filter)
           selected.forEach((noteItem) => {
-            // Iterate Filter
+            let toDelete = false
+            for (let index = 0; index < tagIDs.length; index++) {
+              if (filter.findIndex(x => (x.tag === tagIDs[index] && x.note === noteItem.id)) < 0) {
+                toDelete = true
+                break
+              }
+            }
+            if (toDelete) {
+              console.log('delete', noteItem.title)
+              context.$store.dispatch('removeEntry', {
+                entry: 'selected',
+                source: noteItem
+              })
+            }
           })
         }
       }

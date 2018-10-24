@@ -428,7 +428,6 @@ function thandler (input, done) {
           path.basename(filePath),
           function (err) {
             if (err) {
-              console.log('DEBUG:3:ERROR', err)
               done({
                 state: false,
                 error: err
