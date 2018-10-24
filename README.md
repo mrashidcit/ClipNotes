@@ -4,7 +4,7 @@
 </p>
 
 <p align="center">
-Rapid tags, note taking application for Mac, Windows and Linux
+Clipboard based note taking application for Windows and Mac.
 </p>
 
 <p align="center">
