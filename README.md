@@ -14,7 +14,7 @@ Clipboard based note taking application for Windows and Mac.
 
 ## [Download Beta-version of briefnote](https://github.com/xplorebits/briefnote/releases/tag/v0.0.1)
 
-<a href="https://www.patreon.com/saikksub"><img height="50px" width="auto" alt= "become a patreon" src="https://c5.patreon.com/external/logo/become_a_patron_button@2x.png"></a>
+<a href="https://www.patreon.com/xplorebits"><img height="50px" width="auto" alt= "become a patreon" src="https://c5.patreon.com/external/logo/become_a_patron_button@2x.png"></a>
 
 ## What is briefnote?
 **brief-note** is a *Cross-platform desktop application* to create and manage notes from the system clipboard. User can create notes by simply copying & pasting any **TEXT**, **IMAGE**, **SCREENSHOT** from the file system, browser and editor.
