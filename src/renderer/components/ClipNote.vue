@@ -11,7 +11,7 @@
       v-if="source">
       <div class="text-clamp" single-line>
         <h3 class="headline mb-0">{{note.title}}</h3>
-        <div>{{note.description || 'No Description'}}</div>
+        <div v-if="note.type === 'IMAGE'">{{note.description || 'No Description'}}</div>
       </div>
     </v-card-title>
     <v-card-text

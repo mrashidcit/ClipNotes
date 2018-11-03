@@ -1,5 +1,5 @@
 {
-  "name": "briefnote",
+  "name": "clipnotes",
   "version": "0.0.1",
   "author": "saikksub <saikksub@gmail.com>",
   "description": "Rapid tags, note taking application for Mac, Windows and Linux",
@@ -26,8 +26,8 @@
     "rebuild-for-electron": "./node_modules/.bin/electron-rebuild ."
   },
   "build": {
-    "productName": "briefnote",
-    "appId": "com.xplorebits.desktop.briefnote",
+    "productName": "clipnotes",
+    "appId": "com.xplorebits.desktop.clipnotes",
     "directories": {
       "output": "build"
     },
