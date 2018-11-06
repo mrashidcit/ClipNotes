@@ -83,6 +83,27 @@ const helper = {
     })
     await promise
     return promise
+  },
+  getTagsFromNote: function (note, filter, tags) {
+    const tagsAssociated = []
+    if (
+      note && note.constructor === {}.constructor &&
+      filter && filter.constructor === [].constructor &&
+      tags && tags.constructor === [].constructor
+    ) {
+      filter.forEach((filterItem) => {
+        if (
+          'tag' in filterItem && 'note' in filterItem &&
+          filterItem.note === note.id
+        ) {
+          const tagIndex = tags.findIndex(x => x.id === filterItem.tag)
+          if (tagIndex > -1) {
+            tagsAssociated.push(tags[tagIndex].title)
+          }
+        }
+      })
+    }
+    return tagsAssociated
   }
 }
 

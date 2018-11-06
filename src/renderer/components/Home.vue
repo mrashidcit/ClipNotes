@@ -15,6 +15,7 @@
     <add />
     <about />
     <generic-message />
+    <action-dialog />
     <loading />
     <view-note />
   </div>
@@ -27,6 +28,7 @@ import Add from './Views/Add'
 import About from './Views/About'
 import ViewNote from './Views/ViewNote'
 import GenericMessage from './Views/GenericMessage'
+import ActionDialog from './Views/ActionDialog'
 import Loading from './Views/Loading'
 
 export default {
@@ -37,6 +39,7 @@ export default {
     Add,
     About,
     GenericMessage,
+    ActionDialog,
     Loading,
     ViewNote
   },
@@ -58,6 +61,7 @@ export default {
         this.$store.state.config.about.state ||
         this.$store.state.config.loading.state ||
         this.$store.state.config.genericMessage.state ||
+        this.$store.state.config.actionDialog.state ||
         this.$store.state.config.viewNote.state
       ) {
         return true

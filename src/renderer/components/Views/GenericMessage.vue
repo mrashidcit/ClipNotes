@@ -1,5 +1,5 @@
 <template>
-  <transition name="fade">
+  <transition>
   <div class="glass-view"
     v-if="$store.state.config.genericMessage.state">
     <div class="wrapper hero-x-y">

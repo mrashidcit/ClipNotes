@@ -97,6 +97,26 @@ const mutations = {
     if (validate(config)) {
       switch (config.entry) {
         case 'notes':
+          console.log(config)
+          if ('id' in config.source) {
+            // Delete from notes
+            const targetIndex = state.notes.findIndex(x => x.id === config.source.id)
+            if (targetIndex > -1) {
+              state.notes.splice(targetIndex, 1)
+            }
+            // Delete from filter
+            const filter = Object.assign([], state.filter)
+            filter.forEach((filterItem, index) => {
+              if (filterItem.note === config.source.id) {
+                state.filter.splice(index, 1)
+              }
+            })
+            // Delete from selected
+            const selectedIndex = state.selected.findIndex(x => x.id === config.source.id)
+            if (selectedIndex > -1) {
+              state.selected.splice(selectedIndex, 1)
+            }
+          }
           break
         case 'filter':
           break

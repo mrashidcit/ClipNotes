@@ -26,7 +26,8 @@
         <v-icon class="primary--text">edit</v-icon>
       </v-btn>
       <v-btn icon
-        v-if="hoverActions">
+        v-if="hoverActions"
+        @click="onClickDelete">
         <v-icon class="red--text">delete</v-icon>
       </v-btn>
       <v-btn icon
@@ -80,6 +81,58 @@ export default {
     },
     onMouseOut () {
       this.hoverActions = false
+    },
+    onClickDelete () {
+      const note = Object.assign({}, this.note)
+      const context = this
+      this.$store.dispatch('setState', {
+        name: 'actionDialog',
+        state: true,
+        title: 'Deleting Clip Note',
+        message: `Are you sure about deleting this note "${note.title}"?`,
+        pLabel: 'Yes. Delete this note',
+        nLabel: 'No',
+        pCallback: () => {
+          console.log('delete')
+          context.$store.dispatch('removeEntry', {
+            entry: 'notes',
+            source: note
+          })
+          context.$store.dispatch('setState', {
+            name: 'actionDialog',
+            state: false
+          })
+          context.$root.$emit('sql', {
+            command: 'DELETE',
+            sql: `DELETE FROM notes WHERE id="${note.id}"`
+          })
+          context.$root.$emit('sql', {
+            command: 'DELETE',
+            sql: `DELETE FROM filter WHERE note="${note.id}"`
+          })
+          if (note.type === 'IMAGE') {
+            fops.unlink(path.join(
+              this.$store.state.config.resPath,
+              `${note.thumbnail}.png`
+            ))
+            fops.unlink(path.join(
+              this.$store.state.config.resPath,
+              `${note.path}.png`
+            ))
+          } else {
+            fops.unlink(path.join(
+              this.$store.state.config.resPath,
+              note.path
+            ))
+          }
+        },
+        nCallback: () => {
+          context.$store.dispatch('setState', {
+            name: 'actionDialog',
+            state: false
+          })
+        }
+      })
     },
     getPath (note) {
       if (!this.$store.state.config.resPath) {

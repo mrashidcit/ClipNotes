@@ -108,6 +108,9 @@ ipcMain.on('sql', function (event, config) {
         break
       case 'DELETE':
         console.log('DELETE', config)
+        db.run({
+          sql: config.sql
+        })
         break
       default: break
     }

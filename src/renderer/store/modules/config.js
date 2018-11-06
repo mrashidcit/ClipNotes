@@ -30,6 +30,15 @@ const state = {
     state: false,
     data: null
   },
+  actionDialog: {
+    state: false,
+    title: '',
+    message: '',
+    pLabel: 'Yes',
+    nLabel: 'No',
+    pCallback: () => {},
+    nCallback: () => {}
+  },
   tagSelection: [],
   listCount: 0,
   resPath: null,
@@ -94,6 +103,17 @@ const mutations = {
           if ('data' in config && config.data.constructor === [].constructor) {
             state.tagSelection = Object.assign([], config.data)
           }
+          break
+        case 'actionDialog':
+          state.actionDialog.state = ('state' in config && config.state) ? 1 : 0
+          state.actionDialog.title = ('title' in config && config.title) ? config.title : ''
+          state.actionDialog.message = ('message' in config && config.message) ? config.message : ''
+          state.actionDialog.pLabel = ('pLabel' in config && config.pLabel) ? config.pLabel : 'Yes'
+          state.actionDialog.nLabel = ('nLabel' in config && config.nLabel) ? config.nLabel : 'No'
+          state.actionDialog.pCallback = ('pCallback' in config && typeof config.pCallback === 'function')
+            ? config.pCallback : () => {}
+          state.actionDialog.nCallback = ('nCallback' in config && typeof config.nCallback === 'function')
+            ? config.nCallback : () => {}
           break
         default: break
       }

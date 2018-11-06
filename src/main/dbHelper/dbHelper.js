@@ -118,7 +118,7 @@ DbHelper.prototype.init = () => {
 /**
  * Delete SQL entry with id
  */
-DbHelper.prototype.deleteWithId = (_obj) => {
+DbHelper.prototype.run = (_obj) => {
   // Validate data object
   if (_obj && _obj.constructor === {}.constructor) {
     if ('sql' in _obj && _obj.sql) {
@@ -128,7 +128,7 @@ DbHelper.prototype.deleteWithId = (_obj) => {
             if (error) {
               console.error(error)
             } else {
-              console.log('Deleted an entry in SQL database. SQL', _obj.sql)
+              console.log('SUCCESS', _obj.sql)
             }
           })
         })
