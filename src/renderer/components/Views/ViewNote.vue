@@ -15,10 +15,12 @@
         </v-toolbar-title>
         <v-spacer></v-spacer>
         <v-toolbar-items>
-          <v-btn icon color="white">
+          <v-btn icon color="white"
+            @click="onClickDelete">
             <v-icon class="red--text">delete</v-icon>
           </v-btn>
-          <v-btn icon color="white">
+          <v-btn icon color="white"
+            @click="onClickEdit">
             <v-icon class="black--text">edit</v-icon>
           </v-btn>
           <v-btn icon :color="info ? 'primary' : 'white'"
@@ -63,6 +65,9 @@
 <script>
 import helper from '../../assets/helper.js'
 import Tags from './Tags'
+
+const path = require('path')
+const fops = require('fs-extra')
 
 export default {
   name: 'view-note',
@@ -113,6 +118,65 @@ export default {
       this.source = null
       this.ready = false
       this.info = false
+    },
+    onClickEdit: function () {
+      this.$store.dispatch('setState', {
+        name: 'edit',
+        state: true,
+        data: this.$store.state.config.viewNote.data
+      })
+    },
+    onClickDelete: function () {
+      const note = Object.assign({}, this.$store.state.config.viewNote.data)
+      const context = this
+      this.$store.dispatch('setState', {
+        name: 'actionDialog',
+        state: true,
+        title: 'Deleting Clip Note',
+        message: `Are you sure about deleting this note "${note.title}"?`,
+        pLabel: 'Yes. Delete this note',
+        nLabel: 'No',
+        pCallback: () => {
+          console.log('delete')
+          context.$store.dispatch('removeEntry', {
+            entry: 'notes',
+            source: note
+          })
+          context.$store.dispatch('setState', {
+            name: 'actionDialog',
+            state: false
+          })
+          context.$root.$emit('sql', {
+            command: 'DELETE',
+            sql: `DELETE FROM notes WHERE id="${note.id}"`
+          })
+          context.$root.$emit('sql', {
+            command: 'DELETE',
+            sql: `DELETE FROM filter WHERE note="${note.id}"`
+          })
+          if (note.type === 'IMAGE') {
+            fops.unlink(path.join(
+              this.$store.state.config.resPath,
+              `${note.thumbnail}.png`
+            ))
+            fops.unlink(path.join(
+              this.$store.state.config.resPath,
+              `${note.path}.png`
+            ))
+          } else {
+            fops.unlink(path.join(
+              this.$store.state.config.resPath,
+              note.path
+            ))
+          }
+        },
+        nCallback: () => {
+          context.$store.dispatch('setState', {
+            name: 'actionDialog',
+            state: false
+          })
+        }
+      })
     }
   }
 }

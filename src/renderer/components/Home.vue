@@ -13,6 +13,7 @@
         src="../assets/logo-hero.png">
     </div>
     <add />
+    <edit />
     <about />
     <generic-message />
     <action-dialog />
@@ -25,6 +26,7 @@
 import Sidebar from './Sidebar'
 import Page from './Page'
 import Add from './Views/Add'
+import Edit from './Views/Edit'
 import About from './Views/About'
 import ViewNote from './Views/ViewNote'
 import GenericMessage from './Views/GenericMessage'
@@ -37,6 +39,7 @@ export default {
     Sidebar,
     Page,
     Add,
+    Edit,
     About,
     GenericMessage,
     ActionDialog,
@@ -58,6 +61,7 @@ export default {
     goBlur () {
       if (
         this.$store.state.config.add.state ||
+        this.$store.state.config.edit.state ||
         this.$store.state.config.about.state ||
         this.$store.state.config.loading.state ||
         this.$store.state.config.genericMessage.state ||

@@ -22,7 +22,8 @@
     <v-card-actions v-if="source">
       <v-spacer></v-spacer>
       <v-btn icon
-        v-if="hoverActions">
+        v-if="hoverActions"
+        @click="onClickEdit">
         <v-icon class="primary--text">edit</v-icon>
       </v-btn>
       <v-btn icon
@@ -81,6 +82,13 @@ export default {
     },
     onMouseOut () {
       this.hoverActions = false
+    },
+    onClickEdit () {
+      this.$store.dispatch('setState', {
+        name: 'edit',
+        state: true,
+        data: Object.assign({}, this.note)
+      })
     },
     onClickDelete () {
       const note = Object.assign({}, this.note)

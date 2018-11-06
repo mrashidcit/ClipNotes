@@ -192,9 +192,7 @@ export default {
       this.clean()
       this.$store.dispatch('setState', {
         name: 'add',
-        state: false,
-        data: null,
-        type: null
+        state: false
       })
     },
     onClickCheck () {
@@ -370,8 +368,8 @@ export default {
             context.$store.dispatch('setState', {
               name: 'nextPageIndexPlusPlus'
             })
-            context.onCloseView()
           }
+          context.onCloseView()
         }
         tid.kill()
       })

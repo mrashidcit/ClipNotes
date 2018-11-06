@@ -7,7 +7,7 @@ const state = {
     data: null,
     type: null
   },
-  delete: {
+  edit: {
     state: false,
     data: null
   },
@@ -60,7 +60,10 @@ const mutations = {
           state.add.type = ('type' in config && config.type) ? config.type : null
           state.add.state = ('state' in config && config.state) ? 1 : 0
           break
-        case 'delete':
+        case 'edit':
+          clearViews()
+          state.edit.data = ('data' in config && config.data) ? config.data : null
+          state.edit.state = ('state' in config && config.state) ? 1 : 0
           break
         case 'viewNote':
           clearViews()
@@ -105,6 +108,7 @@ const mutations = {
           }
           break
         case 'actionDialog':
+          clearViews()
           state.actionDialog.state = ('state' in config && config.state) ? 1 : 0
           state.actionDialog.title = ('title' in config && config.title) ? config.title : ''
           state.actionDialog.message = ('message' in config && config.message) ? config.message : ''
@@ -140,9 +144,17 @@ const actions = {
   }
 }
 
-function clearViews () {
+function clearViews (name) {
+  state.about.state = false
   state.genericMessage.state = false
   state.genericMessage.message = ''
+  state.viewNote.state = false
+  state.viewNote.data = null
+  state.add.state = false
+  state.add.data = null
+  state.add.type = null
+  state.edit.state = false
+  state.edit.data = null
 }
 
 function validate (config) {
