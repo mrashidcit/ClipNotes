@@ -2,7 +2,11 @@ const state = {
   notes: [],
   filter: [],
   tags: [],
-  selected: []
+  selected: [],
+  view: {
+    state: false,
+    source: null
+  }
 }
 
 const mutations = {
@@ -128,6 +132,13 @@ const mutations = {
         default: break
       }
     }
+  },
+  VIEW_NOTE (state, config) {
+    console.log(config)
+    state.view.state = ('state' in config && config.state) ? 1 : 0
+    state.view.source = ('source' in config && config.source.constructor === {}.constructor)
+      ? config.source
+      : null
   }
 }
 
@@ -146,6 +157,9 @@ const actions = {
   },
   updateEntry ({ commit }, config) {
     commit('UPDATE', config)
+  },
+  viewNote ({ commit }, config) {
+    commit('VIEW_NOTE', config)
   }
 }
 

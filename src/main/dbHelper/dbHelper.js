@@ -23,7 +23,7 @@ function DbHelper (props) {
  * Initialize SQL database
  */
 DbHelper.prototype.init = () => {
-  // Ensure .briefnote directory
+  // Ensure .clipnotes directory
   fops.ensureDirSync(
     nodePath.join(
       config.homedir,

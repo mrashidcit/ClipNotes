@@ -27,7 +27,7 @@ This is one way of collecing notes. But, NOT faster or efficient way to do. You 
 So, **brifnote** is a simple tool which can store random information that you find in the internet and assign tags to them for future quick reference.
 
 ## Development Instructions
-This project is created using [electron-vue](https://github.com/SimulatedGREG/electron-vue) template. Apart from this template and application dependencies, you need to have following setup to start developing/debugging *briefnote* application.
+This project is created using [electron-vue](https://github.com/SimulatedGREG/electron-vue) template. Apart from this template and application dependencies, you need to have following setup to start developing/debugging *clipnotes* application.
 * *Windows* or *OSX* or *Linux* OS platform
 * *NodeJs* standard version
 

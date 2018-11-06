@@ -11,7 +11,7 @@ const state = {
     state: false,
     data: null
   },
-  preview: {
+  viewNote: {
     state: false,
     data: null
   },
@@ -53,7 +53,10 @@ const mutations = {
           break
         case 'delete':
           break
-        case 'preview':
+        case 'viewNote':
+          clearViews()
+          state.viewNote.state = ('state' in config && config.state) ? 1 : 0
+          state.viewNote.data = ('data' in config && config.data) ? config.data : null
           break
         case 'genericMessage':
           clearViews()
