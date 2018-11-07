@@ -33,7 +33,15 @@
       v-model="strictFilterState">
       </v-switch>
     </div>
-    <v-subheader>Filter Notes with Tags</v-subheader>
+    <v-layout row>
+      <v-subheader>Filter Notes with Tags</v-subheader>
+      <v-spacer></v-spacer>
+      <v-btn small depressed color="grey" round
+        @click="clearTags"
+        class="white--text" style="margin: 10px 5px;">
+        Clear Tags
+      </v-btn>
+    </v-layout>
     <div class="sidebar-tags">
       <v-combobox
         v-model="select" ref="sidebarFilter"
@@ -107,6 +115,11 @@ export default {
     })
   },
   methods: {
+    clearTags () {
+      if (this.select.length > 0) {
+        this.select = Object.assign([], [])
+      }
+    },
     onChangeFilter () {
       if (
         this.select &&

@@ -5,7 +5,7 @@
       <div class="wrapper hero-x"
         style="width: 600px">
         <v-layout row>
-          <h1>{{ $store.state.config.edit.data.title || 'Note Title'}}</h1>
+          <h1>{{ title || 'Untitled Title Note*'}}</h1>
           <v-spacer></v-spacer>
           <v-btn icon color="red"
             @click="onCloseView">
@@ -70,9 +70,9 @@
             </v-btn>
           </v-btn-toggle>
         </v-layout>
-        <p v-if="$store.state.config.add.type === 'TEXT' && !loading" contenteditable="true"
+        <p v-if="type === 'TEXT' && !loading" contenteditable="true"
           style="padding: 10px;" id="add-note-text"
-          v-html="`<p style='font-size: 25px;'>${$store.state.config.add.data}</p>`"></p>
+          v-html="`<p style='font-size: 25px;'>${source}</p>`"></p>
         <v-card flat height="200"
           color="transparent"
           v-if="loading">
@@ -93,6 +93,8 @@
 
 <script>
 import helper from '../../assets/helper.js'
+
+const uid = require('uniqid')
 
 export default {
   name: 'edit',
@@ -127,7 +129,7 @@ export default {
               context.$store.state.config.edit.data.title
             context.description =
               context.$store.state.config.edit.data.description
-            context.updateTags()
+            context.updateView()
           }, 100)
         })
       }
@@ -150,9 +152,164 @@ export default {
       })
     },
     onClickCheck () {
-      console.log('onClickCheck')
+      const context = this
+      if (
+        this.title
+      ) {
+        if (context.select.length < 1) {
+          context.select.push('unlisted')
+        }
+        const note = context.$store.state.config.edit.data
+        const selection = createNewTagsIfAny(
+          this.$store.state.notes.tags,
+          this.select
+        )
+        // TAGS
+        const tags = Object.assign([], this.$store.state.notes.tags)
+        selection._newTags.forEach((newTag) => {
+          let targetIndex = tags.findIndex(x => x.id === newTag.id)
+          if (targetIndex < 0) {
+            // update tags in store
+            context.$store.dispatch('addEntry', {
+              entry: 'tags',
+              source: newTag
+            })
+            // update tags in database
+            context.$root.$emit('sql', {
+              command: 'ADD',
+              sql: `INSERT INTO tags(id, title, value) VALUES(?,?,?)`,
+              data: [newTag.id, newTag.title, newTag.value]
+            })
+          }
+        })
+        // Filter
+        const filter = Object.assign([], this.$store.state.notes.filter)
+        // Filter: new tags
+        selection._newTags.forEach((newTag) => {
+          const targetIndex = filter.findIndex(x => (x.note === note.id && x.tag === newTag.id))
+          if (targetIndex < 0) {
+            // Update filter in store
+            context.$store.dispatch('addEntry', {
+              entry: 'filter',
+              source: {
+                note: note.id,
+                tag: newTag.id
+              }
+            })
+            // Update filter in databse
+            context.$root.$emit('sql', {
+              command: 'ADD',
+              sql: `INSERT INTO filter(note,tag) VALUES(?,?)`,
+              data: [note.id, newTag.id]
+            })
+          }
+        })
+        // Filter: old tags
+        selection._oldTags.forEach((oldTag) => {
+          const targetIndex = filter.findIndex(x => (x.note === note.id && x.tag === oldTag.id))
+          if (targetIndex < 0) {
+            // Update filter in store
+            context.$store.dispatch('addEntry', {
+              entry: 'filter',
+              source: {
+                note: note.id,
+                tag: oldTag.id
+              }
+            })
+            // Update filter in databse
+            context.$root.$emit('sql', {
+              command: 'ADD',
+              sql: `INSERT INTO filter(note,tag) VALUES(?,?)`,
+              data: [note.id, oldTag.id]
+            })
+          }
+        })
+        // Remove unnecessry filter entries
+        filter.forEach((filterItem) => {
+          if (filterItem.note === note.id) {
+            let rFlag = true
+            for (let index = 0; index < context.select.length; index++) {
+              if (
+                context.select[index] &&
+                context.select[index].constructor === {}.constructor &&
+                context.select[index].id === filterItem.tag
+              ) {
+                rFlag = false
+                break
+              } else if (
+                context.select[index] &&
+                typeof context.select[index] === 'string'
+              ) {
+                const tagId = helper.getTagIdFromValue(
+                  context.select[index],
+                  context.$store.state.notes.tags
+                )
+                if (tagId && tagId === filterItem.tag) {
+                  rFlag = false
+                  break
+                }
+              }
+            }
+            if (rFlag) {
+              // Remove from store
+              context.$store.dispatch('removeEntry', {
+                entry: 'filter',
+                source: filterItem
+              })
+              // Remove from sql
+              context.$root.$emit('sql', {
+                command: 'DELETE',
+                sql: `DELETE FROM filter WHERE note="${filterItem.note}" AND tag="${filterItem.tag}"`
+              })
+            }
+          }
+        })
+        // Note
+        // Note: update store
+        this.$store.dispatch('updateEntry', {
+          entry: 'notes',
+          source: {
+            id: note.id,
+            title: this.title,
+            description: this.description
+          }
+        })
+        // Note: update database
+        this.$root.$emit('sql', {
+          command: 'UPDATE',
+          sql: `UPDATE notes set title="${this.title}", description="${this.description}" WHERE id="${note.id}"`
+        })
+        this.$store.dispatch('setState', {
+          name: 'edit',
+          state: false
+        })
+      } else {
+        // Title is required for editing notes.
+        const title = this.$store.state.config.edit.data.title
+        this.$store.dispatch('setState', {
+          name: 'actionDialog',
+          state: true,
+          title: 'Untitle Note',
+          message:
+            `Note title shouldn't be empty. Do you want to use previous title "${title}"?`,
+          pCallback: function () {
+            context.title = title
+            context.$store.dispatch('setState', {
+              name: 'actionDialog',
+              state: false
+            })
+          },
+          nLabel: 'I will provide new title',
+          nCallback: function () {
+            context.$store.dispatch('setState', {
+              name: 'actionDialog',
+              state: false
+            })
+          }
+        })
+      }
     },
-    updateTags () {
+    updateView () {
       const tagsAssciated = helper.getTagsFromNote(
         this.$store.state.config.edit.data,
         this.$store.state.notes.filter,
@@ -171,7 +328,7 @@ export default {
   }
 }
 
-/* function createNewTagsIfAny (source, select) {
+function createNewTagsIfAny (source, select) {
   const newTags = []
   const oldTags = []
   if (
@@ -209,10 +366,9 @@ export default {
       }
     })
   }
-  console.log('old tags', oldTags)
   return {
     _newTags: newTags,
     _oldTags: oldTags
   }
-} */
+}
 </script>

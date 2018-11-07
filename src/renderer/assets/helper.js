@@ -98,12 +98,25 @@ const helper = {
         ) {
           const tagIndex = tags.findIndex(x => x.id === filterItem.tag)
           if (tagIndex > -1) {
-            tagsAssociated.push(tags[tagIndex].title)
+            tagsAssociated.push(tags[tagIndex])
           }
         }
       })
     }
     return tagsAssociated
+  },
+  getTagIdFromValue: function (value, tags) {
+    if (
+      value && typeof value === 'string' &&
+      tags && tags.constructor === [].constructor &&
+      tags.length > 0
+    ) {
+      const tIndex = tags.findIndex(x => x.value === value)
+      if (tIndex > -1) {
+        return tags[tIndex].id
+      }
+    }
+    return null
   }
 }
 

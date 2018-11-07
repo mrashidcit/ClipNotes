@@ -119,6 +119,18 @@ const mutations = {
           }
           break
         case 'filter':
+          if ('tag' in config.source && 'note' in config.source) {
+            const targetIndex = state.filter.findIndex(
+              x =>
+                (
+                  x.tag === config.source.tag &&
+                  x.note === config.source.note
+                )
+            )
+            if (targetIndex > -1) {
+              state.filter.splice(targetIndex, 1)
+            }
+          }
           break
         case 'tags':
           break
@@ -142,6 +154,15 @@ const mutations = {
     if (validate(config)) {
       switch (config.entry) {
         case 'notes':
+          if (
+            'title' in config.source && 'description' in config.source && 'id' in config.source
+          ) {
+            const targetIndex = state.notes.findIndex(x => x.id === config.source.id)
+            if (targetIndex > -1) {
+              state.notes[targetIndex].title = config.source.title
+              state.notes[targetIndex].description = config.source.description
+            }
+          }
           break
         case 'filter':
           break

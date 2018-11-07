@@ -66,12 +66,10 @@ const mutations = {
           state.edit.state = ('state' in config && config.state) ? 1 : 0
           break
         case 'viewNote':
-          clearViews()
           state.viewNote.state = ('state' in config && config.state) ? 1 : 0
           state.viewNote.data = ('data' in config && config.data) ? config.data : null
           break
         case 'genericMessage':
-          clearViews()
           state.genericMessage.state = ('state' in config && config.state) ? 1 : 0
           state.genericMessage.data = ('data' in config && config.data) ? config.data : null
           break
@@ -108,7 +106,6 @@ const mutations = {
           }
           break
         case 'actionDialog':
-          clearViews()
           state.actionDialog.state = ('state' in config && config.state) ? 1 : 0
           state.actionDialog.title = ('title' in config && config.title) ? config.title : ''
           state.actionDialog.message = ('message' in config && config.message) ? config.message : ''

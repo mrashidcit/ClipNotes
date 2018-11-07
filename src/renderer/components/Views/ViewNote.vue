@@ -3,8 +3,10 @@
     <div class="glass-view"
        v-if="$store.state.config.viewNote.state">
       <div id="note-view-image">
+        <transition name="fade">
         <img :src="source" class="hero-x-y fit-image"
           v-if="'type' in $store.state.config.viewNote.data && $store.state.config.viewNote.data.type === 'IMAGE' && ready">
+        </transition>
       </div>
       <div class="hero-x fit-text"
         v-if="'type' in $store.state.config.viewNote.data && $store.state.config.viewNote.data.type === 'TEXT' && ready"

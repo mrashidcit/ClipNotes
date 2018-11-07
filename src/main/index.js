@@ -96,6 +96,9 @@ ipcMain.on('sql', function (event, config) {
         break
       case 'UPDATE':
         console.log('UPDATE', config)
+        db.update({
+          sql: config.sql
+        })
         break
       case 'ADD':
         if ('data' in config) {
