@@ -21,9 +21,9 @@
     "pack:renderer": "cross-env NODE_ENV=production webpack --progress --colors --config .electron-vue/webpack.renderer.config.js",
     "test": "npm run unit && npm run e2e",
     "unit": "karma start test/unit/karma.conf.js",
-    "postinstall": "npm run lint:fix",
+    "postinstall": "npm run electron-rebuild",
     "platformInstall": "./node_modules/.bin/npmpd .",
-    "rebuild-for-electron": "./node_modules/.bin/electron-rebuild ."
+    "electron-rebuild": "./node_modules/.bin/electron-rebuild ."
   },
   "build": {
     "productName": "clipnotes",
