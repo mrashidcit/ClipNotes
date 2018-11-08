@@ -330,4 +330,28 @@ function proportionalScale (originalSize, newSize) {
     overflow-x: hidden;
     overflow-y: auto;
   }
+  .important-info-box {
+    background-color: rgba(60, 169, 113, 0.322);
+    height: auto;
+    padding: 10px;
+    width: 300px;
+    margin: 10px 0;
+    border-style: solid;
+    border-color: rgba(41, 56, 75, 0.486);
+    border-width: 5px;
+  }
+  .important-info-box > p {
+    font-size: 14px;
+    margin: 0;
+    color: black;
+  }
+  .text-light-weight {
+    font-weight: 300;
+  }
+  .text-primary {
+    color: #30A05D;
+  }
+  .text-secondary {
+    color: #29384B;
+  }
 </style>

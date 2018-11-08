@@ -25,7 +25,16 @@ function MenuTemplate (_config) {
         label: 'Notes',
         submenu: [
           {
-            label: 'Create Note',
+            label: 'New Note',
+            accelerator: 'CmdOrCtrl+N',
+            click () {
+              _config.window.webContents.send('onMenuItemClick', {
+                label: 'new_note'
+              })
+            }
+          },
+          {
+            label: 'Save Note',
             accelerator: 'CmdOrCtrl+S',
             click () {
               _config.window.webContents.send('onMenuItemClick', {

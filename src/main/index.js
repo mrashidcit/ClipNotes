@@ -17,6 +17,14 @@ const DbHelper = require('./dbHelper/dbHelper')
 const db = new DbHelper()
 db.init() // Initialize Database
 
+if (process.platform === 'darwin') {
+  app.setAboutPanelOptions({
+    applicationName: 'ClipNotes',
+    applicationVersion: '0.0.2',
+    copyright: 'Copyright © 2018 XploreBits Technologies. All rights reserved.'
+  })
+}
+
 /**
  * Menu Template
  */

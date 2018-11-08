@@ -66,6 +66,7 @@
     "fs-extra": "^7.0.0",
     "jimp": "^0.5.3",
     "jquery": "^3.3.1",
+    "marked": "^0.5.1",
     "material-design-icons-iconfont": "^3.0.3",
     "normalize-url": "^3.3.0",
     "read-chunk": "^3.0.0",

@@ -2,6 +2,9 @@ const state = {
   about: {
     state: false
   },
+  new: {
+    state: false
+  },
   add: {
     state: false,
     data: null,
@@ -59,6 +62,10 @@ const mutations = {
           state.add.data = ('data' in config && config.data) ? config.data : null
           state.add.type = ('type' in config && config.type) ? config.type : null
           state.add.state = ('state' in config && config.state) ? 1 : 0
+          break
+        case 'new':
+          clearViews()
+          state.new.state = ('state' in config && config.state) ? 1 : 0
           break
         case 'edit':
           clearViews()

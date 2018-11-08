@@ -3,6 +3,27 @@
     <div class="sidebar-title">
       <img class="logo" src="../assets/logo-hero.png">
       <div class="options">
+        <v-tooltip bottom
+          color="white">
+          <v-btn icon small flat
+            slot="activator"
+            @click="onClickToPaste">
+            <v-icon class="primary--text">assignment_returned</v-icon>
+          </v-btn>
+          <span class="black--text">Paste</span>
+        </v-tooltip>
+        <!-- <v-tooltip bottom
+          color="white">
+          <v-btn icon small flat
+            slot="activator"
+            @click="$store.dispatch('setState', {
+              name: 'new',
+              state: true
+            })">
+            <v-icon class="black--text">add</v-icon>
+          </v-btn>
+          <span class="black--text">New note</span>
+        </v-tooltip> -->
         <v-menu
           offset-y>
           <v-btn icon small 
@@ -24,7 +45,7 @@
     <div class="sidebar-info">
       <v-subheader>Total Filtered Notes</v-subheader>
       <p class="filter-count">
-        {{$store.state.notes.selected.length > 0
+        {{$store.state.config.tagSelection.length > 0
           ? $store.state.notes.selected.length
           : $store.state.notes.notes.length}}
       </p>
@@ -109,12 +130,21 @@ export default {
           case 'filter':
             context.$refs.sidebarFilter.focus()
             break
+          /* case 'new_note':
+            context.$store.dispatch('setState', {
+              name: 'new',
+              state: true
+            })
+            break */
           default: break
         }
       }
     })
   },
   methods: {
+    onClickToPaste () {
+      document.execCommand('paste')
+    },
     clearTags () {
       if (this.select.length > 0) {
         this.select = Object.assign([], [])

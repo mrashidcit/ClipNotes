@@ -5,7 +5,7 @@
       <div class="wrapper hero-x"
         style="width: 600px">
         <v-layout row>
-          <h1>{{ name || `New Note`}}</h1>
+          <h1>{{ name || `Untitled Note`}}</h1>
           <v-spacer></v-spacer>
           <v-btn icon color="red"
             @click="onCloseView">

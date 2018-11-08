@@ -9,7 +9,7 @@
     </transition>
     <div class="hero-x-y"
       v-if="$store.state.config.loader.state">
-      <img style="height: 120px;width: auto;"
+      <img style="height: 100px;width: auto;"
         src="../assets/logo-hero.png">
     </div>
     <add />
