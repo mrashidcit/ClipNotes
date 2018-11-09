@@ -57,10 +57,12 @@
           <p>There are no notes available for selected tags.</p>
           <div v-if="$store.state.config.strictFilter.state">
             <h2 class="text-primary">
-              Hard Filter Enabled!
+              Strict Filter Enabled!
             </h2>
             <div class="important-info-box">
-              <p>Warning: ClipNotes will filter notes for the <strong> exact combination of selected tags</strong>.</p>
+              <p><strong>
+                Strict Filter will only show notes having all selected tags.
+              </strong>.</p>
             </div>
           </div>
        </div>

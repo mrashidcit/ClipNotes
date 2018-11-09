@@ -8,7 +8,7 @@ Clipboard based note taking application for Windows and Mac.
 </p>
 
 <p align="center">
-  <img src="screenshots/Screen Shot 2018-10-07 at 12.27.44 AM.png"
+  <img src="screenshots/Screenshot 2018-11-09 at 3.00.27 PM.png"
     height="auto" width="auto"/>
 </p>
 
