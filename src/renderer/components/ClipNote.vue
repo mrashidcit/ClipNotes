@@ -9,9 +9,9 @@
     ></v-img>
     <v-card-title primary-title
       v-if="source">
-      <div class="text-clamp" single-line>
-        <h3 class="headline mb-0">{{note.title}}</h3>
-        <div v-if="note.type === 'IMAGE'">{{note.description || 'No Description'}}</div>
+      <div>
+        <h3 class="headline mb-0 text-clamp" >{{note.title}}</h3>
+        <div class="text-clamp" v-if="note.type === 'IMAGE'">{{note.description || 'No Description'}}</div>
       </div>
     </v-card-title>
     <v-card-text
