@@ -8,6 +8,9 @@
 const { ipcRenderer, clipboard } = require('electron')
 const os = require('os')
 const path = require('path')
+const isUrl = require('is-url')
+const grabity = require('grabity')
+const base64Img = require('base64-img')
 
 export default {
   name: 'app',
@@ -151,13 +154,68 @@ export default {
           ) {
             // Found Text
             console.log('app:onPaste:darwin:hasText')
-            console.log(clipboard.readRTF())
-            this.$store.dispatch('setState', {
-              name: 'add',
-              state: true,
-              data: clipboard.readText(),
-              type: 'TEXT'
-            })
+            if (isUrl(clipboard.readText())) {
+              const url = clipboard.readText()
+              context.$store.dispatch('setState', {
+                name: 'loading',
+                state: true
+              })
+              generateBookmarkCard(url).then(function (data) {
+                const imageHtmlWrapper =
+                  `${data.imageDataUrl.split('base64,')[1] &&
+                    data.imageDataUrl.split('data:')[1].split(';')[0].includes('image')
+                    ? `<div style="position: relative;cursor: pointer;">
+                        <img style="height: 200px; width: 100%;" src="${data.imageDataUrl}">
+                        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+                          text-align: center;color: #FFFFFF;overflow: hidden; width: 90%;
+                          border-style: solid; border-color: #FFFFFF; border-weight: 1px; background: rgba(0, 93, 187, 0.8);
+                          box-shadow: 2px 2px 8px #888888; padding: 10px; -webkit-box-orient: vertical;
+                          -webkit-touch-callout: none; user-select: none;">
+                          <h1 style="overflow: hidden; display: -webkit-box;-webkit-line-clamp: 2; -webkit-box-orient: vertical;">
+                            <strong>${data.info.title.replace(/</g, '&lt;')}</strong>
+                          </h1>
+                          <p style="overflow: hidden; display: -webkit-box;-webkit-line-clamp: 2; -webkit-box-orient: vertical;">
+                            ${data.info.description}
+                          </p>
+                        </div>
+                      </div>
+                      </div>`
+                    : `<div style="position: relative; height: 200px; widht: 100%;background: #37AD70;cursor: pointer;">
+                        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+                          text-align: center;color: #FFFFFF;overflow: hidden; width: 90%;
+                          border-style: solid; border-color: #FFFFFF; border-weight: 1px; background: rgba(0, 93, 187, 0.8);
+                          box-shadow: 2px 2px 8px #888888; padding: 10px;
+                          -webkit-box-orient: vertical; -webkit-touch-callout: none; user-select: none;">
+                          <h1 style="overflow: hidden; display: -webkit-box;-webkit-line-clamp: 2; -webkit-box-orient: vertical;">
+                            <strong>${data.info.title.replace(/</g, '&lt;')}</strong>
+                          </h1>
+                          <p style="overflow: hidden; display: -webkit-box;-webkit-line-clamp: 2; -webkit-box-orient: vertical;">
+                            ${data.info.description}
+                          </p>
+                        </div>
+                      </div>`
+                  }
+                  `
+                context.$store.dispatch('setState', {
+                  name: 'add',
+                  state: true,
+                  data: {
+                    title: data.info.title,
+                    bookmark: imageHtmlWrapper,
+                    description: data.info.description,
+                    url: url
+                  },
+                  type: 'BOOKMARK'
+                })
+              })
+            } else {
+              this.$store.dispatch('setState', {
+                name: 'add',
+                state: true,
+                data: clipboard.readHTML(),
+                type: 'TEXT'
+              })
+            }
           }
           break
         case 'linux':
@@ -168,6 +226,31 @@ export default {
       }
     }
   }
+}
+async function generateBookmarkCard (url) {
+  const promise = new Promise(function (resolve, reject) {
+    (async () => {
+      let urlPoint = await grabity.grabIt(url)
+      if (
+        urlPoint.constructor === {}.constructor &&
+        'image' in urlPoint &&
+        urlPoint.image && isUrl(urlPoint.image)
+      ) {
+        base64Img.requestBase64(urlPoint.image, function (err, res, body) {
+          if (err) {
+            reject(err)
+          } else {
+            resolve({
+              imageDataUrl: body,
+              info: urlPoint
+            })
+          }
+        })
+      }
+    })()
+  })
+  await promise
+  return promise
 }
 async function getImageData () {
   const promise = new Promise(function (resolve, reject) {

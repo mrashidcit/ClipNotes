@@ -5,11 +5,16 @@
       <div id="note-view-image">
         <transition name="fade">
         <img :src="source" class="hero-x-y fit-image"
-          v-if="'type' in $store.state.config.viewNote.data && $store.state.config.viewNote.data.type === 'IMAGE' && ready">
+          v-if="'type' in $store.state.config.viewNote.data &&
+            $store.state.config.viewNote.data.type === 'IMAGE' &&
+            ready">
         </transition>
       </div>
       <div class="hero-x fit-text"
-        v-if="'type' in $store.state.config.viewNote.data && $store.state.config.viewNote.data.type === 'TEXT' && ready"
+        v-if="'type' in $store.state.config.viewNote.data &&
+          ($store.state.config.viewNote.data.type === 'TEXT' ||
+          $store.state.config.viewNote.data.type === 'BOOKMARK') &&
+          ready"
         v-html="source"></div>
       <v-toolbar fixed color="transparent" flat>
         <v-toolbar-title style="background: white;padding: 10px 20px;">

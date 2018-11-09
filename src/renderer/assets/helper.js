@@ -24,7 +24,7 @@ const helper = {
         ) + '.png'
       )
       source = fileUrl
-    } else if (note.type === 'TEXT') {
+    } else if (note.type === 'TEXT' || note.type === 'BOOKMARK') {
       source = fops.readFileSync(
         path.join(
           resPath,

@@ -8,9 +8,9 @@
       aspect-ratio="2.85"
     ></v-img>
     <v-card-title primary-title
-      v-if="source">
+      v-if="source && note.type !== 'BOOKMARK'">
       <div>
-        <h3 class="headline mb-0 text-clamp" >{{note.title}}</h3>
+        <h3 class="headline mb-0 text-clamp">{{note.title}}</h3>
         <div class="text-clamp" v-if="note.type === 'IMAGE'">{{note.description || 'No Description'}}</div>
       </div>
     </v-card-title>
@@ -19,6 +19,9 @@
       class="text-clamp"
       v-html="`${source}`">
     </v-card-text>
+    <div v-if="note.type === 'BOOKMARK' && source"
+      v-html="`${source}`">
+    </div>
     <v-card-actions v-if="source">
       <v-spacer></v-spacer>
       <v-btn icon
@@ -159,7 +162,7 @@ export default {
           ) + '.png'
         )
         context.source = fileUrl
-      } else if (note.type === 'TEXT') {
+      } else if (note.type === 'TEXT' || note.type === 'BOOKMARK') {
         fops.readFile(
           path.join(
             this.$store.state.config.resPath,
@@ -192,6 +195,12 @@ export default {
         }
         switch (note.type) {
           case 'TEXT':
+            filePath = path.join(
+              this.$store.state.config.resPath,
+              note.path
+            )
+            break
+          case 'BOOKMARK':
             filePath = path.join(
               this.$store.state.config.resPath,
               note.path

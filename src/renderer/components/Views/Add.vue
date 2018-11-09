@@ -5,7 +5,14 @@
       <div class="wrapper hero-x"
         style="width: 600px">
         <v-layout row>
-          <h1>{{ name || `Untitled Note`}}</h1>
+          <h1>{{
+            ( $store.state.config.add.data.constructor === {}.constructor &&
+              'description' in $store.state.config.add.data && (description = $store.state.config.add.data.description) &&
+              'title' in $store.state.config.add.data && (name = $store.state.config.add.data.title)
+            ) ||
+            name ||
+            `Untitled Note`}}
+          </h1>
           <v-spacer></v-spacer>
           <v-btn icon color="red"
             @click="onCloseView">
@@ -33,6 +40,12 @@
           label="Select Tags"
           multiple chips>
         </v-combobox>
+        <v-card flat style="min-height: 250px;height: 300px;"
+          v-if="$store.state.config.add.type === 'BOOKMARK'">
+        <div @click="openBookmark"
+          v-html="`${$store.state.config.add.data.bookmark}`">
+        </div>
+        </v-card>
         <v-img v-if="$store.state.config.add.type === 'IMAGE'"
           :src="`${$store.state.config.add.data.lQuality}`">
         </v-img>
@@ -70,7 +83,7 @@
         </v-layout>
         <p v-if="$store.state.config.add.type === 'TEXT' && !loading" contenteditable="true"
           style="padding: 10px;" id="add-note-text"
-          v-html="`<p style='font-size: 25px;'>${$store.state.config.add.data}</p>`"></p>
+          v-html="`<p style='font-size: 25px !important;'>${$store.state.config.add.data}</p>`"></p>
         <v-card flat height="200"
           color="transparent"
           v-if="loading">
@@ -147,6 +160,11 @@ export default {
     init () {
       console.log('app:add:init')
     },
+    openBookmark () {
+      this.$electron.shell.openExternal(
+        this.$store.state.config.add.data.url
+      )
+    },
     createNoteObject () {
       let object = null
       const config = this.$store.state.config.add
@@ -174,6 +192,16 @@ export default {
               path: `${((this.name).replace(/ /g, '_') || 'Untitled_note_') + '-' + _id}`,
               id: _id,
               thumbnail: `.t_${((this.name).replace(/ /g, '_') || 'Untitled_note_') + '-' + _id}`
+            }
+            break
+          case 'BOOKMARK':
+            object = {
+              title: this.name || 'Untitled Note',
+              description: this.description || '',
+              type: 'BOOKMARK',
+              path: `${((this.name).replace(/ /g, '_') || 'Untitled_note_') + '-' + _id}.html`,
+              id: _id,
+              thumbnail: null
             }
             break
           default: break
@@ -217,6 +245,8 @@ export default {
           // Source Data cleared
           return
         }
+      } else if (noteObj.type === 'BOOKMARK') {
+        sourceData = this.$store.state.config.add.data.bookmark
       } else {
         if (
           !this.$store.state.config.add.data.lQuality ||
@@ -235,7 +265,7 @@ export default {
           ? context.$store.state.config.add.data.thumbnail
           : null,
         resPath: context.$store.state.config.resPath,
-        sourceData: noteObj.type === 'TEXT'
+        sourceData: (noteObj.type === 'TEXT' || noteObj.type === 'BOOKMARK')
           ? sourceData
           : null
       })
@@ -392,7 +422,7 @@ function thandler (input, done) {
       input.resPath,
       input.note.path
     )
-    if (input.note.type === 'TEXT') {
+    if (input.note.type === 'TEXT' || input.note.type === 'BOOKMARK') {
       // Save HTML file and done
       if ('sourceData' in input && input.sourceData) {
         fops.writeFile(

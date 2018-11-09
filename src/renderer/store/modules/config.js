@@ -148,7 +148,7 @@ const actions = {
   }
 }
 
-function clearViews (name) {
+function clearViews () {
   state.about.state = false
   state.genericMessage.state = false
   state.genericMessage.message = ''
@@ -159,6 +159,7 @@ function clearViews (name) {
   state.add.type = null
   state.edit.state = false
   state.edit.data = null
+  state.loading.state = false
 }
 
 function validate (config) {
