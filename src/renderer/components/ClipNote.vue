@@ -1,11 +1,11 @@
 <template>
-  <v-card flat tile style="margin: 10px;min-height: 250px;"
+  <v-card flat tile style="margin: 10px;height: 250px;"
     @mouseover="onMouseOver" @mouseout="onMouseOut">
     <v-img
       v-if="note.type === 'IMAGE'"
       :src="`${source}`"
       :lazy-src="`${lazySrc}`"
-      aspect-ratio="2.85"
+      aspect-ratio="3.20"
     ></v-img>
     <v-card-title primary-title
       v-if="source && note.type !== 'BOOKMARK'">
@@ -15,14 +15,16 @@
       </div>
     </v-card-title>
     <v-card-text
+      style="height: 100px;"
       v-if="note.type === 'TEXT' && source"
       class="text-clamp"
       v-html="`${source}`">
     </v-card-text>
     <div v-if="note.type === 'BOOKMARK' && source"
+      @click="openUrl"
       v-html="`${source}`">
     </div>
-    <v-card-actions v-if="source">
+    <v-layout row class="card-actions" v-if="source">
       <v-spacer></v-spacer>
       <v-btn icon
         v-if="hoverActions"
@@ -34,11 +36,15 @@
         @click="onClickDelete">
         <v-icon class="red--text">delete</v-icon>
       </v-btn>
-      <v-btn icon
+      <v-btn icon v-if="note.type !== 'BOOKMARK'"
         @click="onViewNote">
         <v-icon class="secondary--text">zoom_out_map</v-icon>
       </v-btn>
-    </v-card-actions>
+      <v-btn icon v-if="note.type === 'BOOKMARK'"
+        @click="openUrl">
+        <v-icon class="secondary--text">open_in_browser</v-icon>
+      </v-btn>
+    </v-layout>
     <div class="hero-x-y"
       v-if="!source"
       :load-source="getPath(note)">
@@ -58,6 +64,7 @@ const path = require('path')
 const Spawn = require('threads').spawn
 const normalizeUrl = require('normalize-url')
 const lazyImage = require('../assets/lazyImage.js')
+const isUrl = require('is-url')
 
 export default {
   name: 'clip-note',
@@ -85,6 +92,19 @@ export default {
     },
     onMouseOut () {
       this.hoverActions = false
+    },
+    openUrl () {
+      if (
+        'description' in this.note &&
+        'type' in this.note &&
+        this.note.type === 'BOOKMARK' &&
+        this.note.description
+      ) {
+        const url = JSON.parse(this.note.description).url
+        if (isUrl(url)) {
+          this.$electron.shell.openExternal(url)
+        }
+      }
     },
     onClickEdit () {
       this.$store.dispatch('setState', {
@@ -259,4 +279,3 @@ function threadHandler (input, done) {
   )
 }
 </script>
-

@@ -5,7 +5,14 @@
       <div class="wrapper hero-x"
         style="width: 600px">
         <v-layout row>
-          <h1>{{ title || 'Untitled Title Note*'}}</h1>
+          <h1>{{
+            ( $store.state.config.edit.data.constructor === {}.constructor &&
+              'description' in $store.state.config.edit.data && (description = $store.state.config.edit.data.description) &&
+              'title' in $store.state.config.edit.data && (name = $store.state.config.edit.data.title)
+            ) ||
+            name ||
+            `Untitled Note`}}
+          </h1>
           <v-spacer></v-spacer>
           <v-btn icon color="red"
             @click="onCloseView">
@@ -33,6 +40,11 @@
           label="Select Tags"
           multiple chips>
         </v-combobox>
+        <v-card flat style="min-height: 250px;height: 300px;"
+          v-if="$store.state.config.edit.data.type === 'BOOKMARK'">
+          <div v-html="source">
+          </div>
+        </v-card>
         <transition name="fade">
           <v-img v-if="type === 'IMAGE' && ready"
             :src="source" style="width: auto; height: 100%">

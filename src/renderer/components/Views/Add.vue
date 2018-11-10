@@ -42,9 +42,9 @@
         </v-combobox>
         <v-card flat style="min-height: 250px;height: 300px;"
           v-if="$store.state.config.add.type === 'BOOKMARK'">
-        <div @click="openBookmark"
-          v-html="`${$store.state.config.add.data.bookmark}`">
-        </div>
+          <div @click="openBookmark"
+            v-html="`${$store.state.config.add.data.bookmark}`">
+          </div>
         </v-card>
         <v-img v-if="$store.state.config.add.type === 'IMAGE'"
           :src="`${$store.state.config.add.data.lQuality}`">
@@ -197,9 +197,12 @@ export default {
           case 'BOOKMARK':
             object = {
               title: this.name || 'Untitled Note',
-              description: this.description || '',
+              description: JSON.stringify({
+                text: this.description || '',
+                url: this.$store.state.config.add.data.url
+              }),
               type: 'BOOKMARK',
-              path: `${((this.name).replace(/ /g, '_') || 'Untitled_note_') + '-' + _id}.html`,
+              path: `${((this.name).replace(/ /g, '_').replace(/\//g, '-') || 'Untitled_note_') + '-' + _id}.html`,
               id: _id,
               thumbnail: null
             }
@@ -255,6 +258,7 @@ export default {
           return
         }
       }
+      console.log(noteObj)
       const tid = new Spawn(thandler)
       tid.send({
         note: noteObj,
@@ -430,6 +434,7 @@ function thandler (input, done) {
           input.sourceData,
           'utf8',
           function (err) {
+            console.log(err)
             if (err) {
               done({
                 state: false,

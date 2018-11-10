@@ -431,4 +431,12 @@ function proportionalScale (originalSize, newSize) {
   .text-secondary {
     color: #29384B;
   }
+  .card-actions {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    line-height: 50px;
+    background: #FFFFFF;
+  }
 </style>
