@@ -54,7 +54,11 @@
             </h1>
           </div>
           <p style="font-size: 18px; color: grey; min-height: 50px;">
-            {{$store.state.config.viewNote.data.description || 'No Description'}}
+            {{
+              ($store.state.config.viewNote.data.type === 'BOOKMARK' &&
+                JSON.parse($store.state.config.viewNote.data.description).text) || 
+              $store.state.config.viewNote.data.description || 'No Description'
+            }}
           </p>
           <h4>
             Tags Assiciated

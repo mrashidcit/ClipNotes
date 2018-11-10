@@ -10,7 +10,6 @@
               'description' in $store.state.config.edit.data && (description = $store.state.config.edit.data.description) &&
               'title' in $store.state.config.edit.data && (name = $store.state.config.edit.data.title)
             ) ||
-            name ||
             `Untitled Note`}}
           </h1>
           <v-spacer></v-spacer>

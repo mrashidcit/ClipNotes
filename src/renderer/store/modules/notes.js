@@ -133,6 +133,17 @@ const mutations = {
           }
           break
         case 'tags':
+          if ('id' in config.source && config.source.id) {
+            const targetIndex = state.tags.findIndex(
+              x =>
+                (
+                  x.id === config.source.id
+                )
+            )
+            if (targetIndex > -1) {
+              state.tags.splice(targetIndex, 1)
+            }
+          }
           break
         case 'selected':
           if (

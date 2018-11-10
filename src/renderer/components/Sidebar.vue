@@ -57,27 +57,19 @@
     <v-layout row>
       <v-subheader>Filter Notes with Tags</v-subheader>
       <v-spacer></v-spacer>
-      <v-tooltip bottom
-        color="white">
-        <v-btn small icon
-          @click="clearTags" slot="activator"
-          class="white--text" style="margin: 10px 5px;">
-          <v-icon class="grey--text">clear_all</v-icon>
-        </v-btn>
-        <span class="black--text">Clear Tag Selection</span>
-      </v-tooltip>
-      <v-tooltip bottom
-        color="white">
-        <v-btn small icon
-          @click="$store.dispatch('setState', {
-            name: 'manageTags',
-            state: true
-          })" slot="activator"
-          class="white--text" style="margin: 10px 5px;">
-          <v-icon class="grey--text">label</v-icon>
-        </v-btn>
-        <span class="black--text">Manage Tags</span>
-      </v-tooltip>
+      <v-btn small icon
+        @click="clearTags"
+        class="white--text" style="margin: 10px 5px;">
+        <v-icon class="grey--text">clear_all</v-icon>
+      </v-btn>
+      <v-btn small icon
+        @click="$store.dispatch('setState', {
+          name: 'manageTags',
+          state: true
+        })"
+        class="white--text" style="margin: 10px 5px;">
+        <v-icon class="grey--text">label</v-icon>
+      </v-btn>
     </v-layout>
     <div class="sidebar-tags">
       <v-combobox
@@ -140,6 +132,7 @@ export default {
   },
   mounted () {
     const context = this
+    context.tags = Object.assign([], this.$store.state.notes.tags)
     ipcRenderer.on('onMenuItemClick', (event, arg) => {
       if (arg && arg.constructor === {}.constructor && 'label' in arg) {
         switch (arg.label) {

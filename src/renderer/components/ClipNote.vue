@@ -37,6 +37,11 @@
         <v-icon class="red--text">delete</v-icon>
       </v-btn>
       <v-btn icon
+        v-if="hoverActions"
+        @click="onClickDownload">
+        <v-icon class="blue--text">vertical_align_bottom</v-icon>
+      </v-btn>
+      <v-btn icon
         @click="onViewNote">
         <v-icon class="secondary--text">zoom_out_map</v-icon>
       </v-btn>
@@ -59,6 +64,8 @@
 </template>
 
 <script>
+import helper from '../assets/helper'
+
 const fops = require('fs-extra')
 const path = require('path')
 const Spawn = require('threads').spawn
@@ -104,6 +111,49 @@ export default {
         if (isUrl(url)) {
           this.$electron.shell.openExternal(url)
         }
+      }
+    },
+    onClickDownload () {
+      const context = this
+      const path = this.$electron.remote.dialog.showSaveDialog(
+        this.$electron.remote.getCurrentWindow(),
+        {
+          filters: [
+            {
+              name: `${this.note.type === 'IMAGE' ? 'Image' : 'HTML'}`,
+              extensions: [`${this.note.type === 'IMAGE' ? 'png' : 'html'}`] }
+          ]
+        }
+      )
+      const srcPath = helper.getPathSys(
+        this.note,
+        this.$store.state.config.resPath,
+        this,
+        false
+      )
+      if (path && srcPath && fops.existsSync(srcPath)) {
+        fops.copy(
+          srcPath,
+          path,
+          function (err) {
+            if (err) {
+              context.$store.dispatch('setState', {
+                name: 'snackbar',
+                state: true,
+                message: 'Successfully exported!',
+                background: 'red',
+                color: 'white--text'
+              })
+            } else {
+              console.log('done')
+              context.$store.dispatch('setState', {
+                name: 'snackbar',
+                state: true,
+                message: 'Successfully exported!'
+              })
+            }
+          }
+        )
       }
     },
     onClickEdit () {

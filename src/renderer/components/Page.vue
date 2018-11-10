@@ -61,7 +61,7 @@
             </h2>
             <div class="important-info-box">
               <p><strong>
-                Strict Filter will only show notes having all selected tags.
+                Strict Filter will only show notes having combination of all selected tags.
               </strong>.</p>
             </div>
           </div>

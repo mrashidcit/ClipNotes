@@ -45,6 +45,16 @@ const state = {
     pCallback: () => {},
     nCallback: () => {}
   },
+  snackbar: {
+    state: false,
+    position: 'top',
+    align: 'right',
+    background: 'primary',
+    color: 'white--text',
+    timeout: 3000,
+    mode: 'multi-line',
+    message: ''
+  },
   tagSelection: [],
   listCount: 0,
   resPath: null,
@@ -129,6 +139,16 @@ const mutations = {
             ? config.pCallback : () => {}
           state.actionDialog.nCallback = ('nCallback' in config && typeof config.nCallback === 'function')
             ? config.nCallback : () => {}
+          break
+        case 'snackbar':
+          state.snackbar.state = ('state' in config && config.state) ? 1 : 0
+          state.snackbar.position = ('position' in config && config.position) ? config.position : 'top'
+          state.snackbar.align = ('align' in config && config.align) ? config.align : 'right'
+          state.snackbar.background = ('background' in config && config.background) ? config.background : 'primary'
+          state.snackbar.color = ('color' in config && config.color) ? config.color : 'white--text'
+          state.snackbar.timeout = ('timeout' in config && config.timeout) ? config.timeout : 3000
+          state.snackbar.mode = ('mode' in config && config.mode) ? config.mode : ''
+          state.snackbar.message = ('message' in config && config.message) ? config.message : ''
           break
         default: break
       }

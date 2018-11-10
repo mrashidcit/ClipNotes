@@ -20,6 +20,30 @@
     <action-dialog />
     <loading />
     <view-note />
+    <v-snackbar
+      v-model="snackbar"
+      :color="$store.state.config.snackbar.background"
+      :bottom="$store.state.config.snackbar.position === 'bottom'"
+      :left="$store.state.config.snackbar.align === 'left'"
+      :multi-line="$store.state.config.snackbar.mode === 'multi-line'"
+      :right="$store.state.config.snackbar.align === 'right'"
+      :timeout="$store.state.config.snackbar.timeout"
+      :top="$store.state.config.snackbar.position === 'top'"
+      :vertical="$store.state.config.snackbar.mode === 'vertical'">
+      <strong :class="`${$store.state.config.snackbar.color}`">
+        {{ $store.state.config.snackbar.message }}
+      </strong>
+      <v-btn
+        flat icon
+        @click="$store.dispatch('setState', {
+          name: 'snackbar',
+          state: false
+        })">
+        <v-icon :class="`${$store.state.config.snackbar.color}`">
+          close
+        </v-icon>
+      </v-btn>
+    </v-snackbar>
   </div>
 </template>
 
@@ -48,6 +72,32 @@ export default {
     ActionDialog,
     Loading,
     ViewNote
+  },
+  data () {
+    return {
+      snackbar: false
+    }
+  },
+  computed: {
+    onSnackbarLocalChange: function () {
+      return this.snackbar
+    },
+    onSnackbarStoreChange: function () {
+      return this.$store.state.config.snackbar.state
+    }
+  },
+  watch: {
+    onSnackbarLocalChange: function (state) {
+      if (!state) {
+        this.$store.dispatch('setState', {
+          name: 'snackbar',
+          state: false
+        })
+      }
+    },
+    onSnackbarStoreChange: function (state) {
+      this.snackbar = state
+    }
   },
   mounted () {
     const context = this
