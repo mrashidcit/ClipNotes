@@ -24,11 +24,18 @@
             <v-icon class="white--text">check</v-icon>
           </v-btn>
         </v-layout>
+        <div class="important-info-box" style="width: 100%;"
+          v-if="$store.state.config.edit.data.type === 'BOOKMARK'">
+          You can only edit Tags assicated with a bookmark.
+          Title and Description are fetched ONLY at the time of creating bookmark.
+        </div>
         <v-text-field box
+          :disabled="$store.state.config.edit.data.type === 'BOOKMARK'"
           v-model="title" ref="name"
           label="Note Name">
         </v-text-field>
         <v-textarea
+          :disabled="$store.state.config.edit.data.type === 'BOOKMARK'"
           v-model="description"
           name="input-description"
           label="Note Description">

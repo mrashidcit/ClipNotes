@@ -11,6 +11,7 @@
         </transition>
       </div>
       <div class="hero-x fit-text"
+        @click="openUrl"
         v-if="'type' in $store.state.config.viewNote.data &&
           ($store.state.config.viewNote.data.type === 'TEXT' ||
           $store.state.config.viewNote.data.type === 'BOOKMARK') &&
@@ -75,6 +76,7 @@ import Tags from './Tags'
 
 const path = require('path')
 const fops = require('fs-extra')
+const isUrl = require('is-url')
 
 export default {
   name: 'view-note',
@@ -107,6 +109,20 @@ export default {
     }
   },
   methods: {
+    openUrl () {
+      if (
+        this.$store.state.config.viewNote.data.type === 'BOOKMARK' &&
+        'description' in this.$store.state.config.viewNote.data &&
+        this.$store.state.config.viewNote.data.description
+      ) {
+        const linkUrl = JSON.parse(
+          this.$store.state.config.viewNote.data.description
+        ).url
+        if (isUrl(linkUrl)) {
+          this.$electron.shell.openExternal(linkUrl)
+        }
+      }
+    },
     loadSource: function () {
       const src = helper.getPath(
         this.$store.state.config.viewNote.data,

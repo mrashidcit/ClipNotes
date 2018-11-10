@@ -1,6 +1,6 @@
 <template>
   <v-chip>
-    {{tag}}
+    {{tag.title}}
   </v-chip>
 </template>
 

@@ -14,6 +14,9 @@ const state = {
     state: false,
     data: null
   },
+  manageTags: {
+    state: false
+  },
   viewNote: {
     state: false,
     data: null
@@ -71,6 +74,10 @@ const mutations = {
           clearViews()
           state.edit.data = ('data' in config && config.data) ? config.data : null
           state.edit.state = ('state' in config && config.state) ? 1 : 0
+          break
+        case 'manageTags':
+          clearViews()
+          state.manageTags.state = ('state' in config && config.state) ? 1 : 0
           break
         case 'viewNote':
           state.viewNote.state = ('state' in config && config.state) ? 1 : 0

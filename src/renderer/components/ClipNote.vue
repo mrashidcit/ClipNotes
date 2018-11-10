@@ -36,7 +36,7 @@
         @click="onClickDelete">
         <v-icon class="red--text">delete</v-icon>
       </v-btn>
-      <v-btn icon v-if="note.type !== 'BOOKMARK'"
+      <v-btn icon
         @click="onViewNote">
         <v-icon class="secondary--text">zoom_out_map</v-icon>
       </v-btn>
